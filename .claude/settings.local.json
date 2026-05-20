@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir \"c:\\\\Users\\\\DELL\\\\OneDrive\\\\Desktop\\\\InsightFlow\")",
+      "PowerShell(cd \"c:\\\\Users\\\\DELL\\\\OneDrive\\\\Desktop\\\\InsightFlow\\\\frontend\"; npx shadcn@latest add button --yes 2>&1; echo \"---EXIT:$LASTEXITCODE---\")",
+      "PowerShell(cd \"c:\\\\Users\\\\DELL\\\\OneDrive\\\\Desktop\\\\InsightFlow\\\\frontend\"; npx shadcn@4.6.0 add button card input separator --yes 2>&1; echo \"---EXIT:$LASTEXITCODE---\")",
+      "PowerShell(cd \"c:\\\\Users\\\\DELL\\\\OneDrive\\\\Desktop\\\\InsightFlow\\\\frontend\"; npx shadcn@4.6.0 add dropdown-menu dialog sheet toast --yes 2>&1; echo \"---EXIT:$LASTEXITCODE---\")"
+    ]
+  }
+}
