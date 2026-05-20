@@ -12,6 +12,23 @@ Update this file after every meaningful implementation change.
 
 ## Completed
 
+- **Unit 3: Frontend ↔ Backend Integration**
+  - `axios` + `@tanstack/react-query` installed
+  - `.env`, `.env.development`, `.env.production` created with `VITE_API_BASE_URL`
+  - `src/lib/env/index.ts` — centralized environment access
+  - `src/lib/api/config.ts` — base URL + timeout from env
+  - `src/lib/api/client.ts` — Axios instance with 10s timeout + JSON headers
+  - `src/lib/api/interceptors.ts` — response error normalization (401, 403, 5xx, network)
+  - `src/lib/api/endpoints.ts` — endpoint registry (`/health/`, `/auth/*`)
+  - `src/lib/api/types.ts` — `ApiResponse<T>` and `ApiError` types
+  - `src/lib/api/utils.ts` — `getRequest`, `postRequest`, `patchRequest`, `deleteRequest`
+  - `src/app/providers/query-provider.tsx` — `QueryClient` (retry:1, no window-focus refetch)
+  - `src/services/health/index.ts` — `getHealthStatus()` service
+  - `src/hooks/api/use-health-check.ts` — `useHealthCheck()` React Query hook
+  - `src/App.tsx` updated: `QueryProvider` wraps the app
+  - `src/features/dashboard/pages/dashboard-page.tsx` — shows live API connection status
+  - Production build passes (0 TS errors, 440 kB bundle)
+
 - **Unit 2: Backend API Foundation**
   - Django 5.x + DRF + PostgreSQL backend initialized under `/backend`
   - Modular settings: `config/settings/{base,development,production}.py`
@@ -47,8 +64,7 @@ Update this file after every meaningful implementation change.
 
 ## Next Up
 
-1. **Unit 3: Frontend ↔ Backend Integration** — API communication layer, shared env handling
-2. **Unit 4: Deployment & Environment Setup** — Railway + Vercel deployment pipeline
+1. **Unit 4: Deployment & Environment Setup** — Railway + Vercel deployment pipeline
 
 ## Open Questions
 
