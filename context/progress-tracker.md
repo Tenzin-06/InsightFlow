@@ -64,7 +64,7 @@ Update this file after every meaningful implementation change.
 
 ## Next Up
 
-1. **Unit 4: Deployment & Environment Setup** — Railway + Vercel deployment pipeline
+1. **Unit 4: Deployment & Environment Setup** — Render (backend) + Neon (PostgreSQL) + Vercel (frontend) deployment pipeline
 
 ## Open Questions
 

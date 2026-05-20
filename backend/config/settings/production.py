@@ -5,10 +5,10 @@ env = environ.Env()
 
 DEBUG = False
 
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[".railway.app"])
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[".onrender.com"])
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://*.railway.app",
+    "https://*.onrender.com",
     "https://*.vercel.app",
 ]
 
@@ -33,14 +33,7 @@ MIDDLEWARE = [
 ]
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": env("PGDATABASE"),
-        "USER": env("PGUSER"),
-        "PASSWORD": env("PGPASSWORD"),
-        "HOST": env("PGHOST"),
-        "PORT": env("PGPORT"),
-    }
+    "default": env.db("DATABASE_URL")
 }
 
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
