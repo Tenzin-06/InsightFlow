@@ -1,6 +1,8 @@
-import { Moon, Sun, User } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
+
 import { Button } from "@/components/ui/button";
+import { Navigation } from "@/components/layout/navigation";
 
 export function Header() {
   const { theme, setTheme } = useTheme();
@@ -21,9 +23,7 @@ export function Header() {
             <Moon className="h-4 w-4 text-text-secondary" />
           )}
         </Button>
-        <Button variant="ghost" size="icon" aria-label="User profile">
-          <User className="h-4 w-4 text-text-secondary" />
-        </Button>
+        <Navigation />
       </div>
     </header>
   );

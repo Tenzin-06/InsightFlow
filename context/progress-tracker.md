@@ -8,9 +8,20 @@ Update this file after every meaningful implementation change.
 
 ## Current Goal
 
-- Unit 3: Frontend ↔ Backend Integration
+- Unit 5: Authentication UI
 
 ## Completed
+
+- **Unit 5: Authentication UI**
+  - `react-hook-form`, `zod`, `@hookform/resolvers` installed
+  - `src/components/ui/label.tsx` — Radix Label primitive
+  - `src/features/auth/layouts/authentication-layout.tsx` — split-screen layout (branding left, form right)
+  - `src/features/auth/components/` — auth-card, auth-header, auth-footer, password-input, login-form, signup-form
+  - `src/features/auth/pages/login-page.tsx` — Login/Sign Up tab switcher + LoginForm
+  - `src/features/auth/pages/register-page.tsx` — Login/Sign Up tab switcher + SignupForm
+  - `src/app/router/index.tsx` — `/login` + `/register` under `AuthenticationLayout`
+  - `src/components/layout/navigation.tsx` — session-aware nav (guest: Login+SignUp / auth: Dashboard+avatar)
+  - `src/components/layout/header.tsx` — uses Navigation component
 
 - **Unit 3: Frontend ↔ Backend Integration**
   - `axios` + `@tanstack/react-query` installed
@@ -64,7 +75,7 @@ Update this file after every meaningful implementation change.
 
 ## Next Up
 
-1. **Unit 4: Deployment & Environment Setup** — Render (backend) + Neon (PostgreSQL) + Vercel (frontend) deployment pipeline
+1. **Unit 6: Backend Authentication** — JWT auth endpoints, login/register API, session handling
 
 ## Open Questions
 
@@ -83,4 +94,4 @@ Update this file after every meaningful implementation change.
 ## Session Notes
 
 - Unit 1 complete. Frontend shell running at `localhost:5173` with full design system, routing, and dashboard layout.
-- Begin Unit 2 next: create `/backend` Django project. No dependency on Unit 1 for this step.
+- Unit 5 complete. Authentication UI implemented with split-screen layout, react-hook-form + zod validation, session-aware navigation.
