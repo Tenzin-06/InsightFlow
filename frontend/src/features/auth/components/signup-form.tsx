@@ -34,8 +34,13 @@ export function SignupForm() {
 
   async function onSubmit(_values: SignupValues) {
     setIsLoading(true);
-    await new Promise((r) => setTimeout(r, 1500));
-    setIsLoading(false);
+    try {
+      await new Promise((r) => setTimeout(r, 1500));
+    } catch (err) {
+      console.error("Signup error:", err);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (

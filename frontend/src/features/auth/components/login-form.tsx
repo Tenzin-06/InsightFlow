@@ -28,8 +28,13 @@ export function LoginForm() {
 
   async function onSubmit(_values: LoginValues) {
     setIsLoading(true);
-    await new Promise((r) => setTimeout(r, 1500));
-    setIsLoading(false);
+    try {
+      await new Promise((r) => setTimeout(r, 1500));
+    } catch (err) {
+      console.error("Login error:", err);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
