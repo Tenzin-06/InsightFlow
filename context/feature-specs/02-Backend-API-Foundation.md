@@ -1,5 +1,3 @@
-# Unit 2 Specification — Backend API Foundation
-
 ## Goal
 
 Establish the foundational backend architecture for InsightFlow using Django, Django REST Framework, and PostgreSQL, including scalable API configuration, environment management, and modular backend structure.  
