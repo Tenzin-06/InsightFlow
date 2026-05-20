@@ -8,9 +8,24 @@ Update this file after every meaningful implementation change.
 
 ## Current Goal
 
-- Unit 2: Backend API Foundation (Django + DRF + PostgreSQL)
+- Unit 3: Frontend ↔ Backend Integration
 
 ## Completed
+
+- **Unit 2: Backend API Foundation**
+  - Django 5.x + DRF + PostgreSQL backend initialized under `/backend`
+  - Modular settings: `config/settings/{base,development,production}.py`
+  - Six Django apps scaffolded: `authentication`, `users`, `surveys`, `analytics`, `campaigns`, `core`
+  - Each app has: `models.py`, `views.py`, `serializers.py`, `urls.py`, `services.py`, `selectors.py`
+  - `apps.core.models.TimeStampedModel` abstract base with `created_at` / `updated_at`
+  - `GET /api/v1/health/` endpoint returning `{"status": "ok", "service": "InsightFlow API"}`
+  - DRF configured: JSON-only renderer/parser, `LimitOffsetPagination`
+  - CORS configured: `localhost:5173` allowed in development
+  - PostgreSQL credentials loaded from `.env` via `django-environ`
+  - Static/media dirs configured (`staticfiles/`, `media/`)
+  - Console logging configured (DEBUG level in development)
+  - Requirements split: `requirements/{base,development,production}.txt`
+  - `django-admin check` passes with 0 issues
 
 - **Unit 1: Frontend Application Foundation**
   - React + Vite + TypeScript project initialized
@@ -32,9 +47,8 @@ Update this file after every meaningful implementation change.
 
 ## Next Up
 
-1. **Unit 2: Backend API Foundation** — Django setup, DRF, PostgreSQL, base API config
-2. **Unit 3: Frontend ↔ Backend Integration** — API communication layer, shared env handling
-3. **Unit 4: Deployment & Environment Setup** — Railway + Vercel deployment pipeline
+1. **Unit 3: Frontend ↔ Backend Integration** — API communication layer, shared env handling
+2. **Unit 4: Deployment & Environment Setup** — Railway + Vercel deployment pipeline
 
 ## Open Questions
 
