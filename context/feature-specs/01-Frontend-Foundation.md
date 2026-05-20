@@ -17,7 +17,6 @@ The frontend should follow a modern SaaS dashboard aesthetic inspired by:
 - soft rounded corners
 - subtle shadows
 - minimal but professional UI
-- dark/light theme support
 - analytics-first layout structure
 
 The design language should support:

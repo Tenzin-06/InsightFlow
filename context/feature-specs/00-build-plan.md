@@ -1,685 +1,748 @@
-# InsightFlow — Spec Unit Build Plan
+# InsightFlow — Final Specification Roadmap
 
 ## Overview
 
-This document defines the development breakdown for **InsightFlow**, an AI-powered survey intelligence and distribution platform.
+This document defines the finalized spec-driven development roadmap for InsightFlow.
 
-The build process follows a **spec-driven development workflow**, where:
+InsightFlow is an AI-powered survey intelligence and distribution platform designed for:
 
-- Each unit corresponds to one spec file
-- Each unit produces one visible outcome
-- Dependencies are introduced only when required
-- Related work that naturally belongs together is grouped into one unit
-- Units are intentionally scoped for manageable implementation sessions
+- Academic researchers
+- Students
+- Government agencies
+- Research organizations
 
-The structure below is ordered in the recommended development sequence.
+The platform enhances the entire survey lifecycle through:
+
+- Smarter survey distribution
+- Engagement tracking
+- AI-powered analytics
+- Automated follow-ups
+- Controlled synthetic response simulation
+
+The roadmap below follows a strict:
+
+- UI-first development strategy
+- Incremental functionality integration workflow
+- Spec-driven implementation structure
+
+Each unit represents one implementation specification.
 
 ---
 
-# Build Units
+## Phase 1 — Foundation
 
-## 1. Frontend Application Foundation
+### Unit 1: Frontend Application Foundation
 
-### Builds
-
+**Builds**
 - React setup
-- Routing system
 - Tailwind CSS integration
 - shadcn/ui integration
-- Global theme foundation
-- Basic frontend structure
+- Global theme system
+- Base routing structure
 
-### Visible Result
+**Visible Result**
+Frontend shell is running with the base design system.
 
-A styled frontend application shell is running locally.
-
-### Dependencies
-
+**Dependencies**
 None.
 
 ---
 
-## 2. Marketing Website & Landing Page
+### Unit 2: Backend API Foundation
 
-### Builds
-
-- Public landing page
-- Hero section
-- Feature showcase sections
-- CTA sections
-- Responsive navigation
-- Footer
-- Initial design system implementation
-- Mobile responsiveness
-- Premium SaaS UI styling
-
-### Visible Result
-
-InsightFlow has a polished public-facing landing page.
-
-### Dependencies
-
-- Unit 1
-
----
-
-## 3. Backend API Foundation
-
-### Builds
-
+**Builds**
 - Django setup
 - Django REST Framework setup
 - PostgreSQL integration
-- Base API routing
-- Environment configuration
+- Base API configuration
 
-### Visible Result
+**Visible Result**
+Backend APIs run successfully.
 
-Backend APIs run successfully with database connectivity.
-
-### Dependencies
-
+**Dependencies**
 None.
 
 ---
 
-## 4. Frontend ↔ Backend Integration
+### Unit 3: Frontend ↔ Backend Integration
 
-### Builds
-
-- API communication setup
+**Builds**
+- API communication layer
 - Shared environment handling
-- Health check integration
-- Base API service layer
+- Base API utilities
 
-### Visible Result
+**Visible Result**
+Frontend communicates with backend successfully.
 
-Frontend successfully communicates with backend APIs.
-
-### Dependencies
-
+**Dependencies**
 - Unit 1
-- Unit 3
+- Unit 2
 
 ---
 
-## 5. Deployment & Environment Setup
+### Unit 4: Deployment & Environment Setup
 
-### Builds
-
-- Railway backend deployment configuration
-- Vercel frontend deployment configuration
-- Production environment variables
+**Builds**
+- Railway deployment configuration
+- Vercel deployment configuration
+- Environment variable setup
 - Initial deployment pipeline
 
-### Visible Result
-
+**Visible Result**
 InsightFlow is deployed online.
 
-### Dependencies
-
-- Unit 4
+**Dependencies**
+- Unit 3
 
 ---
 
-## 6. Authentication System
+## Phase 2 — Authentication & Dashboard
 
-### Builds
+### Unit 5: Authentication UI
 
+**Builds**
+- Login page UI
+- Signup page UI
+- Authentication layouts
+- Session-aware navigation states
+
+**Visible Result**
+Authentication screens are fully designed.
+
+**Dependencies**
+- Unit 1
+
+---
+
+### Unit 6: Authentication System Integration
+
+**Builds**
 - Clerk integration
-- Login/signup flows
-- Session management
+- Authentication logic
 - Protected routes
-- Backend user association layer
+- Backend user association
 
-### Visible Result
+**Visible Result**
+Users can authenticate successfully.
 
-Users can authenticate and access protected pages.
-
-### Dependencies
-
-- Unit 4
+**Dependencies**
+- Unit 5
+- Unit 3
 
 ---
 
-## 7. Dashboard Layout & Navigation
+### Unit 7: Dashboard Layout & Navigation UI
 
-### Builds
-
+**Builds**
 - Sidebar navigation
-- Responsive dashboard shell
-- Main application layout
+- Dashboard shell
+- Responsive dashboard layout
 - Navigation routing structure
 
-### Visible Result
+**Visible Result**
+Main application dashboard UI exists.
 
-Logged-in users see the full dashboard structure.
-
-### Dependencies
-
+**Dependencies**
 - Unit 6
 
 ---
 
-## 8. Survey Data Architecture
+### Unit 8: Survey Data Architecture
 
-### Builds
-
-- Survey database schema
+**Builds**
+- Survey schema
 - Question schema
-- Survey relationships
 - Survey CRUD APIs
 
-### Visible Result
+**Visible Result**
+Survey data can be stored and managed.
 
-Surveys can be stored and managed through APIs.
-
-### Dependencies
-
-- Unit 3
+**Dependencies**
+- Unit 2
 - Unit 6
 
 ---
 
-## 9. Survey Management Interface
+### Unit 9: Marketing Website & Landing Page
 
-### Builds
+**Builds**
+- Public landing page
+- Hero section
+- Feature sections
+- CTA sections
+- Footer
+- Responsive marketing layout
 
+**Visible Result**
+InsightFlow has a polished public-facing website.
+
+**Dependencies**
+- Unit 1
+
+---
+
+## Phase 3 — Survey Management
+
+### Unit 10: Survey Management UI
+
+**Builds**
 - Survey list page
 - Survey creation page
 - Survey detail page
-- Metadata editing UI
+- Survey editor UI
 
-### Visible Result
+**Visible Result**
+Users can visually manage surveys.
 
-Users can create and manage surveys visually.
-
-### Dependencies
-
+**Dependencies**
 - Unit 7
-- Unit 8
 
 ---
 
-## 10. Google Forms Import System
+### Unit 11: Survey Management Functionality
 
-### Builds
+**Builds**
+- Survey CRUD integration
+- Form submission logic
+- Survey persistence
+- Metadata management
 
-- Google Forms import processing
+**Visible Result**
+Survey management UI becomes functional.
+
+**Dependencies**
+- Unit 8
+- Unit 10
+
+---
+
+### Unit 12: Google Forms Import UI
+
+**Builds**
+- Import modal/page
+- Import workflow UI
+- Loading states
+- Error states
+
+**Visible Result**
+Users can access Google Forms import workflows.
+
+**Dependencies**
+- Unit 10
+
+---
+
+### Unit 13: Google Forms Import System
+
+**Builds**
+- Google Forms parsing
 - Question normalization
 - Import APIs
-- Import UI workflow
 
-### Visible Result
+**Visible Result**
+Google Forms import works successfully.
 
-Users can import Google Forms into InsightFlow.
-
-### Dependencies
-
-- Unit 7
-- Unit 8
-
----
-
-## 11. Survey Response Infrastructure
-
-### Builds
-
-- Response database schema
-- Answer storage structure
-- Submission APIs
-- Response persistence logic
-
-### Visible Result
-
-Survey responses can be submitted and stored.
-
-### Dependencies
-
-- Unit 8
-
----
-
-## 12. Public Survey Experience
-
-### Builds
-
-- Public survey routes
-- Standard survey renderer
-- Survey completion flow
-- Mobile-friendly response UI
-
-### Visible Result
-
-Respondents can complete surveys publicly.
-
-### Dependencies
-
-- Unit 11
-
----
-
-## 13. Conversational Survey Experience
-
-### Builds
-
-- One-question-at-a-time survey flow
-- Chat-style UI
-- Conversational state management
-- Mobile conversational UX
-
-### Visible Result
-
-Surveys can be completed in conversational format.
-
-### Dependencies
-
+**Dependencies**
 - Unit 12
-
----
-
-## 14. Campaign & Distribution Data Layer
-
-### Builds
-
-- Campaign schema
-- Audience list schema
-- Distribution relationships
-- Campaign CRUD APIs
-
-### Visible Result
-
-Campaigns and audience lists can be managed structurally.
-
-### Dependencies
-
 - Unit 8
 
 ---
 
-## 15. Survey Sharing System
+### Unit 14: Survey Response Infrastructure
 
-### Builds
+**Builds**
+- Response schema
+- Answer storage
+- Submission APIs
 
-- Shareable survey links
-- QR code generation
-- Public distribution helpers
+**Visible Result**
+Survey responses can be stored.
 
-### Visible Result
-
-Surveys can be distributed through links and QR codes.
-
-### Dependencies
-
-- Unit 14
+**Dependencies**
+- Unit 8
 
 ---
 
-## 16. Audience Management Interface
+### Unit 15: Public Survey Experience UI
 
-### Builds
+**Builds**
+- Public survey pages
+- Survey renderer UI
+- Mobile layouts
+- Completion screens
 
-- Audience upload tools
-- Contact management UI
-- Audience list editing workflows
+**Visible Result**
+Respondents can visually interact with surveys.
 
-### Visible Result
-
-Users can manage survey recipient lists.
-
-### Dependencies
-
-- Unit 14
-- Unit 7
+**Dependencies**
+- Unit 10
 
 ---
 
-## 17. Email Distribution System
+### Unit 16: Public Survey Functionality
 
-### Builds
+**Builds**
+- Survey loading logic
+- Submission functionality
+- Validation logic
+- Completion handling
 
-- Resend integration
-- Email template system
-- Campaign sending APIs
-- Campaign sending UI
+**Visible Result**
+Public surveys function end-to-end.
 
-### Visible Result
-
-Users can send survey campaigns through email.
-
-### Dependencies
-
+**Dependencies**
 - Unit 14
+- Unit 15
+
+---
+
+### Unit 17: Conversational Survey UI
+
+**Builds**
+- Chat-style survey layout
+- Conversational transitions
+- One-question-at-a-time interface
+
+**Visible Result**
+Conversational survey experience exists visually.
+
+**Dependencies**
+- Unit 15
+
+---
+
+### Unit 18: Conversational Survey Logic
+
+**Builds**
+- Conversational flow state management
+- Sequential question handling
+- Conversational submission flow
+
+**Visible Result**
+Conversational surveys function correctly.
+
+**Dependencies**
+- Unit 17
 - Unit 16
 
 ---
 
-## 18. Background Job Infrastructure
+## Phase 4 — Distribution
 
-### Builds
+### Unit 19: Campaign & Distribution Data Layer
 
-- Trigger.dev integration
-- Async processing pipeline
-- Job retry/error handling
-- Background task abstraction
+**Builds**
+- Campaign schema
+- Audience schema
+- Campaign APIs
 
-### Visible Result
+**Visible Result**
+Campaign data structures exist.
 
-Long-running tasks execute asynchronously.
-
-### Dependencies
-
-- Unit 17
+**Dependencies**
+- Unit 8
 
 ---
 
-## 19. Campaign Scheduling & Reminder Automation
+### Unit 20: Survey Sharing System
 
-### Builds
+**Builds**
+- Shareable survey links
+- QR code generation
+- Distribution helpers
 
-- Campaign scheduling
-- Delayed campaign sending
+**Visible Result**
+Surveys can be shared publicly.
+
+**Dependencies**
+- Unit 19
+
+---
+
+### Unit 21: Audience Management UI
+
+**Builds**
+- Audience management pages
+- Upload interfaces
+- Contact list UI
+
+**Visible Result**
+Audience management screens are available.
+
+**Dependencies**
+- Unit 7
+
+---
+
+### Unit 22: Audience Management Functionality
+
+**Builds**
+- Audience CRUD logic
+- Upload processing
+- Audience persistence
+
+**Visible Result**
+Audience management becomes functional.
+
+**Dependencies**
+- Unit 19
+- Unit 21
+
+---
+
+### Unit 23: Email Campaign UI
+
+**Builds**
+- Campaign creation page
+- Email template UI
+- Send/schedule interfaces
+
+**Visible Result**
+Email campaign workflows exist visually.
+
+**Dependencies**
+- Unit 21
+
+---
+
+### Unit 24: Email Distribution System
+
+**Builds**
+- Resend integration
+- Email sending logic
+- Campaign processing
+- Email templates
+
+**Visible Result**
+Email campaigns can be sent.
+
+**Dependencies**
+- Unit 22
+- Unit 23
+
+---
+
+### Unit 25: Background Job Infrastructure
+
+**Builds**
+- Trigger.dev integration
+- Async job execution
+- Retry/error handling
+
+**Visible Result**
+Background tasks run asynchronously.
+
+**Dependencies**
+- Unit 24
+
+---
+
+### Unit 26: Campaign Scheduling & Reminder Automation
+
+**Builds**
+- Scheduling system
 - Reminder workflows
 - Automated follow-up logic
 
-### Visible Result
+**Visible Result**
+Campaign automation works.
 
-Campaigns and reminders can run automatically.
-
-### Dependencies
-
-- Unit 18
+**Dependencies**
+- Unit 25
 
 ---
 
-## 20. Engagement Tracking System
+## Phase 5 — Tracking & Analytics
 
-### Builds
+### Unit 27: Engagement Tracking System
 
+**Builds**
 - Email open tracking
 - Link click tracking
 - Response tracking
 - Drop-off detection
 
-### Visible Result
+**Visible Result**
+Survey engagement metrics are collected.
 
-Survey engagement activity is tracked.
-
-### Dependencies
-
-- Unit 17
-- Unit 11
+**Dependencies**
+- Unit 24
+- Unit 16
 
 ---
 
-## 21. Analytics Metrics Engine
+### Unit 28: Engagement Optimization Automation
 
-### Builds
-
-- Aggregated analytics computation
-- Response metrics
-- Engagement metrics
-- Drop-off analytics APIs
-
-### Visible Result
-
-Analytics metrics become available for visualization.
-
-### Dependencies
-
-- Unit 20
-
----
-
-## 22. Analytics Dashboard
-
-### Builds
-
-- Response rate charts
-- Engagement dashboards
-- Question-level analytics
-- Metric visualization components
-
-### Visible Result
-
-Users can visually analyze survey performance.
-
-### Dependencies
-
-- Unit 21
-- Unit 7
-
----
-
-## 23. Gemini AI Infrastructure
-
-### Builds
-
-- Gemini API integration
-- AI processing abstraction
-- Async AI task execution
-- AI prompt orchestration
-
-### Visible Result
-
-AI services are operational inside the platform.
-
-### Dependencies
-
-- Unit 18
-
----
-
-## 24. AI Response Summarization
-
-### Builds
-
-- AI-generated survey summaries
-- Summary storage and retrieval
-- Summary UI components
-
-### Visible Result
-
-Surveys display AI-generated summaries.
-
-### Dependencies
-
-- Unit 23
-- Unit 11
-
----
-
-## 25. AI Sentiment & Quality Analysis
-
-### Builds
-
-- Sentiment analysis
-- Response quality scoring
-- Sentiment/quality visualizations
-
-### Visible Result
-
-Responses receive AI-based sentiment and quality analysis.
-
-### Dependencies
-
-- Unit 23
-- Unit 11
-
----
-
-## 26. Per-Question AI Insights
-
-### Builds
-
-- Question-level AI insights
-- Insight generation logic
-- Insight dashboard components
-
-### Visible Result
-
-Questions display AI-generated insights.
-
-### Dependencies
-
-- Unit 23
-- Unit 22
-
----
-
-## 27. Simulation Mode Infrastructure
-
-### Builds
-
-- Simulation data isolation
-- Persona system
-- Simulation safety boundaries
-- Controlled execution rules
-
-### Visible Result
-
-Simulation mode operates separately from real data.
-
-### Dependencies
-
-- Unit 11
-- Unit 23
-
----
-
-## 28. Synthetic Response Generation System
-
-### Builds
-
-- Persona-driven synthetic responses
-- AI simulation generation
-- Simulation run management
-- Simulation UI workflows
-
-### Visible Result
-
-Users can generate synthetic survey responses.
-
-### Dependencies
-
-- Unit 27
-
----
-
-## 29. Engagement Optimization Automation
-
-### Builds
-
+**Builds**
 - Non-respondent targeting
 - Smart reminder logic
 - Rule-based engagement optimization
 
-### Visible Result
-
+**Visible Result**
 Campaigns optimize follow-ups automatically.
 
-### Dependencies
-
-- Unit 19
-- Unit 20
-
----
-
-## 30. PDF Report Generation System
-
-### Builds
-
-- PDF report generation
-- Structured report templates
-- AI insight embedding
-- One-click report export UI
-
-### Visible Result
-
-Users can export professional analytics reports as PDFs.
-
-### Dependencies
-
-- Unit 21
-- Unit 24
-- Unit 25
+**Dependencies**
 - Unit 26
+- Unit 27
 
 ---
 
-## 31. Observability & Error Monitoring
+### Unit 29: Analytics Dashboard UI
 
-### Builds
+**Builds**
+- Analytics dashboard layout
+- Charts
+- Metrics cards
+- Analytics pages
 
+**Visible Result**
+Analytics dashboards exist visually.
+
+**Dependencies**
+- Unit 7
+
+---
+
+### Unit 30: Analytics Metrics Engine
+
+**Builds**
+- Metrics aggregation
+- Analytics APIs
+- Dashboard data computation
+
+**Visible Result**
+Analytics dashboards display real data.
+
+**Dependencies**
+- Unit 27
+- Unit 29
+
+---
+
+## Phase 6 — AI Capabilities
+
+### Unit 31: Gemini AI Infrastructure
+
+**Builds**
+- Gemini API integration
+- AI processing abstraction
+- Async AI workflows
+
+**Visible Result**
+AI services are connected.
+
+**Dependencies**
+- Unit 25
+
+---
+
+### Unit 32: AI Analytics Features
+
+**Builds**
+- Response summarization
+- Sentiment analysis
+- Quality scoring
+- Question-level insights
+- AI dashboard integration
+
+**Visible Result**
+AI-powered insights appear in analytics.
+
+**Dependencies**
+- Unit 30
+- Unit 31
+
+---
+
+### Unit 33a: Simulation Mode — Infrastructure & Safeguards
+
+**Builds**
+- Simulation data isolation
+- Synthetic dataset separation
+- Simulation safeguards
+- Execution constraints
+
+**Visible Result**
+Simulation mode operates safely and independently from production data.
+
+**Dependencies**
+- Unit 31
+
+---
+
+### Unit 33b: Simulation Mode — UI & Persona Management
+
+**Builds**
+- Simulation UI
+- Persona management UI
+- Simulation execution workflows
+- Synthetic response generation flows
+
+**Visible Result**
+Users can configure and run synthetic survey simulations.
+
+**Dependencies**
+- Unit 33a
+
+---
+
+### Unit 34a: PDF Report — UI & Templates
+
+**Builds**
+- PDF export UI
+- Report layouts
+- Report templates
+- Export workflows
+
+**Visible Result**
+Users can visually configure and initiate report exports.
+
+**Dependencies**
+- Unit 29
+
+---
+
+### Unit 34b: PDF Report — Generation Engine & AI Embedding
+
+**Builds**
+- PDF generation engine
+- Analytics embedding
+- AI insight embedding
+- Download generation logic
+
+**Visible Result**
+Professional analytics reports can be generated and downloaded.
+
+**Dependencies**
+- Unit 32
+- Unit 34a
+
+---
+
+## Phase 7 — Production Hardening
+
+### Unit 35: Observability & Error Monitoring
+
+**Builds**
 - Logging system
 - Error monitoring
 - Background job observability
 - API diagnostics
 
-### Visible Result
-
+**Visible Result**
 System issues are traceable and monitorable.
 
-### Dependencies
-
-- Unit 18
+**Dependencies**
+- Unit 25
 
 ---
 
-## 32. API Security & Access Protection
+### Unit 36: API Security & Access Protection
 
-### Builds
-
+**Builds**
 - Rate limiting
 - API protection middleware
 - Security headers
 - Abuse prevention measures
 
-### Visible Result
-
+**Visible Result**
 Platform APIs are secured for production usage.
 
-### Dependencies
-
-- Unit 31
+**Dependencies**
+- Unit 35
 
 ---
 
-## 33. Database & Performance Optimization
+### Unit 37: Database & Performance Optimization
 
-### Builds
-
+**Builds**
 - Query optimization
 - Database indexing
 - Analytics performance tuning
 - Response caching strategies
 
-### Visible Result
-
+**Visible Result**
 Platform performance is optimized for scale.
 
-### Dependencies
-
-- Unit 21
+**Dependencies**
 - Unit 30
+- Unit 31
 
 ---
 
-## 34. Production Readiness & Final Validation
+### Unit 38: Production Readiness & Final Validation
 
-### Builds
-
+**Builds**
 - Deployment verification
 - Environment validation
 - Final production checks
 - Stability testing workflows
 
-### Visible Result
-
+**Visible Result**
 InsightFlow is fully production-ready.
 
-### Dependencies
-
+**Dependencies**
 - All previous units
 
 ---
+
+## Technology Stack
+
+| Layer | Technology | Role |
+|---|---|---|
+| Frontend Framework | React | Core frontend application |
+| UI Components | shadcn/ui | Accessible UI components |
+| Styling | Tailwind CSS | Utility-first styling system |
+| Backend Framework | Django | Backend application framework |
+| API Layer | Django REST Framework | REST API system |
+| Database | PostgreSQL | Primary relational database |
+| Authentication | Clerk | Authentication and session management |
+| AI Provider | Google Gemini API | AI analytics and simulation |
+| Background Jobs | Trigger.dev | Async processing and scheduling |
+| Email Service | Resend | Campaign email delivery |
+| Frontend Hosting | Vercel | Frontend deployment |
+| Backend Hosting | Railway | Backend deployment |
+
+---
+
+## Development Principles
+
+### UI-First Workflow
+
+The development process follows a strict UI-first approach:
+
+1. Build interfaces first
+2. Validate UX and layout flows
+3. Integrate business logic afterward
+4. Add external services last
+
+### Architecture Style
+
+- Modular monolith backend
+- API-first architecture
+- Async-first AI and automation processing
+- Strict isolation of simulation data
+
+### Product Goals
+
+InsightFlow aims to:
+
+- Improve survey response rates
+- Increase data quality
+- Automate research workflows
+- Provide AI-assisted survey insights
+- Simplify survey distribution and monitoring
+
+---
+
+## Final Notes
+
+This roadmap is optimized for:
+
+- Spec-driven development
+- Incremental feature delivery
+- Maintainable implementation cycles
+- Clear UI-to-logic progression
+- Production scalability
+
+The structure allows InsightFlow to become usable early while progressively layering advanced analytics, automation, and AI capabilities.
