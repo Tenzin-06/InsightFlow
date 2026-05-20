@@ -1,0 +1,136 @@
+@import "tailwindcss";
+@plugin "tailwindcss-animate";
+
+@theme {
+  /* Background system */
+  --color-bg-primary: #F5F7FB;
+  --color-bg-secondary: #FFFFFF;
+  --color-bg-tertiary: #F8FAFC;
+  --color-bg-hover: #EEF4FF;
+  --color-bg-selected: #E7F0FF;
+  --color-bg-muted: #F1F5F9;
+
+  /* Brand colors */
+  --color-primary-50: #EEF4FF;
+  --color-primary-100: #DCEBFF;
+  --color-primary-200: #C7DDFF;
+  --color-primary-300: #9FC2FF;
+  --color-primary-400: #6EA4FF;
+  --color-primary-500: #3B82F6;
+  --color-primary-600: #2563EB;
+  --color-primary-700: #1D4ED8;
+  --color-primary-800: #1E40AF;
+  --color-primary-900: #172554;
+
+  /* AI accent */
+  --color-ai-50: #F0FDFA;
+  --color-ai-100: #CCFBF1;
+  --color-ai-200: #99F6E4;
+  --color-ai-300: #5EEAD4;
+  --color-ai-400: #2DD4BF;
+  --color-ai-500: #14B8A6;
+  --color-ai-600: #0D9488;
+  --color-ai-700: #0F766E;
+
+  /* Semantic colors */
+  --color-success: #22C55E;
+  --color-warning: #F59E0B;
+  --color-danger: #EF4444;
+  --color-info: #0EA5E9;
+  --color-chart-blue: #3B82F6;
+  --color-chart-light: #BFDBFE;
+  --color-chart-muted: #CBD5E1;
+
+  /* Simulation palette */
+  --color-sim-bg: #FFF7ED;
+  --color-sim-primary: #F97316;
+  --color-sim-border: #FED7AA;
+  --color-sim-warning: #FB923C;
+
+  /* Text colors */
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #475569;
+  --color-text-muted: #94A3B8;
+  --color-text-disabled: #CBD5E1;
+  --color-text-inverse: #FFFFFF;
+
+  /* Border system */
+  --color-border-default: #E2E8F0;
+  --color-border-soft: #EEF2F7;
+  --color-border-strong: #CBD5E1;
+
+  /* Shadow system */
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.06);
+  --shadow-lg: 0 12px 24px rgba(15, 23, 42, 0.08);
+
+  /* Border radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --radius-2xl: 24px;
+
+  /* Typography */
+  --font-primary: "Inter", sans-serif;
+  --font-display: "Inter Tight", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* shadcn/ui compatibility tokens */
+  --color-background: #F5F7FB;
+  --color-foreground: #0F172A;
+  --color-card: #FFFFFF;
+  --color-card-foreground: #0F172A;
+  --color-popover: #FFFFFF;
+  --color-popover-foreground: #0F172A;
+  --color-primary: #3B82F6;
+  --color-primary-foreground: #FFFFFF;
+  --color-secondary: #F1F5F9;
+  --color-secondary-foreground: #0F172A;
+  --color-muted: #F1F5F9;
+  --color-muted-foreground: #94A3B8;
+  --color-accent: #EEF4FF;
+  --color-accent-foreground: #0F172A;
+  --color-destructive: #EF4444;
+  --color-destructive-foreground: #FFFFFF;
+  --color-border: #E2E8F0;
+  --color-input: #E2E8F0;
+  --color-ring: #3B82F6;
+  --radius: 10px;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    background-color: #F5F7FB;
+    color: #0F172A;
+    font-family: "Inter", sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #94A3B8;
+  }
+}
