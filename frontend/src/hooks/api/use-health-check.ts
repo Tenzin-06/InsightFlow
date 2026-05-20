@@ -5,5 +5,7 @@ export const useHealthCheck = () => {
   return useQuery({
     queryKey: ["health"],
     queryFn: getHealthStatus,
+    refetchInterval: 30_000,
+    refetchIntervalInBackground: true,
   });
 };

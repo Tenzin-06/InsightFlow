@@ -11,7 +11,7 @@ export function attachInterceptors(client: AxiosInstance): void {
     (response) => response,
     (error) => {
       const normalized: ApiError = {
-        message: error?.response?.data?.detail ?? error.message ?? "Unknown error",
+        message: error?.response?.data?.detail ?? error?.message ?? "Unknown error",
         status: error?.response?.status,
       };
 
