@@ -15,7 +15,8 @@
 | Background Jobs    | Trigger.dev           | Async processing for emails, AI tasks, and scheduling             |
 | Email Service      | Resend                | Email delivery for campaigns and reminders                        |
 | Frontend Hosting   | Vercel                | Deployment platform for React frontend                            |
-| Backend Hosting    | Railway               | Deployment platform for Django backend                            |
+| Backend Hosting    | Render                | Deployment platform for Django backend                            |
+| Database Hosting   | Neon                  | Managed serverless PostgreSQL (production)                        |
 
 ---
 
