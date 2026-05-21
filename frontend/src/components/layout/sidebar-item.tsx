@@ -18,8 +18,8 @@ export function SidebarItem({ path, label, icon: Icon, onClick }: SidebarItemPro
         cn(
           "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-bold transition-colors",
           isActive
-            ? "bg-bg-selected text-primary-600 border-l-2 border-primary-500"
-            : "text-text-secondary hover:bg-bg-hover hover:text-text-primary border-l-2 border-transparent"
+            ? "bg-bg-secondary text-primary-600 shadow-sm"
+            : "text-text-secondary hover:bg-bg-secondary/60 hover:text-text-primary"
         )
       }
     >

@@ -32,10 +32,10 @@ export function MobileSidebar() {
           <Menu className="h-5 w-5 text-text-secondary" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-64 p-0 bg-bg-secondary border-r border-border-default">
+      <SheetContent side="left" className="w-64 p-0 bg-bg-primary border-r border-border-default">
         <SheetTitle className="sr-only">Navigation</SheetTitle>
 
-        <div className="flex h-16 items-center gap-2.5 border-b border-border-default px-5">
+        <div className="flex h-16 items-center gap-2.5 px-5">
           <img src={logoSrc} alt="InsightFlow logo" className="h-22 w-22 object-contain" />
           <span className="text-base font-bold tracking-tight text-text-primary">InsightFlow</span>
         </div>
