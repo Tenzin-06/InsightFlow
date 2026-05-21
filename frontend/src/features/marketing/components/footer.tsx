@@ -16,8 +16,8 @@ const authLinks = [
 ];
 
 const legalLinks = [
-  { label: "Privacy Policy", to: "#" },
-  { label: "Terms of Service", to: "#" },
+  { label: "Privacy Policy", to: "/privacy" },
+  { label: "Terms of Service", to: "/terms" },
 ];
 
 const socialLinks = [
@@ -119,6 +119,8 @@ export function Footer() {
                     <a
                       href={href}
                       aria-label={label}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 text-base text-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
                       <Icon className="h-5 w-5" aria-hidden="true" />
