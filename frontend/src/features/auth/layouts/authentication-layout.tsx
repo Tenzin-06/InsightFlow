@@ -1,8 +1,14 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, Navigate } from "react-router-dom";
+import { useAuth } from "@clerk/react";
 
 import brandImage from "@/assets/brand_image-bg.png";
 
 export default function AuthenticationLayout() {
+  const { isSignedIn, isLoaded } = useAuth();
+
+  if (isLoaded && isSignedIn) {
+    return <Navigate to="/dashboard" replace />;
+  }
   return (
     <div className="min-h-screen flex bg-bg-primary">
       {/* Left branding panel — desktop only */}

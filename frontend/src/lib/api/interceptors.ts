@@ -1,9 +1,23 @@
 import type { AxiosInstance } from "axios";
 import type { ApiError } from "./types";
 
+let tokenGetter: (() => Promise<string | null>) | null = null;
+
+export function setTokenGetter(fn: () => Promise<string | null>): void {
+  tokenGetter = fn;
+}
+
 export function attachInterceptors(client: AxiosInstance): void {
   client.interceptors.request.use(
-    (config) => config,
+    async (config) => {
+      if (tokenGetter) {
+        const token = await tokenGetter();
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+      }
+      return config;
+    },
     (error) => Promise.reject(error),
   );
 
@@ -14,11 +28,6 @@ export function attachInterceptors(client: AxiosInstance): void {
         message: error?.response?.data?.detail ?? error?.message ?? "Unknown error",
         status: error?.response?.status,
       };
-
-      if (normalized.status === 401) {
-        // placeholder: redirect to login when auth is implemented
-      }
-
       return Promise.reject(normalized);
     },
   );

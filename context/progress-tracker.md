@@ -8,9 +8,29 @@ Update this file after every meaningful implementation change.
 
 ## Current Goal
 
-- Unit 5: Authentication UI
+- Unit 6: Authentication Integration (Clerk)
 
 ## Completed
+
+- **Unit 6: Authentication Integration (Clerk)**
+  - `@clerk/react@latest` installed
+  - `.env.local` created with `VITE_CLERK_PUBLISHABLE_KEY` (gitignored)
+  - `src/main.tsx` — `<ClerkProvider afterSignOutUrl="/">` wraps the app
+  - `src/components/layout/navigation.tsx` — `<Show>` + `<UserButton>` replacing hardcoded auth state
+  - `src/features/auth/components/login-form.tsx` — wired to `useSignIn()`, real Clerk auth + error handling
+  - `src/features/auth/components/signup-form.tsx` — wired to `useSignUp()`, real Clerk auth + error handling
+  - `src/routes/protected-route.tsx` — `useAuth()` guard, redirects unauthenticated to `/login`
+  - `src/app/router/index.tsx` — dashboard routes wrapped in `ProtectedRoute`
+  - `src/lib/api/interceptors.ts` — `setTokenGetter` pattern; injects Clerk JWT into all API requests
+  - `src/app/providers/auth-token-provider.tsx` — bridges Clerk `getToken` into axios interceptor
+  - `backend/apps/authentication/models.py` — `AppUser` model with `clerk_user_id`, `email`, `full_name`
+  - `backend/apps/authentication/middleware.py` — `ClerkAuthMiddleware` verifies JWT via JWKS, get-or-creates `AppUser`
+  - `backend/apps/authentication/permissions.py` — `IsClerkAuthenticated` DRF permission class
+  - `backend/config/settings/base.py` — middleware + permission class registered
+  - `backend/requirements/base.txt` — `PyJWT`, `cryptography` added
+  - `backend/.env` — `CLERK_JWKS_URL` added
+  - Migration `0001_initial.py` created and applied
+  - `src/features/auth/layouts/authentication-layout.tsx` — redirects signed-in users to `/dashboard`
 
 - **Unit 5: Authentication UI**
   - `react-hook-form`, `zod`, `@hookform/resolvers` installed
@@ -75,7 +95,7 @@ Update this file after every meaningful implementation change.
 
 ## Next Up
 
-1. **Unit 6: Backend Authentication** — JWT auth endpoints, login/register API, session handling
+- None.
 
 ## Open Questions
 
