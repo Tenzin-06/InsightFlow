@@ -16,7 +16,6 @@ const navLinks = [
   { label: "Features", href: "#features" },
   { label: "Workflow", href: "#workflow" },
   { label: "Analytics", href: "#analytics" },
-  { label: "Pricing", href: "#pricing" },
 ];
 
 export function MobileNav() {

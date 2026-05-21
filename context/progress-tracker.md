@@ -21,7 +21,7 @@ Update this file after every meaningful implementation change.
   - `src/features/marketing/components/analytics-section.tsx` — AI intelligence section with 4 capabilities, mock metrics grid, mock bar chart
   - `src/features/marketing/components/cta-section.tsx` — reusable CTA component with mid-page and final variants
   - `src/features/marketing/components/footer.tsx` — structured footer with branding, nav, legal, social links
-  - `src/features/marketing/pages/landing-page.tsx` — full page assembly with Navbar, Hero, Features, Workflow, Analytics, CTAs, Footer
+  - `src/features/marketing/pages/landing-page.tsx` — full-page assembly with Navbar, Hero, Features, Workflow, Analytics, CTAs, Footer
   - `src/app/router/index.tsx` — updated landing page import to `@/features/marketing/pages/landing-page`
 
 - **Unit 8: Survey Data Architecture**

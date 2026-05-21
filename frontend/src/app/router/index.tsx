@@ -16,8 +16,9 @@ const CampaignsPage = lazy(() => import("@/features/campaigns/pages/campaigns-pa
 const SettingsPage = lazy(() => import("@/features/dashboard/pages/settings-page"));
 
 const PageLoader = () => (
-  <div className="flex h-screen items-center justify-center">
-    <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary-500 border-t-transparent" />
+  <div role="status" aria-live="polite" className="flex h-screen items-center justify-center">
+    <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary-500 border-t-transparent" aria-hidden="true" />
+    <span className="sr-only">Loading…</span>
   </div>
 );
 
