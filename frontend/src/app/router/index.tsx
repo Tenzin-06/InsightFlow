@@ -10,7 +10,10 @@ const LandingPage = lazy(() => import("@/features/marketing/pages/landing-page")
 const LoginPage = lazy(() => import("@/features/auth/pages/login-page"));
 const RegisterPage = lazy(() => import("@/features/auth/pages/register-page"));
 const DashboardPage = lazy(() => import("@/features/dashboard/pages/dashboard-page"));
-const SurveysPage = lazy(() => import("@/features/surveys/pages/surveys-page"));
+const SurveyListPage = lazy(() => import("@/features/surveys/pages/survey-list-page"));
+const SurveyCreatePage = lazy(() => import("@/features/surveys/pages/survey-create-page"));
+const SurveyDetailPage = lazy(() => import("@/features/surveys/pages/survey-detail-page"));
+const SurveyEditorPage = lazy(() => import("@/features/surveys/pages/survey-editor-page"));
 const AnalyticsPage = lazy(() => import("@/features/analytics/pages/analytics-page"));
 const CampaignsPage = lazy(() => import("@/features/campaigns/pages/campaigns-page"));
 const SettingsPage = lazy(() => import("@/features/dashboard/pages/settings-page"));
@@ -41,7 +44,10 @@ const router = createBrowserRouter([
         element: <DashboardLayout />,
         children: [
           { path: "/dashboard", element: <Suspense fallback={<PageLoader />}><DashboardPage /></Suspense> },
-          { path: "/surveys", element: <Suspense fallback={<PageLoader />}><SurveysPage /></Suspense> },
+          { path: "/surveys", element: <Suspense fallback={<PageLoader />}><SurveyListPage /></Suspense> },
+          { path: "/surveys/create", element: <Suspense fallback={<PageLoader />}><SurveyCreatePage /></Suspense> },
+          { path: "/surveys/:surveyId", element: <Suspense fallback={<PageLoader />}><SurveyDetailPage /></Suspense> },
+          { path: "/surveys/:surveyId/edit", element: <Suspense fallback={<PageLoader />}><SurveyEditorPage /></Suspense> },
           { path: "/analytics", element: <Suspense fallback={<PageLoader />}><AnalyticsPage /></Suspense> },
           { path: "/campaigns", element: <Suspense fallback={<PageLoader />}><CampaignsPage /></Suspense> },
           { path: "/settings", element: <Suspense fallback={<PageLoader />}><SettingsPage /></Suspense> },

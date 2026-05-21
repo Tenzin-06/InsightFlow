@@ -95,6 +95,9 @@ REST_FRAMEWORK = {
     "DEFAULT_PARSER_CLASSES": [
         "rest_framework.parsers.JSONParser",
     ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "apps.authentication.authentication.ClerkAuthentication",
+    ],
     "DEFAULT_PERMISSION_CLASSES": [
         "apps.authentication.permissions.IsClerkAuthenticated",
     ],

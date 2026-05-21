@@ -22,9 +22,7 @@ class QuestionSerializer(serializers.ModelSerializer):
         return value
 
     def validate_question_text(self, value):
-        if not value or not value.strip():
-            raise serializers.ValidationError("Question text cannot be empty.")
-        return value.strip()
+        return value.strip() if value else value
 
     def validate_order(self, value):
         if value < 0:

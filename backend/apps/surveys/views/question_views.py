@@ -13,12 +13,21 @@ class QuestionViewSet(viewsets.ModelViewSet):
     http_method_names = ["get", "post", "patch", "delete", "head", "options"]
 
     def get_queryset(self):
-        return Question.objects.filter(survey__owner=self.request.user).select_related("survey")
+        qs = Question.objects.filter(survey__owner=self.request.user).select_related("survey")
+        survey_pk = self.kwargs.get("survey_pk")
+        if survey_pk:
+            qs = qs.filter(survey__pk=survey_pk)
+        return qs
 
     def get_permissions(self):
-        if self.action == "create":
+        if self.action in ("list", "create"):
             return [IsClerkAuthenticated()]
         return [IsClerkAuthenticated(), IsSurveyOwner()]
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({"success": True, "data": serializer.data, "error": None})
 
     def create(self, request, *args, **kwargs):
         survey_id = self.kwargs.get("survey_pk")

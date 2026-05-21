@@ -7,8 +7,8 @@ router = DefaultRouter()
 router.register("surveys", SurveyViewSet, basename="survey")
 router.register("questions", QuestionViewSet, basename="question")
 
-question_create = QuestionViewSet.as_view({"post": "create"})
+question_list_create = QuestionViewSet.as_view({"get": "list", "post": "create"})
 
 urlpatterns = router.urls + [
-    path("surveys/<int:survey_pk>/questions/", question_create, name="survey-questions-create"),
+    path("surveys/<int:survey_pk>/questions/", question_list_create, name="survey-questions"),
 ]
