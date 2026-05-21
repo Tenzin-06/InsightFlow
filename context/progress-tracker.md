@@ -12,6 +12,16 @@ Update this file after every meaningful implementation change.
 
 ## Completed
 
+- **Unit 7: Dashboard UI**
+  - `src/routes/route-config.ts` — centralized route metadata (label, path, icon) for all dashboard modules
+  - `src/components/layout/sidebar-item.tsx` — reusable nav item with active/hover states and left-accent border
+  - `src/components/layout/sidebar.tsx` — updated with `logo-bg.png` branding, main nav + settings footer section
+  - `src/components/layout/user-nav.tsx` — Clerk `<UserButton />` wrapper for authenticated user controls
+  - `src/components/layout/mobile-sidebar.tsx` — Sheet-based responsive drawer, auto-closes on route change
+  - `src/components/layout/dashboard-header.tsx` — header with mobile toggle, page title, search/bell placeholders, theme toggle, user nav
+  - `src/components/layout/page-container.tsx` — standardized page wrapper (max-w-7xl, responsive padding)
+  - `src/app/layouts/dashboard-layout.tsx` — updated: desktop sidebar hidden on mobile, uses `DashboardHeader`
+
 - **Unit 6: Authentication Integration (Clerk)**
   - `@clerk/react@latest` installed
   - `.env.local` created with `VITE_CLERK_PUBLISHABLE_KEY` (gitignored)
