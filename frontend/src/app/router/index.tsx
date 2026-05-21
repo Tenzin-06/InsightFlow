@@ -6,7 +6,7 @@ import DashboardLayout from "@/app/layouts/dashboard-layout";
 import AuthenticationLayout from "@/features/auth/layouts/authentication-layout";
 import { ProtectedRoute } from "@/routes/protected-route";
 
-const LandingPage = lazy(() => import("@/features/dashboard/pages/landing-page"));
+const LandingPage = lazy(() => import("@/features/marketing/pages/landing-page"));
 const LoginPage = lazy(() => import("@/features/auth/pages/login-page"));
 const RegisterPage = lazy(() => import("@/features/auth/pages/register-page"));
 const DashboardPage = lazy(() => import("@/features/dashboard/pages/dashboard-page"));

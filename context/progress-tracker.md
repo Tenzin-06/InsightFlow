@@ -8,9 +8,21 @@ Update this file after every meaningful implementation change.
 
 ## Current Goal
 
-- Unit 8: Survey Data Architecture (complete)
+- Unit 9: Landing Page (complete)
 
 ## Completed
+
+- **Unit 9: Landing Page (Marketing Website)**
+  - `src/features/marketing/components/mobile-nav.tsx` — Sheet-based mobile menu with nav links and auth CTAs
+  - `src/features/marketing/components/navbar.tsx` — sticky responsive navbar with logo, nav links, theme toggle, login, Get Started
+  - `src/features/marketing/components/hero-section.tsx` — hero with gradient headline, dual CTAs, hero image, floating stat cards
+  - `src/features/marketing/components/feature-section.tsx` — 4 feature cards (distribution, analytics, intelligence, automation) in 2-col grid
+  - `src/features/marketing/components/workflow-section.tsx` — 5-step workflow (Create → Launch → Track → Analyze → Insights), desktop horizontal + mobile vertical
+  - `src/features/marketing/components/analytics-section.tsx` — AI intelligence section with 4 capabilities, mock metrics grid, mock bar chart
+  - `src/features/marketing/components/cta-section.tsx` — reusable CTA component with mid-page and final variants
+  - `src/features/marketing/components/footer.tsx` — structured footer with branding, nav, legal, social links
+  - `src/features/marketing/pages/landing-page.tsx` — full page assembly with Navbar, Hero, Features, Workflow, Analytics, CTAs, Footer
+  - `src/app/router/index.tsx` — updated landing page import to `@/features/marketing/pages/landing-page`
 
 - **Unit 8: Survey Data Architecture**
   - `backend/apps/surveys/models/survey.py` — `Survey` model with owner FK, title, description, status (draft/published/archived), is_public, timestamps, DB indexes
