@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Loader2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useSignUp } from "@clerk/react";
 
 import { Button } from "@/components/ui/button";
@@ -25,7 +26,8 @@ const signupSchema = z
 type SignupValues = z.infer<typeof signupSchema>;
 
 export function SignupForm() {
-  const { signUp } = useSignUp();
+  const { signUp, setActive } = useSignUp();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
 
@@ -44,13 +46,16 @@ export function SignupForm() {
       const firstName = nameParts[0];
       const lastName = nameParts.slice(1).join(" ") || undefined;
 
-      await signUp.create({
+      const result = await signUp.create({
         emailAddress: values.email,
         password: values.password,
         firstName,
         lastName,
       });
-      // AuthenticationLayout detects isSignedIn and redirects to /dashboard
+      if (result.status === "complete" && setActive) {
+        await setActive({ session: result.createdSessionId });
+        navigate("/dashboard");
+      }
     } catch (err: any) {
       setAuthError(err?.errors?.[0]?.message ?? "Could not create account. Please try again.");
     } finally {

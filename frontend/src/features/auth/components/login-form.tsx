@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { useSignIn } from "@clerk/react";
 
@@ -19,7 +19,8 @@ const loginSchema = z.object({
 type LoginValues = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
-  const { signIn } = useSignIn();
+  const { signIn, setActive } = useSignIn();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
 
@@ -34,11 +35,15 @@ export function LoginForm() {
     setIsLoading(true);
     setAuthError(null);
     try {
-      await signIn.create({
+      const result = await signIn.create({
+        strategy: "password",
         identifier: values.email,
         password: values.password,
       });
-      // AuthenticationLayout detects isSignedIn and redirects to /dashboard
+      if (result.status === "complete" && setActive) {
+        await setActive({ session: result.createdSessionId });
+        navigate("/dashboard");
+      }
     } catch (err: any) {
       setAuthError(err?.errors?.[0]?.message ?? "Invalid email or password.");
     } finally {
