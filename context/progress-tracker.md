@@ -8,9 +8,23 @@ Update this file after every meaningful implementation change.
 
 ## Current Goal
 
-- Unit 6: Authentication Integration (Clerk)
+- Unit 8: Survey Data Architecture (complete)
 
 ## Completed
+
+- **Unit 8: Survey Data Architecture**
+  - `backend/apps/surveys/models/survey.py` — `Survey` model with owner FK, title, description, status (draft/published/archived), is_public, timestamps, DB indexes
+  - `backend/apps/surveys/models/question.py` — `Question` model with survey FK, question_text, question_type (5 types), is_required, order, JSONField metadata
+  - `backend/apps/surveys/serializers/survey_serializer.py` — validates title, status; nested read-only questions
+  - `backend/apps/surveys/serializers/question_serializer.py` — validates type, text, order
+  - `backend/apps/surveys/permissions.py` — `IsSurveyOwner` custom permission
+  - `backend/apps/surveys/views/survey_views.py` — `SurveyViewSet` (ModelViewSet, owner-scoped queryset, standardized responses)
+  - `backend/apps/surveys/views/question_views.py` — `QuestionViewSet` (PATCH, DELETE flat + POST nested via survey_pk)
+  - `backend/apps/surveys/services.py` — survey + question CRUD service functions
+  - `backend/apps/surveys/utils.py` — `success_response` / `error_response` helpers
+  - `backend/apps/surveys/urls.py` — DRF router: `surveys/`, `questions/`, + `surveys/<id>/questions/`
+  - `backend/config/urls.py` — surveys URLs registered under `/api/v1/`
+  - Migration `0001_initial.py` created and applied
 
 - **Unit 7: Dashboard UI**
   - `src/routes/route-config.ts` — centralized route metadata (label, path, icon) for all dashboard modules
