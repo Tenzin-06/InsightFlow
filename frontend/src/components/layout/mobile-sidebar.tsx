@@ -43,11 +43,11 @@ export function MobileSidebar() {
         <div className="flex h-[calc(100%-4rem)] flex-col">
           <nav className="flex-1 space-y-0.5 px-3 py-4" aria-label="Mobile navigation">
             {mainNavRoutes.map((route) => (
-              <SidebarItem key={route.path} {...route} />
+              <SidebarItem key={route.path} {...route} onClick={() => setOpen(false)} />
             ))}
           </nav>
           <div className="border-t border-border-default px-3 py-4">
-            <SidebarItem {...settingsRoute} />
+            <SidebarItem {...settingsRoute} onClick={() => setOpen(false)} />
           </div>
         </div>
       </SheetContent>
