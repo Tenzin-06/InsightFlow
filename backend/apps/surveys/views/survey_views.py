@@ -10,6 +10,8 @@ class SurveyViewSet(viewsets.ModelViewSet):
     serializer_class = SurveySerializer
     permission_classes = [IsAuthenticated, IsSurveyOwner]
     http_method_names = ["get", "post", "patch", "delete", "head", "options"]
+    # Disable DRF pagination — the frontend handles its own page slicing
+    pagination_class = None
 
     def get_queryset(self):
         return Survey.objects.filter(owner=self.request.user).prefetch_related("questions")
