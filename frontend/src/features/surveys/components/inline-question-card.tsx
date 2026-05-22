@@ -6,7 +6,6 @@ import {
   ChevronUp,
   ChevronDown,
   X,
-  Plus,
 } from "lucide-react";
 import {
   Select,
