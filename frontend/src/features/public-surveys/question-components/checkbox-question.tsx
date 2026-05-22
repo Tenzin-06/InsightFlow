@@ -26,7 +26,7 @@ export function CheckboxQuestion({ question }: CheckboxQuestionProps) {
   const choices: string[] = question.metadata.choices ?? [];
   // Ensure field is registered so watch triggers re-renders
   register(question.id as never);
-  const selectedValues: string[] = (watch(question.id as never) as string[]) ?? [];
+  const selectedValues: string[] = ((watch(question.id as never) as unknown) as string[]) ?? [];
   const error = errors[question.id];
 
   function handleToggle(choice: string, checked: boolean) {

@@ -27,7 +27,7 @@ export function MultipleChoiceQuestion({ question }: MultipleChoiceQuestionProps
 
   const choices: string[] = question.metadata.choices ?? [];
   // watch re-renders this component whenever the field value changes
-  const selectedValue = watch(question.id as never) as string | undefined;
+  const selectedValue = (watch(question.id as never) as unknown) as string | undefined;
   const error = errors[question.id];
 
   // Register once — react-hook-form manages the underlying value
