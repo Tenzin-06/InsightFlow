@@ -1,0 +1,15 @@
+# Worktrees — never commit isolated dev environments
+.claude/worktrees/
+
+# Claude Code internals — per-machine, not project state
+.agents/
+skills-lock.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea/
