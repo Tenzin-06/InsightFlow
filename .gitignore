@@ -1,0 +1,4 @@
+# Claude Code internals
+.claude/worktrees/
+.agents/
+skills-lock.json
