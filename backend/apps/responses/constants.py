@@ -1,0 +1,19 @@
+from apps.surveys.models.question import (
+    QUESTION_TYPE_SHORT_TEXT,
+    QUESTION_TYPE_LONG_TEXT,
+    QUESTION_TYPE_MULTIPLE_CHOICE,
+    QUESTION_TYPE_CHECKBOX,
+    QUESTION_TYPE_RATING,
+)
+
+# Question types this unit supports for submission
+SUPPORTED_QUESTION_TYPES = [
+    QUESTION_TYPE_SHORT_TEXT,
+    QUESTION_TYPE_LONG_TEXT,
+    QUESTION_TYPE_MULTIPLE_CHOICE,
+    QUESTION_TYPE_CHECKBOX,
+    QUESTION_TYPE_RATING,
+]
+
+# Maximum number of answers allowed per submission
+MAX_ANSWERS_PER_SUBMISSION = 200
