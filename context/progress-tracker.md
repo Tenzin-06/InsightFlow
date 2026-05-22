@@ -8,17 +8,26 @@ Update this file after every meaningful implementation change.
 
 ## Current Goal
 
-- Unit 6: Authentication Integration (Clerk)
+- Unit 9: Landing Page (complete)
 
 ## Completed
+
+- **Unit 9: Landing Page (Marketing Website)**
+  - `src/features/marketing/components/mobile-nav.tsx` — Sheet-based mobile menu with nav links and auth CTAs
+  - `src/features/marketing/components/navbar.tsx` — sticky responsive navbar with logo, nav links, theme toggle, login, Get Started
+  - `src/features/marketing/components/hero-section.tsx` — hero with gradient headline, dual CTAs, hero image, floating stat cards
+  - `src/features/marketing/components/feature-section.tsx` — 4 feature cards (distribution, analytics, intelligence, automation) in 2-col grid
+  - `src/features/marketing/components/workflow-section.tsx` — 5-step workflow (Create → Launch → Track → Analyze → Insights), desktop horizontal + mobile vertical
+  - `src/features/marketing/components/analytics-section.tsx` — AI intelligence section with 4 capabilities, mock metrics grid, mock bar chart
+  - `src/features/marketing/components/cta-section.tsx` — reusable CTA component with mid-page and final variants
+  - `src/features/marketing/components/footer.tsx` — structured footer with branding, nav, legal, social links
+  - `src/features/marketing/pages/landing-page.tsx` — full-page assembly with Navbar, Hero, Features, Workflow, Analytics, CTAs, Footer
+  - `src/app/router/index.tsx` — updated landing page import to `@/features/marketing/pages/landing-page`
 
 - **Unit 6: Authentication Integration (Clerk)**
   - `@clerk/react@latest` installed
   - `.env.local` created with `VITE_CLERK_PUBLISHABLE_KEY` (gitignored)
   - `src/main.tsx` — `<ClerkProvider afterSignOutUrl="/">` wraps the app
-  - `src/components/layout/navigation.tsx` — `<Show>` + `<UserButton>` replacing hardcoded auth state
-  - `src/features/auth/components/login-form.tsx` — wired to `useSignIn()`, real Clerk auth + error handling
-  - `src/features/auth/components/signup-form.tsx` — wired to `useSignUp()`, real Clerk auth + error handling
   - `src/routes/protected-route.tsx` — `useAuth()` guard, redirects unauthenticated to `/login`
   - `src/app/router/index.tsx` — dashboard routes wrapped in `ProtectedRoute`
   - `src/lib/api/interceptors.ts` — `setTokenGetter` pattern; injects Clerk JWT into all API requests
@@ -115,3 +124,4 @@ Update this file after every meaningful implementation change.
 
 - Unit 1 complete. Frontend shell running at `localhost:5173` with full design system, routing, and dashboard layout.
 - Unit 5 complete. Authentication UI implemented with split-screen layout, react-hook-form + zod validation, session-aware navigation.
+- Unit 9 complete. Landing page (marketing website) with full section layout, scroll animations, and responsive design.
