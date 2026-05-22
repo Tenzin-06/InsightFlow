@@ -60,4 +60,5 @@ class ClerkAuthMiddleware:
             defaults={"email": email},
         )
         request.clerk_user = user
+        request.user = user
         return self.get_response(request)
