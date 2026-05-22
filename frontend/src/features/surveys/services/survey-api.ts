@@ -70,3 +70,14 @@ export async function updateQuestion(
 export async function deleteQuestion(questionId: string): Promise<void> {
   await deleteRequest<void>(API_ENDPOINTS.questions.detail(questionId));
 }
+
+export async function reorderQuestions(orderedIds: string[]): Promise<void> {
+  await Promise.all(
+    orderedIds.map((id, index) =>
+      patchRequest<ApiResponse<Question>, UpdateQuestionPayload>(
+        API_ENDPOINTS.questions.detail(id),
+        { order: index + 1 }
+      )
+    )
+  );
+}

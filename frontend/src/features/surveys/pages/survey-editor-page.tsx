@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   Eye,
@@ -9,6 +9,9 @@ import {
   Type,
   Image,
   LayoutGrid,
+  Check,
+  AlertCircle,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -20,6 +23,33 @@ import { cn } from "@/lib/utils";
 import type { Survey, UpdateSurveyPayload } from "@/features/surveys/types";
 
 type Tab = "questions" | "responses" | "settings";
+type SaveStatus = "idle" | "saving" | "saved" | "error";
+
+function SaveIndicator({ status }: { status: SaveStatus }) {
+  if (status === "idle") return null;
+  if (status === "saving") {
+    return (
+      <span className="flex items-center gap-1 text-xs text-text-muted animate-pulse">
+        <Loader2 className="h-3 w-3 animate-spin" />
+        Saving…
+      </span>
+    );
+  }
+  if (status === "saved") {
+    return (
+      <span className="flex items-center gap-1 text-xs text-success">
+        <Check className="h-3 w-3" />
+        Saved
+      </span>
+    );
+  }
+  return (
+    <span className="flex items-center gap-1 text-xs text-destructive">
+      <AlertCircle className="h-3 w-3" />
+      Error saving
+    </span>
+  );
+}
 
 export default function SurveyEditorPage() {
   const { surveyId } = useParams<{ surveyId: string }>();
@@ -29,6 +59,43 @@ export default function SurveyEditorPage() {
 
   const [activeTab, setActiveTab] = useState<Tab>("questions");
   const addQuestionRef = useRef<(() => void) | null>(null);
+
+  // ── Save status ───────────────────────────────────────────────────────────
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
+  const savedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Merge survey-level mutation state with question editor state
+  const surveyPending = updateSurvey.isPending;
+  const surveyError = updateSurvey.isError;
+  const surveySuccess = updateSurvey.isSuccess;
+
+  useEffect(() => {
+    if (surveyPending) {
+      if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
+      setSaveStatus("saving");
+    } else if (surveyError) {
+      setSaveStatus("error");
+    } else if (surveySuccess) {
+      setSaveStatus("saved");
+      savedTimerRef.current = setTimeout(() => setSaveStatus("idle"), 2000);
+    }
+    return () => {
+      if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
+    };
+  }, [surveyPending, surveyError, surveySuccess]);
+
+  const handleQuestionSaveState = useCallback((state: "idle" | "saving" | "error") => {
+    if (state === "saving") {
+      if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
+      setSaveStatus("saving");
+    } else if (state === "error") {
+      setSaveStatus("error");
+    } else if (saveStatus === "saving") {
+      // Only transition to saved when we were saving (avoid overriding survey-level state)
+      setSaveStatus("saved");
+      savedTimerRef.current = setTimeout(() => setSaveStatus("idle"), 2000);
+    }
+  }, [saveStatus]);
 
   function handlePublish() {
     updateSurvey.mutate({ id: surveyId!, payload: { status: "published" } });
@@ -59,13 +126,12 @@ export default function SurveyEditorPage() {
   }
 
   return (
-    /* Full-bleed background that escapes the DashboardLayout's p-4/p-6 padding */
     <div className="-mx-4 -my-4 min-h-[calc(100vh-4rem)] bg-[#f0f0fb] dark:bg-slate-950 md:-mx-6 md:-my-6">
 
       {/* ── Top bar ──────────────────────────────────────────────────────── */}
       <div className="sticky top-0 z-20 border-b bg-white/95 backdrop-blur dark:bg-card/95">
         <div className="flex items-center px-4 py-2 md:px-6">
-          {/* Back + title */}
+          {/* Back + title + save status */}
           <div className="flex min-w-0 flex-1 items-center gap-3">
             <button
               onClick={() => navigate(`/surveys/${survey.id}`)}
@@ -81,6 +147,9 @@ export default function SurveyEditorPage() {
             </div>
             <div className="hidden sm:block">
               <SurveyStatusBadge status={survey.status} />
+            </div>
+            <div className="hidden sm:block">
+              <SaveIndicator status={saveStatus} />
             </div>
           </div>
 
@@ -136,7 +205,11 @@ export default function SurveyEditorPage() {
             <EditableFormHeader survey={survey} onSave={(p) => updateSurvey.mutate({ id: survey.id, payload: p })} />
 
             {/* Question cards */}
-            <SurveyEditor surveyId={survey.id} onAddRef={addQuestionRef} />
+            <SurveyEditor
+              surveyId={survey.id}
+              onAddRef={addQuestionRef}
+              onSaveStateChange={handleQuestionSaveState}
+            />
           </div>
 
           {/* Right floating toolbar */}

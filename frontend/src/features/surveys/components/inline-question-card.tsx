@@ -167,7 +167,12 @@ export function InlineQuestionCard({
         role="button"
         tabIndex={0}
         onClick={onActivate}
-        onKeyDown={(e) => e.key === "Enter" && onActivate()}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+            e.preventDefault();
+            onActivate();
+          }
+        }}
         className="cursor-pointer rounded-xl border border-border/60 bg-white px-6 py-5 shadow-sm transition-all hover:shadow-md dark:bg-card"
       >
         {/* Question title */}

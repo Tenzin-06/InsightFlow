@@ -6,7 +6,7 @@ import {
   updateSurvey,
   deleteSurvey,
 } from "@/features/surveys/services/survey-api";
-import type { CreateSurveyPayload, UpdateSurveyPayload } from "@/features/surveys/types";
+import type { CreateSurveyPayload, Survey, UpdateSurveyPayload } from "@/features/surveys/types";
 
 export const SURVEYS_QUERY_KEY = ["surveys"] as const;
 
@@ -45,13 +45,37 @@ export function useUpdateSurvey() {
   return useMutation({
     mutationFn: ({ id, payload }: { id: string; payload: UpdateSurveyPayload }) =>
       updateSurvey(id, payload),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: SURVEYS_QUERY_KEY });
-      queryClient.invalidateQueries({ queryKey: ["survey", data.id] });
+    onMutate: async ({ id, payload }) => {
+      await queryClient.cancelQueries({ queryKey: ["survey", id] });
+      await queryClient.cancelQueries({ queryKey: SURVEYS_QUERY_KEY });
+
+      const previousSurvey = queryClient.getQueryData<Survey>(["survey", id]);
+      const previousSurveys = queryClient.getQueryData<Survey[]>(SURVEYS_QUERY_KEY);
+
+      if (previousSurvey) {
+        queryClient.setQueryData<Survey>(["survey", id], { ...previousSurvey, ...payload });
+      }
+      queryClient.setQueryData<Survey[]>(SURVEYS_QUERY_KEY, (old) =>
+        (old ?? []).map((s) => (s.id === id ? { ...s, ...payload } : s))
+      );
+
+      return { previousSurvey, previousSurveys, id };
+    },
+    onError: (error, _, context) => {
+      if (context?.previousSurvey) {
+        queryClient.setQueryData(["survey", context.id], context.previousSurvey);
+      }
+      if (context?.previousSurveys) {
+        queryClient.setQueryData(SURVEYS_QUERY_KEY, context.previousSurveys);
+      }
+      toast.error(apiErrorMessage(error, "Failed to update survey"));
+    },
+    onSuccess: () => {
       toast.success("Survey updated");
     },
-    onError: (error) => {
-      toast.error(apiErrorMessage(error, "Failed to update survey"));
+    onSettled: (_, __, { id }) => {
+      queryClient.invalidateQueries({ queryKey: SURVEYS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ["survey", id] });
     },
   });
 }

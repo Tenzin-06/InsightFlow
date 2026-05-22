@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Search, SlidersHorizontal, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -31,6 +31,11 @@ export default function SurveyListPage() {
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
+  // Clamp page when filtered results shrink (e.g. after a delete or search change)
+  useEffect(() => {
+    setPage((p) => Math.min(p, Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))));
+  }, [filtered.length]);
+
   function handleSearchChange(value: string) {
     setSearch(value);
     setPage(1);
@@ -58,7 +63,7 @@ export default function SurveyListPage() {
           <div>
             <h1 className="text-2xl font-extrabold text-text-primary">Surveys Overview</h1>
             <p className="mt-0.5 text-sm text-text-secondary">
-              Survey every field to create and filter a survey.
+              Create, manage, and track all your surveys in one place.
             </p>
           </div>
           <Button

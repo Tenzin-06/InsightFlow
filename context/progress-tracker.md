@@ -8,9 +8,18 @@ Update this file after every meaningful implementation change.
 
 ## Current Goal
 
-- Unit 10: Survey Management UI (in progress)
+- Unit 11: Survey Management Functionality — Complete
 
 ## Completed
+
+- **Unit 11: Survey Management Functionality**
+  - `src/features/surveys/types/index.ts` — Added `SurveyMetadata` and `QuestionMetadata` named types; updated `Question.metadata` to `QuestionMetadata`
+  - `src/features/surveys/services/survey-api.ts` — Added `reorderQuestions(orderedIds)` API method (batch PATCH for stable ordering)
+  - `src/features/surveys/utils/normalize.ts` — New file: `normalizeQuestion`, `normalizeSurvey`, `normalizeQuestionMetadata`, `normalizeSurveyMetadata` utilities
+  - `src/features/surveys/hooks/use-questions.ts` — Full optimistic updates for `useCreateQuestion`, `useUpdateQuestion`, `useDeleteQuestion`; new `useReorderQuestions` hook with optimistic cache reorder + rollback
+  - `src/features/surveys/hooks/use-surveys.ts` — Optimistic updates for `useUpdateSurvey` (immediate cache update for `["survey", id]` and `["surveys"]` with rollback on error)
+  - `src/features/surveys/components/survey-editor.tsx` — Uses `useReorderQuestions` for move-up/move-down; exposes `onSaveStateChange` prop to report mutation state to parent
+  - `src/features/surveys/pages/survey-editor-page.tsx` — `SaveIndicator` component in top bar showing "Saving…" / "Saved" / "Error saving" driven by combined survey + question mutation state
 
 - **Unit 10: Survey Management UI**
   - `src/components/ui/badge.tsx` — Badge component with success/warning/muted/outline variants
@@ -154,7 +163,7 @@ Update this file after every meaningful implementation change.
 
 ## In Progress
 
-- None. Unit 10 complete.
+- None. Unit 11 complete.
 
 ## Next Up
 

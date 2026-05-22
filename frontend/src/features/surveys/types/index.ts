@@ -7,6 +7,20 @@ export type QuestionType =
   | "checkbox"
   | "rating";
 
+export type SurveyMetadata = {
+  theme?: string;
+  estimated_completion_time?: number;
+  distribution_enabled?: boolean;
+  [key: string]: unknown;
+};
+
+export type QuestionMetadata = {
+  choices?: string[];
+  min_rating?: number;
+  max_rating?: number;
+  [key: string]: unknown;
+};
+
 export type Survey = {
   id: string;
   title: string;
@@ -28,7 +42,7 @@ export type Question = {
   question_type: QuestionType;
   is_required: boolean;
   order: number;
-  metadata: Record<string, unknown>;
+  metadata: QuestionMetadata;
   created_at: string;
   updated_at: string;
 };
@@ -48,7 +62,7 @@ export type CreateQuestionPayload = {
   question_type: QuestionType;
   is_required?: boolean;
   order?: number;
-  metadata?: Record<string, unknown>;
+  metadata?: QuestionMetadata;
 };
 
 export type UpdateQuestionPayload = Partial<CreateQuestionPayload>;

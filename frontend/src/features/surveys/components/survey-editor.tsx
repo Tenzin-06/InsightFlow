@@ -7,15 +7,19 @@ import {
   useCreateQuestion,
   useUpdateQuestion,
   useDeleteQuestion,
+  useReorderQuestions,
 } from "@/features/surveys/hooks/use-questions";
 import type { UpdateQuestionPayload } from "@/features/surveys/types";
+
+type SaveState = "idle" | "saving" | "error";
 
 type Props = {
   surveyId: string;
   onAddRef?: RefObject<(() => void) | null>;
+  onSaveStateChange?: (state: SaveState) => void;
 };
 
-export function SurveyEditor({ surveyId, onAddRef }: Props) {
+export function SurveyEditor({ surveyId, onAddRef, onSaveStateChange }: Props) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const autoCreated = useRef(false);
 
@@ -23,6 +27,7 @@ export function SurveyEditor({ surveyId, onAddRef }: Props) {
   const createQuestion = useCreateQuestion(surveyId);
   const updateQuestion = useUpdateQuestion(surveyId);
   const deleteQuestion = useDeleteQuestion(surveyId);
+  const reorderQuestions = useReorderQuestions(surveyId);
 
   const sorted = [...questions].sort((a, b) => a.order - b.order);
 
@@ -30,6 +35,29 @@ export function SurveyEditor({ surveyId, onAddRef }: Props) {
   useEffect(() => {
     if (onAddRef) onAddRef.current = handleAddQuestion;
   });
+
+  // Report mutation state to parent
+  const isSaving =
+    createQuestion.isPending ||
+    updateQuestion.isPending ||
+    deleteQuestion.isPending ||
+    reorderQuestions.isPending;
+  const hasError =
+    createQuestion.isError ||
+    updateQuestion.isError ||
+    deleteQuestion.isError ||
+    reorderQuestions.isError;
+
+  useEffect(() => {
+    if (!onSaveStateChange) return;
+    if (isSaving) {
+      onSaveStateChange("saving");
+    } else if (hasError) {
+      onSaveStateChange("error");
+    } else {
+      onSaveStateChange("idle");
+    }
+  }, [isSaving, hasError, onSaveStateChange]);
 
   // Auto-create the first question when a brand-new survey opens empty
   useEffect(() => {
@@ -55,7 +83,7 @@ export function SurveyEditor({ surveyId, onAddRef }: Props) {
         question_text: "Untitled Question",
         question_type: "multiple_choice",
         is_required: false,
-        order: sorted.length + 1,
+        order: sorted.length > 0 ? Math.max(...sorted.map((q) => q.order)) + 1 : 1,
         metadata: { choices: ["Option 1"] },
       },
       { onSuccess: (q) => setActiveId(q.id) }
@@ -69,17 +97,17 @@ export function SurveyEditor({ surveyId, onAddRef }: Props) {
   function handleMoveUp(id: string) {
     const idx = sorted.findIndex((q) => q.id === id);
     if (idx <= 0) return;
-    const prev = sorted[idx - 1];
-    updateQuestion.mutate({ id, payload: { order: prev.order } });
-    updateQuestion.mutate({ id: prev.id, payload: { order: sorted[idx].order } });
+    const reordered = [...sorted];
+    [reordered[idx - 1], reordered[idx]] = [reordered[idx], reordered[idx - 1]];
+    reorderQuestions.mutate(reordered.map((q) => q.id));
   }
 
   function handleMoveDown(id: string) {
     const idx = sorted.findIndex((q) => q.id === id);
     if (idx >= sorted.length - 1) return;
-    const next = sorted[idx + 1];
-    updateQuestion.mutate({ id, payload: { order: next.order } });
-    updateQuestion.mutate({ id: next.id, payload: { order: sorted[idx].order } });
+    const reordered = [...sorted];
+    [reordered[idx], reordered[idx + 1]] = [reordered[idx + 1], reordered[idx]];
+    reorderQuestions.mutate(reordered.map((q) => q.id));
   }
 
   if (isLoading || (sorted.length === 0 && createQuestion.isPending)) {

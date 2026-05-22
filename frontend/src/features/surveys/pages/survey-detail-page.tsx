@@ -37,6 +37,7 @@ export default function SurveyDetailPage() {
   }
 
   function handleDelete() {
+    if (deleteSurvey.isPending) return;
     if (window.confirm("Delete this survey? This action cannot be undone.")) {
       deleteSurvey.mutate(surveyId!, {
         onSuccess: () => navigate("/surveys"),
@@ -101,6 +102,7 @@ export default function SurveyDetailPage() {
                 variant="outline"
                 size="sm"
                 onClick={handleDelete}
+                disabled={deleteSurvey.isPending}
                 className="text-destructive hover:text-destructive"
               >
                 <Trash2 className="mr-1.5 h-3.5 w-3.5" />
