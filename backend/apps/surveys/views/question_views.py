@@ -1,6 +1,6 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from apps.authentication.permissions import IsClerkAuthenticated
+from apps.authentication.permissions import IsAuthenticated
 from apps.surveys.models.question import Question
 from apps.surveys.models.survey import Survey
 from apps.surveys.serializers.question_serializer import QuestionSerializer
@@ -9,7 +9,7 @@ from apps.surveys.permissions import IsSurveyOwner
 
 class QuestionViewSet(viewsets.ModelViewSet):
     serializer_class = QuestionSerializer
-    permission_classes = [IsClerkAuthenticated, IsSurveyOwner]
+    permission_classes = [IsAuthenticated, IsSurveyOwner]
     http_method_names = ["get", "post", "patch", "delete", "head", "options"]
 
     def get_queryset(self):
@@ -21,15 +21,11 @@ class QuestionViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ("list", "create"):
-            return [IsClerkAuthenticated()]
-        return [IsClerkAuthenticated(), IsSurveyOwner()]
+            return [IsAuthenticated()]
+        return [IsAuthenticated(), IsSurveyOwner()]
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
         serializer = self.get_serializer(queryset, many=True)
         return Response({"success": True, "data": serializer.data, "error": None})
 

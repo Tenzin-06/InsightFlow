@@ -10,7 +10,7 @@
 | Backend Framework  | Django                | Core backend application (modular monolith)                       |
 | API Layer          | Django REST Framework | REST APIs for frontend communication                              |
 | Database           | PostgreSQL            | Primary relational database for surveys, responses, and analytics |
-| Authentication     | Clerk                 | User authentication and session management                        |
+| Authentication     | Local JWT (PyJWT)     | Self-contained JWT auth; no external service required             |
 | AI Provider        | Google Gemini API     | AI-powered analysis, summarization, and simulation                |
 | Background Jobs    | Trigger.dev           | Async processing for emails, AI tasks, and scheduling             |
 | Email Service      | Resend                | Email delivery for campaigns and reminders                        |
@@ -117,19 +117,20 @@ Used for:
 
 ## 🔐 Authentication & Access Model
 
-### Provider: Clerk
+### Provider: Local JWT (PyJWT + Django password hashing)
 
 ### Core Principles:
 
-- Clerk handles authentication entirely
-- Backend never stores passwords
-- Every request is associated with a Clerk user ID
+- All auth is self-contained — no external service dependencies
+- Passwords hashed with Django's PBKDF2-SHA256 (`make_password` / `check_password`)
+- Short-lived **access tokens** (60 min, HS256) + long-lived **refresh tokens** (7 days)
+- Tokens stored in `localStorage` on the client
 
 ### Access Control Model:
 
 - Each user belongs to a **workspace (implicit MVP single workspace)**
 - All surveys, campaigns, and responses are **owned by a user**
-- Ownership is enforced via `user_id` foreign key references
+- Ownership is enforced via `owner` FK on `Survey`
 
 ### Authorization Rules:
 
@@ -142,10 +143,20 @@ Used for:
 
 ### Session Flow:
 
-1. User logs in via Clerk frontend
-2. JWT token sent with API requests
-3. Django verifies token via middleware
-4. User context injected into request lifecycle
+1. User registers/logs in via `/api/v1/auth/register/` or `/api/v1/auth/login/`
+2. Backend returns `{ access, refresh, user }` JSON
+3. Frontend stores tokens in `localStorage`, injects `Bearer <access>` on every request
+4. `JWTAuthentication` (DRF) validates the token using `SECRET_KEY` and sets `request.user`
+5. `IsAuthenticated` permission guards all protected endpoints
+
+### Auth Endpoints:
+
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/v1/auth/register/` | Create account → returns tokens |
+| POST | `/api/v1/auth/login/` | Sign in → returns tokens |
+| POST | `/api/v1/auth/token/refresh/` | Exchange refresh token for new access token |
+| GET | `/api/v1/auth/me/` | Return current user info |
 
 ---
 
