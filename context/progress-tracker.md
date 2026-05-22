@@ -12,6 +12,36 @@ Update this file after every meaningful implementation change.
 
 ## Completed
 
+- **Unit 15: Public Survey Experience UI**
+  - `src/components/ui/progress.tsx` — Progress bar component (div-based, no Radix needed)
+  - `src/components/ui/radio-group.tsx` — RadioGroup + RadioGroupItem via `@radix-ui/react-radio-group`
+  - `src/components/ui/checkbox.tsx` — Checkbox via `@radix-ui/react-checkbox`
+  - `src/components/ui/alert.tsx` — Alert, AlertTitle, AlertDescription with default/destructive/success variants
+  - `src/features/public-surveys/types/index.ts` — PublicQuestion, PublicSurvey, AnswerValue, SurveyFormValues, SubmissionPayload, PublicSurveyErrorType
+  - `src/features/public-surveys/constants/index.ts` — QUESTION_TYPE_LABELS, rating defaults, SECONDS_PER_QUESTION
+  - `src/features/public-surveys/utils/index.ts` — buildAnswerPayload, estimateCompletionTime, isAnswered
+  - `src/features/public-surveys/services/public-survey-api.ts` — standalone publicClient (no auth injection); getPublicSurvey, submitSurvey
+  - `src/features/public-surveys/hooks/use-public-survey.ts` — usePublicSurvey (TanStack Query, retry:1, 5 min stale)
+  - `src/features/public-surveys/hooks/use-survey-submission.ts` — useSurveySubmission (useMutation)
+  - `src/features/public-surveys/hooks/use-survey-progress.ts` — useSurveyProgress (pure fn, answeredCount/totalCount/percentage)
+  - `src/features/public-surveys/components/survey-container.tsx` — centered max-w-2xl layout
+  - `src/features/public-surveys/components/survey-header.tsx` — title, description, clock estimate, question count
+  - `src/features/public-surveys/components/survey-progress.tsx` — "X of Y questions" + Progress bar
+  - `src/features/public-surveys/components/survey-footer.tsx` — minimal branding footer
+  - `src/features/public-surveys/components/completion-screen.tsx` — success icon, thank-you, Return Home
+  - `src/features/public-surveys/components/survey-loading.tsx` — skeleton placeholders mirroring final layout
+  - `src/features/public-surveys/components/survey-error.tsx` — error icon, message, Retry + Go Home actions
+  - `src/features/public-surveys/components/submit-button.tsx` — loading state + disabled during submission
+  - `src/features/public-surveys/components/question-renderer.tsx` — numbered card wrapper + type dispatcher
+  - `src/features/public-surveys/question-components/short-text-question.tsx` — Input with validation
+  - `src/features/public-surveys/question-components/long-text-question.tsx` — Textarea with validation
+  - `src/features/public-surveys/question-components/multiple-choice-question.tsx` — RadioGroup, full-row touch targets
+  - `src/features/public-surveys/question-components/checkbox-question.tsx` — multi-select array via watch/setValue
+  - `src/features/public-surveys/question-components/rating-question.tsx` — clickable numeric buttons (1–5 or 1–10)
+  - `src/features/public-surveys/pages/public-survey-page.tsx` — full page: FormProvider, validation, submission, completion
+  - `src/app/router/index.tsx` — added `/s/:surveyId` public route under PublicLayout (no auth guard)
+  - `package.json` — added `@radix-ui/react-radio-group`, `@radix-ui/react-checkbox`
+
 - **Unit 14: Survey Response Infrastructure**
   - `backend/apps/responses/__init__.py` + `apps.py` + `constants.py` + `exceptions.py` + `permissions.py` + `utils.py` — full app scaffold
   - `backend/apps/responses/models/response.py` — `Response` model: survey FK, optional respondent FK, JSONField metadata, submitted_at; indexes on survey + submitted_at
@@ -184,7 +214,7 @@ Update this file after every meaningful implementation change.
 
 ## In Progress
 
-- None. Unit 14 complete.
+- None. Unit 15 complete.
 
 ## Next Up
 
