@@ -55,9 +55,10 @@ class ClerkAuthMiddleware:
         clerk_user_id = payload.get("sub", "")
         email = payload.get("email", "")
 
-        user, _ = AppUser.objects.get_or_create(
+        user, _ = AppUser.objects.update_or_create(
             clerk_user_id=clerk_user_id,
             defaults={"email": email},
         )
         request.clerk_user = user
+        request.user = user
         return self.get_response(request)

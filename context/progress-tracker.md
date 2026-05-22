@@ -8,10 +8,45 @@ Update this file after every meaningful implementation change.
 
 ## Current Goal
 
-- Unit 9: Landing Page (complete)
+- Unit 11: Survey Management Functionality — Complete
 
 ## Completed
 
+- **Unit 11: Survey Management Functionality**
+  - `src/features/surveys/types/index.ts` — Added `SurveyMetadata` and `QuestionMetadata` named types; updated `Question.metadata` to `QuestionMetadata`
+  - `src/features/surveys/services/survey-api.ts` — Added `reorderQuestions(orderedIds)` API method (batch PATCH for stable ordering)
+  - `src/features/surveys/utils/normalize.ts` — New file: `normalizeQuestion`, `normalizeSurvey`, `normalizeQuestionMetadata`, `normalizeSurveyMetadata` utilities
+  - `src/features/surveys/hooks/use-questions.ts` — Full optimistic updates for `useCreateQuestion`, `useUpdateQuestion`, `useDeleteQuestion`; new `useReorderQuestions` hook with optimistic cache reorder + rollback
+  - `src/features/surveys/hooks/use-surveys.ts` — Optimistic updates for `useUpdateSurvey` (immediate cache update for `["survey", id]` and `["surveys"]` with rollback on error)
+  - `src/features/surveys/components/survey-editor.tsx` — Uses `useReorderQuestions` for move-up/move-down; exposes `onSaveStateChange` prop to report mutation state to parent
+  - `src/features/surveys/pages/survey-editor-page.tsx` — `SaveIndicator` component in top bar showing "Saving…" / "Saved" / "Error saving" driven by combined survey + question mutation state
+
+- **Unit 10: Survey Management UI**
+  - `src/components/ui/badge.tsx` — Badge component with success/warning/muted/outline variants
+  - `src/components/ui/skeleton.tsx` — Skeleton loading component
+  - `src/components/ui/textarea.tsx` — Textarea form input
+  - `src/components/ui/select.tsx` — Radix-based Select component (installed @radix-ui/react-select)
+  - `src/features/surveys/types/index.ts` — Survey, Question, payload types + SurveyStatus/QuestionType enums
+  - `src/lib/api/endpoints.ts` — Added surveys and questions endpoint registry
+  - `src/features/surveys/services/survey-api.ts` — Full CRUD service: getSurveys, getSurveyById, createSurvey, updateSurvey, deleteSurvey, getQuestions, createQuestion, updateQuestion, deleteQuestion
+  - `src/features/surveys/hooks/use-surveys.ts` — useSurveys, useCreateSurvey, useUpdateSurvey, useDeleteSurvey with TanStack Query + toast notifications
+  - `src/features/surveys/hooks/use-survey.ts` — useSurvey (single survey by id)
+  - `src/features/surveys/hooks/use-questions.ts` — useQuestions, useCreateQuestion, useUpdateQuestion, useDeleteQuestion
+  - `src/features/surveys/components/survey-status-badge.tsx` — Status badge (Draft/Published/Archived)
+  - `src/features/surveys/components/empty-state.tsx` — Reusable empty state with optional CTA
+  - `src/features/surveys/components/survey-card.tsx` — Survey card with dropdown actions (edit, view, publish, delete)
+  - `src/features/surveys/components/survey-list.tsx` — Responsive grid with skeleton loading + empty state
+  - `src/features/surveys/components/survey-header.tsx` — Page header with back button, status badge, and action slots
+  - `src/features/surveys/components/survey-form.tsx` — react-hook-form + zod validated create/edit form
+  - `src/features/surveys/components/question-card.tsx` — Question card with ordering controls, type/required badges, edit/delete
+  - `src/features/surveys/components/question-editor.tsx` — Question create/edit form with type Select, required toggle
+  - `src/features/surveys/components/question-toolbar.tsx` — Add question toolbar strip
+  - `src/features/surveys/components/survey-editor.tsx` — Full editor with add/edit/delete/reorder via dialogs + TanStack Query
+  - `src/features/surveys/pages/survey-list-page.tsx` — /surveys route: survey grid, create button, delete + publish actions
+  - `src/features/surveys/pages/survey-create-page.tsx` — /surveys/create: creation form, redirects to editor on success
+  - `src/features/surveys/pages/survey-detail-page.tsx` — /surveys/:surveyId: overview card, question summary card, management actions
+  - `src/features/surveys/pages/survey-editor-page.tsx` — /surveys/:surveyId/edit: two-column layout (editor + info sidebar)
+  - `src/app/router/index.tsx` — Added /surveys/create, /surveys/:surveyId, /surveys/:surveyId/edit routes
 - **Unit 9: Landing Page (Marketing Website)**
   - `src/features/marketing/components/mobile-nav.tsx` — Sheet-based mobile menu with nav links and auth CTAs
   - `src/features/marketing/components/navbar.tsx` — sticky responsive navbar with logo, nav links, theme toggle, login, Get Started
@@ -23,6 +58,30 @@ Update this file after every meaningful implementation change.
   - `src/features/marketing/components/footer.tsx` — structured footer with branding, nav, legal, social links
   - `src/features/marketing/pages/landing-page.tsx` — full-page assembly with Navbar, Hero, Features, Workflow, Analytics, CTAs, Footer
   - `src/app/router/index.tsx` — updated landing page import to `@/features/marketing/pages/landing-page`
+
+- **Unit 8: Survey Data Architecture**
+  - `backend/apps/surveys/models/survey.py` — `Survey` model with owner FK, title, description, status (draft/published/archived), is_public, timestamps, DB indexes
+  - `backend/apps/surveys/models/question.py` — `Question` model with survey FK, question_text, question_type (5 types), is_required, order, JSONField metadata
+  - `backend/apps/surveys/serializers/survey_serializer.py` — validates title, status; nested read-only questions
+  - `backend/apps/surveys/serializers/question_serializer.py` — validates type, text, order
+  - `backend/apps/surveys/permissions.py` — `IsSurveyOwner` custom permission
+  - `backend/apps/surveys/views/survey_views.py` — `SurveyViewSet` (ModelViewSet, owner-scoped queryset, standardized responses)
+  - `backend/apps/surveys/views/question_views.py` — `QuestionViewSet` (PATCH, DELETE flat + POST nested via survey_pk)
+  - `backend/apps/surveys/services.py` — survey + question CRUD service functions
+  - `backend/apps/surveys/utils.py` — `success_response` / `error_response` helpers
+  - `backend/apps/surveys/urls.py` — DRF router: `surveys/`, `questions/`, + `surveys/<id>/questions/`
+  - `backend/config/urls.py` — surveys URLs registered under `/api/v1/`
+  - Migration `0001_initial.py` created and applied
+
+- **Unit 7: Dashboard UI**
+  - `src/routes/route-config.ts` — centralized route metadata (label, path, icon) for all dashboard modules
+  - `src/components/layout/sidebar-item.tsx` — reusable nav item with active/hover states and left-accent border
+  - `src/components/layout/sidebar.tsx` — updated with `logo-bg.png` branding, main nav + settings footer section
+  - `src/components/layout/user-nav.tsx` — Clerk `<UserButton />` wrapper for authenticated user controls
+  - `src/components/layout/mobile-sidebar.tsx` — Sheet-based responsive drawer, auto-closes on route change
+  - `src/components/layout/dashboard-header.tsx` — header with mobile toggle, page title, search/bell placeholders, theme toggle, user nav
+  - `src/components/layout/page-container.tsx` — standardized page wrapper (max-w-7xl, responsive padding)
+  - `src/app/layouts/dashboard-layout.tsx` — updated: desktop sidebar hidden on mobile, uses `DashboardHeader`
 
 - **Unit 6: Authentication Integration (Clerk)**
   - `@clerk/react@latest` installed
@@ -100,7 +159,7 @@ Update this file after every meaningful implementation change.
 
 ## In Progress
 
-- None.
+- None. Unit 11 complete.
 
 ## Next Up
 

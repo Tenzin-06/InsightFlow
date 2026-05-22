@@ -6,9 +6,18 @@ import brandImage from "@/assets/brand_image-bg.png";
 export default function AuthenticationLayout() {
   const { isSignedIn, isLoaded } = useAuth();
 
-  if (isLoaded && isSignedIn) {
+  if (!isLoaded) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary-500 border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (isSignedIn) {
     return <Navigate to="/dashboard" replace />;
   }
+
   return (
     <div className="min-h-screen flex bg-bg-primary">
       {/* Left branding panel — desktop only */}

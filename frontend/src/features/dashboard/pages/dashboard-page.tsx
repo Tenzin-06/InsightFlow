@@ -13,7 +13,7 @@ export default function DashboardPage() {
 
       <Card className="w-fit">
         <CardHeader>
-          <CardTitle className="text-sm font-medium text-text-secondary">API Status</CardTitle>
+          <CardTitle className="text-base font-bold text-text-secondary">API Status</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading && <p className="text-sm text-text-secondary">Connecting to API…</p>}
@@ -32,7 +32,7 @@ export default function DashboardPage() {
         {["Surveys", "Responses", "Campaigns", "Completion Rate"].map((label) => (
           <Card key={label}>
             <CardHeader>
-              <CardTitle className="text-sm font-medium text-text-secondary">{label}</CardTitle>
+              <CardTitle className="text-base font-bold text-text-secondary">{label}</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-bold text-text-primary">—</p>
