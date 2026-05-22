@@ -30,6 +30,7 @@ LOCAL_APPS = [
     "apps.authentication",
     "apps.users",
     "apps.surveys",
+    "apps.responses",
     "apps.analytics",
     "apps.campaigns",
 ]

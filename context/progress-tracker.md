@@ -12,6 +12,23 @@ Update this file after every meaningful implementation change.
 
 ## Completed
 
+- **Unit 14: Survey Response Infrastructure**
+  - `backend/apps/responses/__init__.py` + `apps.py` + `constants.py` + `exceptions.py` + `permissions.py` + `utils.py` — full app scaffold
+  - `backend/apps/responses/models/response.py` — `Response` model: survey FK, optional respondent FK, JSONField metadata, submitted_at; indexes on survey + submitted_at
+  - `backend/apps/responses/models/answer.py` — `Answer` model: response FK, question FK, JSONField value, JSONField metadata; index on question
+  - `backend/apps/responses/serializers/submission_serializer.py` — `SubmissionSerializer` + `AnswerInputSerializer`; validates non-empty answers, max payload size, no duplicate question_ids
+  - `backend/apps/responses/serializers/response_serializer.py` — read-only `ResponseSerializer` with nested answers
+  - `backend/apps/responses/serializers/answer_serializer.py` — `AnswerSerializer` ModelSerializer
+  - `backend/apps/responses/services/validation_service.py` — `validate_submission`: question-survey membership, supported types, type-specific value checks (rating=numeric, checkbox=list), required-question enforcement
+  - `backend/apps/responses/services/answer_normalization_service.py` — `normalize_answers`: sanitizes text (strip), normalizes checkbox lists, coerces integer ratings from float
+  - `backend/apps/responses/services/submission_service.py` — `submit_survey_response`: validate → normalize → atomic `Response.create` + `Answer.bulk_create`; full rollback on any failure
+  - `backend/apps/responses/views/submission_views.py` — `SurveySubmitView` (APIView, AllowAny); resolves published survey, validates payload, links optional respondent via `request.clerk_user`
+  - `backend/apps/responses/urls.py` — `POST surveys/<int:survey_pk>/submit/`
+  - `backend/config/settings/base.py` — added `apps.responses` to `LOCAL_APPS`
+  - `backend/config/urls.py` — wired `apps.responses.urls` under `/api/v1/`
+  - `backend/apps/authentication/middleware.py` — added `OPTIONAL_AUTH_PATH_SUFFIXES = ["/submit/"]`; try-auth-don't-require block for anonymous + authenticated submissions
+  - `backend/apps/responses/migrations/0001_initial.py` — migration created and applied (`responses.0001_initial... OK`)
+
 - **Unit 11: Survey Management Functionality**
   - `src/features/surveys/types/index.ts` — Added `SurveyMetadata` and `QuestionMetadata` named types; updated `Question.metadata` to `QuestionMetadata`
   - `src/features/surveys/services/survey-api.ts` — Added `reorderQuestions(orderedIds)` API method (batch PATCH for stable ordering)
@@ -167,7 +184,7 @@ Update this file after every meaningful implementation change.
 
 ## In Progress
 
-- None. Unit 11 complete.
+- None. Unit 14 complete.
 
 ## Next Up
 
