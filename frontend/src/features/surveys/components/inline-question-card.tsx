@@ -155,7 +155,6 @@ export function InlineQuestionCard({
   }
 
   const showOptions = localType === "multiple_choice" || localType === "checkbox";
-  const typeLabel = QUESTION_TYPES.find((t) => t.value === localType)?.label ?? localType;
 
   // ── Inactive preview (looks like a rendered form card) ───────────────────
   if (!isActive) {
