@@ -83,22 +83,30 @@ Update this file after every meaningful implementation change.
   - `src/components/layout/page-container.tsx` — standardized page wrapper (max-w-7xl, responsive padding)
   - `src/app/layouts/dashboard-layout.tsx` — updated: desktop sidebar hidden on mobile, uses `DashboardHeader`
 
-- **Unit 6: Authentication Integration (Clerk)**
-  - `@clerk/react@latest` installed
-  - `.env.local` created with `VITE_CLERK_PUBLISHABLE_KEY` (gitignored)
-  - `src/main.tsx` — `<ClerkProvider afterSignOutUrl="/">` wraps the app
-  - `src/routes/protected-route.tsx` — `useAuth()` guard, redirects unauthenticated to `/login`
-  - `src/app/router/index.tsx` — dashboard routes wrapped in `ProtectedRoute`
-  - `src/lib/api/interceptors.ts` — `setTokenGetter` pattern; injects Clerk JWT into all API requests
-  - `src/app/providers/auth-token-provider.tsx` — bridges Clerk `getToken` into axios interceptor
-  - `backend/apps/authentication/models.py` — `AppUser` model with `clerk_user_id`, `email`, `full_name`
-  - `backend/apps/authentication/middleware.py` — `ClerkAuthMiddleware` verifies JWT via JWKS, get-or-creates `AppUser`
-  - `backend/apps/authentication/permissions.py` — `IsClerkAuthenticated` DRF permission class
-  - `backend/config/settings/base.py` — middleware + permission class registered
-  - `backend/requirements/base.txt` — `PyJWT`, `cryptography` added
-  - `backend/.env` — `CLERK_JWKS_URL` added
-  - Migration `0001_initial.py` created and applied
-  - `src/features/auth/layouts/authentication-layout.tsx` — redirects signed-in users to `/dashboard`
+- **Unit 6 (revised): Authentication — Local JWT (replaces Clerk)**
+  - Clerk removed entirely: `@clerk/react` uninstalled, `src/lib/clerk-appearance.ts` deleted, `CLERK_JWKS_URL` no longer needed
+  - `backend/apps/authentication/models.py` — `AppUser` updated: removed `clerk_user_id`, added `password` (PBKDF2 hash) + `is_active`; `set_password`/`check_password` helpers; `is_authenticated` property
+  - `backend/apps/authentication/migrations/0002_update_appuser_local_auth.py` — removes `clerk_user_id`, adds `password` + `is_active`
+  - `backend/apps/authentication/authentication.py` — `JWTAuthentication` (DRF `BaseAuthentication`); validates HS256 tokens with `SECRET_KEY`
+  - `backend/apps/authentication/middleware.py` — `ClerkAuthMiddleware` removed; file is now a no-op comment
+  - `backend/apps/authentication/permissions.py` — `IsAuthenticated` replaces `IsClerkAuthenticated`
+  - `backend/apps/authentication/views.py` — `RegisterView`, `LoginView`, `TokenRefreshView`, `MeView`
+  - `backend/apps/authentication/serializers.py` — `RegisterSerializer`, `LoginSerializer`
+  - `backend/apps/authentication/urls.py` — `auth/register/`, `auth/login/`, `auth/token/refresh/`, `auth/me/`
+  - `backend/config/urls.py` — auth URLs registered under `/api/v1/`
+  - `backend/config/settings/base.py` — `ClerkAuthMiddleware` removed from `MIDDLEWARE`; DRF uses `JWTAuthentication` + `IsAuthenticated`
+  - `backend/requirements/base.txt` — `cryptography` removed (no longer needed)
+  - `backend/apps/surveys/views/survey_views.py` + `question_views.py` — swapped to `IsAuthenticated`
+  - `src/features/auth/context/auth-context.tsx` — `AuthProvider` + `useAuth()` hook; tokens in `localStorage`
+  - `src/features/auth/services/auth-api.ts` — `loginApi`, `registerApi`, `refreshTokenApi`
+  - `src/main.tsx` — `<AuthProvider>` replaces `<ClerkProvider>`
+  - `src/routes/protected-route.tsx` — uses custom `useAuth()`
+  - `src/app/providers/auth-token-provider.tsx` — reads access token from `localStorage` into axios interceptor
+  - `src/features/auth/layouts/authentication-layout.tsx` — uses custom `useAuth()`
+  - `src/features/auth/pages/login-page.tsx` — custom form (react-hook-form + zod)
+  - `src/features/auth/pages/register-page.tsx` — custom form with confirm-password
+  - `src/components/layout/user-nav.tsx` — user initials avatar + dropdown (profile, sign out)
+  - `src/components/layout/navigation.tsx` — auth-aware navbar using `useAuth()` (no Clerk `<Show>`)
 
 - **Unit 5: Authentication UI**
   - `react-hook-form`, `zod`, `@hookform/resolvers` installed
@@ -171,6 +179,7 @@ Update this file after every meaningful implementation change.
 
 ## Architecture Decisions
 
+- **Auth**: Switched from Clerk to self-contained JWT auth (PyJWT HS256) — no external service, works everywhere without environment keys at startup
 - Tailwind v4 (not v3) — uses `@tailwindcss/vite` plugin; CSS-based config in `src/index.css` via `@theme {}` block
 - Tailwind animate plugin loaded via `@plugin "tailwindcss-animate"` (not `@import`) — required for Tailwind v4
 - shadcn/ui CLI (v4.6.0) on Windows puts files in literal `@/` directory — all components written manually with Radix UI imports
