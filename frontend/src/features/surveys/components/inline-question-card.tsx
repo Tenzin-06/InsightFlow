@@ -27,7 +27,6 @@ const QUESTION_TYPES: { value: QuestionType; label: string }[] = [
 
 type Props = {
   question: Question;
-  index: number;
   isFirst: boolean;
   isLast: boolean;
   isActive: boolean;
@@ -68,7 +67,6 @@ function RequiredToggle({
 
 export function InlineQuestionCard({
   question,
-  index,
   isFirst,
   isLast,
   isActive,

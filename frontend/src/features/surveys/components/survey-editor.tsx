@@ -126,7 +126,6 @@ export function SurveyEditor({ surveyId, onAddRef, onSaveStateChange }: Props) {
         <InlineQuestionCard
           key={question.id}
           question={question}
-          index={idx}
           isFirst={idx === 0}
           isLast={idx === sorted.length - 1}
           isActive={activeId === question.id}
