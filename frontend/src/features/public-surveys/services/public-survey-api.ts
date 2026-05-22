@@ -4,10 +4,13 @@
  * Uses a standalone Axios client that does NOT attach auth tokens, since
  * public survey participation does not require authentication.
  *
- * Backend endpoint notes:
- *  - GET  /api/v1/surveys/{id}/        → survey detail with nested questions
- *                                         (backend must expose this AllowAny)
- *  - POST /api/v1/surveys/{id}/submit/ → submit answers (already AllowAny, Unit 14)
+ * Endpoints (Unit 16):
+ *  - GET  /api/v1/public/surveys/{id}/        → fetch a published survey with questions
+ *  - POST /api/v1/public/surveys/{id}/submit/ → submit respondent answers
+ *
+ * Both endpoints accept anonymous and authenticated requests.
+ * If a valid Bearer token is present on a submit request, the backend will
+ * link the respondent FK on the created Response record.
  */
 
 import axios from "axios";
@@ -26,7 +29,7 @@ const publicClient = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-// Normalise error shape for consistent error handling
+// Normalise error shape for consistent error handling in hooks
 publicClient.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -46,23 +49,33 @@ publicClient.interceptors.response.use(
 
 /**
  * Fetch a published survey with its questions.
- * Uses the dedicated /public/ endpoint which requires no authentication
- * and only returns surveys with status=published.
+ *
+ * Calls GET /api/v1/public/surveys/{surveyId}/
+ * Only surveys with status=published are returned.
+ * Draft / archived / deleted surveys return a 404 which the hook surfaces
+ * as the SurveyError component.
  */
 export async function getPublicSurvey(surveyId: string): Promise<PublicSurvey> {
   const res = await publicClient.get<ApiResponse<PublicSurvey>>(
-    `/surveys/${surveyId}/public/`
+    `/public/surveys/${surveyId}/`
   );
   return res.data.data;
 }
 
 /**
- * Submit a respondent's answers to a survey.
- * Corresponds to the AllowAny endpoint created in Unit 14.
+ * Submit a respondent's answers to a published survey.
+ *
+ * Calls POST /api/v1/public/surveys/{surveyId}/submit/
+ * The backend validates, normalises, and atomically persists the submission.
+ * Any validation failure is reflected via a rejected promise with { message, status }.
  */
 export async function submitSurvey(
   surveyId: string,
   payload: SubmissionPayload
-): Promise<void> {
-  await publicClient.post(`/surveys/${surveyId}/submit/`, payload);
+): Promise<{ response_id: number }> {
+  const res = await publicClient.post<ApiResponse<{ response_id: number }>>(
+    `/public/surveys/${surveyId}/submit/`,
+    payload
+  );
+  return res.data.data;
 }

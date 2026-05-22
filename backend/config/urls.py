@@ -6,6 +6,7 @@ api_v1_urlpatterns = [
     path("", include("apps.authentication.urls")),
     path("", include("apps.surveys.urls")),
     path("", include("apps.responses.urls")),
+    path("", include("apps.public_surveys.urls")),
 ]
 
 urlpatterns = [

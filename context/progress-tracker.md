@@ -12,6 +12,21 @@ Update this file after every meaningful implementation change.
 
 ## Completed
 
+- **Unit 16: Public Survey Functionality** ✅ implemented & verified
+  - `backend/apps/public_surveys/__init__.py` + `apps.py` — app scaffold
+  - `backend/apps/public_surveys/permissions.py` — `PublicSurveyPermission` (AllowAny, extensible for rate-limiting)
+  - `backend/apps/public_surveys/validators.py` — re-exports `validate_submission`; ready for rate-limit / CAPTCHA extensions
+  - `backend/apps/public_surveys/utils.py` — re-exports `success_response` / `error_response` helpers
+  - `backend/apps/public_surveys/serializers/public_survey_serializer.py` — `PublicQuestionSerializer` + `PublicSurveySerializer` (id, title, description, question_count, nested questions)
+  - `backend/apps/public_surveys/views/public_survey_views.py` — `PublicSurveyDetailView` (GET) + `PublicSurveySubmitView` (POST); AllowAny; published-only guard; delegates to existing submission service
+  - `backend/apps/public_surveys/urls.py` — `GET public/surveys/<pk>/` + `POST public/surveys/<pk>/submit/`
+  - `backend/apps/public_surveys/services/__init__.py` — empty; ready for future public-survey-specific services
+  - `backend/config/settings/base.py` — added `apps.public_surveys` to `LOCAL_APPS`
+  - `backend/config/urls.py` — wired `apps.public_surveys.urls` under `/api/v1/`
+  - `frontend/src/features/public-surveys/services/public-survey-api.ts` — updated URLs: `GET /public/surveys/${id}/` + `POST /public/surveys/${id}/submit/`; return type of `submitSurvey` updated to `{ response_id: number }`
+  - `frontend/src/features/public-surveys/hooks/use-survey-submission.ts` — updated `useMutation` TData generic to `{ response_id: number }` to match updated API service
+  - `django-admin check`: 0 issues; `tsc -b --noEmit`: 0 errors
+
 - **Unit 15: Public Survey Experience UI** ✅ implemented & verified
   - `src/components/ui/progress.tsx` — Progress bar component (div-based, no Radix needed)
   - `src/components/ui/radio-group.tsx` — RadioGroup + RadioGroupItem via `@radix-ui/react-radio-group`
@@ -214,7 +229,7 @@ Update this file after every meaningful implementation change.
 
 ## In Progress
 
-- None. Unit 15 complete.
+- None. Unit 16 complete.
 
 ## Next Up
 

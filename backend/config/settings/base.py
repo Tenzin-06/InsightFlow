@@ -31,6 +31,7 @@ LOCAL_APPS = [
     "apps.users",
     "apps.surveys",
     "apps.responses",
+    "apps.public_surveys",
     "apps.analytics",
     "apps.campaigns",
 ]
