@@ -12,7 +12,7 @@ Update this file after every meaningful implementation change.
 
 ## Completed
 
-- **Unit 15: Public Survey Experience UI**
+- **Unit 15: Public Survey Experience UI** ✅ implemented & verified
   - `src/components/ui/progress.tsx` — Progress bar component (div-based, no Radix needed)
   - `src/components/ui/radio-group.tsx` — RadioGroup + RadioGroupItem via `@radix-ui/react-radio-group`
   - `src/components/ui/checkbox.tsx` — Checkbox via `@radix-ui/react-checkbox`
@@ -240,3 +240,4 @@ Update this file after every meaningful implementation change.
 - Unit 1 complete. Frontend shell running at `localhost:5173` with full design system, routing, and dashboard layout.
 - Unit 5 complete. Authentication UI implemented with split-screen layout, react-hook-form + zod validation, session-aware navigation.
 - Unit 9 complete. Landing page (marketing website) with full section layout, scroll animations, and responsive design.
+- Unit 15 complete and verified. Public survey experience fully functional end-to-end. Two bugs fixed during verification: (1) survey list empty due to DRF LimitOffsetPagination wrapping list response — fixed with `pagination_class = None` on SurveyViewSet; (2) radio button indicator invisible due to lucide Circle SVG fill — fixed with plain `<span>` dot + `data-[state=checked]:border-primary-500`. Branch: `feat/survey-experience-ui`.
