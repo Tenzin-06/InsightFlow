@@ -9,15 +9,16 @@ type Props = {
   onOpen: () => void;
   onEdit: () => void;
   onUpload: () => void;
+  onDelete: () => void;
 };
 
-export function AudienceCard({ audience, onOpen, onEdit, onUpload }: Props) {
+export function AudienceCard({ audience, onOpen, onEdit, onUpload, onDelete }: Props) {
   return (
     <Card className="bg-white shadow-sm dark:bg-card">
       <CardHeader>
         <CardTitle className="line-clamp-1 text-text-primary">{audience.name}</CardTitle>
         <CardAction>
-          <AudienceActions onOpen={onOpen} onEdit={onEdit} onUpload={onUpload} />
+          <AudienceActions onOpen={onOpen} onEdit={onEdit} onUpload={onUpload} onDelete={onDelete} />
         </CardAction>
       </CardHeader>
       <CardContent className="space-y-4">

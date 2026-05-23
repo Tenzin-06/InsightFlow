@@ -12,6 +12,34 @@ Update this file after every meaningful implementation change.
 
 ## Completed
 
+- **Unit 22: Audience Management Functionality** ✅ implemented & verified
+  - `backend/apps/campaigns/models/recipient.py` — added `UniqueConstraint(["audience", "email"], "unique_recipient_per_audience")` + `Index(["audience"])` 
+  - `backend/apps/campaigns/migrations/0002_recipient_unique_constraint.py` — migration applied (`campaigns.0002... OK`)
+  - `backend/apps/campaigns/services/validation_service.py` — `is_valid_email()`, `normalize_contact()` with email strip+lowercase + format validation
+  - `backend/apps/campaigns/services/upload_service.py` — `process_bulk_upload()`: validate → batch-deduplicate → existing-email check → `bulk_create(ignore_conflicts=True)` inside `transaction.atomic()`; returns `{uploaded, duplicates, invalid}` summary
+  - `backend/apps/campaigns/serializers/audience_serializer.py` — added nested `RecipientSerializer(many=True, read_only=True)` recipients field; optimized `get_recipient_count` via prefetch cache
+  - `backend/apps/campaigns/views/audience_views.py` — added `@action upload` (`POST /audiences/:id/upload/`) and `@action recipients` (`GET /audiences/:id/recipients/?q&limit&offset`) with search and manual pagination
+  - `backend/apps/campaigns/views/upload_views.py` — `UploadContactsView` + `RecipientListView` standalone class-based views (spec compliance; same logic as viewset actions)
+  - `frontend/src/lib/api/endpoints.ts` — added `audiences.recipients(id)` endpoint
+  - `frontend/src/features/audiences/types/index.ts` — added `UploadSummary` + `AudienceRecipientPage` types
+  - `frontend/src/features/audiences/services/audience-api.ts` — added `deleteAudience`, `getAudienceRecipients`; updated `uploadAudienceContacts` return type to `UploadSummary`
+  - `frontend/src/features/audiences/services/validation-service.ts` — `isValidEmail`, `validateContactRow`, `validateContactBatch` (mirrors backend rules)
+  - `frontend/src/features/audiences/services/upload-service.ts` — `parseUploadFile`, `submitContactUpload`, re-exports `validateContactBatch`
+  - `frontend/src/features/audiences/hooks/use-delete-audience.ts` — `useDeleteAudience` with cache removal, list invalidation, optional redirect
+  - `frontend/src/features/audiences/hooks/use-audience-contacts.ts` — `useAudienceContacts` querying `/audiences/:id/recipients/` with q/limit/offset support
+  - `frontend/src/features/audiences/hooks/use-contact-validation.ts` — `useContactValidation` hook deriving validCount/errors/isValid from draft
+  - `frontend/src/features/audiences/hooks/use-contact-upload.ts` — updated to return `UploadSummary` from mutation, show `formatUploadSummary` toast, invalidate audience-contacts query key
+  - `frontend/src/features/audiences/utils/csv-parser.ts` — re-exports `parseContactsFromCsv`, `isValidEmail`, `summarizeMetadata`
+  - `frontend/src/features/audiences/utils/recipient-normalizer.ts` — `normalizeContact`, `normalizeContacts`, `deduplicateContacts`
+  - `frontend/src/features/audiences/utils/upload-utils.ts` — `formatUploadSummary`, `isDraftSubmittable`, `isAcceptedCsvFile`, `isWithinSizeLimit`, constants
+  - `frontend/src/features/audiences/state/audience-store.ts` — `useUploadState` + `useAudienceListState` hooks for ephemeral UI state
+  - `frontend/src/features/audiences/components/audience-actions.tsx` — added `onDelete` prop + Delete menu item with red styling and separator
+  - `frontend/src/features/audiences/components/audience-card.tsx` — added `onDelete` prop, passes to `AudienceActions`
+  - `frontend/src/features/audiences/components/audience-table.tsx` — added `onDelete` prop, passes through to `AudienceCard`
+  - `frontend/src/features/audiences/pages/audiences-page.tsx` — wired `useDeleteAudience` + confirmation dialog; passes `onDelete` to `AudienceTable`
+  - `frontend/src/features/audiences/pages/audience-detail-page.tsx` — uses `useAudienceContacts` (dedicated endpoint) + `useDeleteAudience` with confirmation dialog; stat cards show live loaded-contact count
+  - `npm.cmd run build`: passes (0 TS errors)
+
 - **Unit 23: Email Campaign UI** implemented and verified
   - `frontend/package.json` + `package-lock.json` - added `@tiptap/react` and `@tiptap/starter-kit`
   - `frontend/src/features/email-campaigns/types/index.ts` - campaign draft, status, schedule, preview, template, variable, validation, and option types
