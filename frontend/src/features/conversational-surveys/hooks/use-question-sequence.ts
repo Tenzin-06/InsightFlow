@@ -1,12 +1,10 @@
 /**
  * useQuestionSequence
  *
- * Provides question progression helpers derived from the question list
- * and the current Zustand index. All predicates are computed from the
- * pure progression-utils functions.
+ * Provides question progression helpers derived from the question list.
+ * All predicates are computed from the pure progression-utils functions.
  */
 
-import { useConversationStore } from "../stores/conversation-store";
 import {
   isAutoAdvanceType,
   isLastQuestion,
@@ -36,9 +34,6 @@ export function useQuestionSequence({
   questions,
 }: UseQuestionSequenceParams): QuestionSequenceResult {
   const total = questions.length;
-
-  // Expose the current index from the store (future branching support)
-  useConversationStore((s) => s.currentQuestionIndex);
 
   return {
     checkIsAutoAdvance: isAutoAdvanceType,
