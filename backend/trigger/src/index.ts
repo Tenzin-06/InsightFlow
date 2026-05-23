@@ -23,7 +23,11 @@ export { analyzeTextTask } from "./tasks/analyze_text.js";
 export { generateSummaryTask } from "./tasks/generate_summary.js";
 export { classifyResponsesTask } from "./tasks/classify_responses.js";
 export { processAITaskTask } from "./tasks/process_ai_task.js";
-// Unit 33a - Simulation Mode Foundation
+// Unit 32 — AI Analytics
+export { summarizeResponsesTask } from "./tasks/summarize_responses.js";
+export { analyzeSentimentTask } from "./tasks/analyze_sentiment.js";
+export { generateInsightsTask } from "./tasks/generate_insights.js";
+// Unit 33a — Simulation Mode Foundation
 export { runSimulationTask } from "./tasks/run_simulation.js";
 export { validateSimulationTask } from "./tasks/validate_simulation.js";
 export { cleanupSimulationTask } from "./tasks/cleanup_simulation.js";

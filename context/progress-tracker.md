@@ -8,7 +8,7 @@ Update this file after every meaningful implementation change.
 
 ## Current Goal
 
-- Unit 36 — next unit (TBD)
+- Unit 36 - PDF Report Backend
 
 ## Completed
 
@@ -41,6 +41,42 @@ Update this file after every meaningful implementation change.
   - `frontend/src/lib/api/endpoints.ts` — `reports` endpoint stubs (exports, exportDetail, initiate, status)
   - Build: `npm run build` passes — 0 TS errors; `dist/assets/reports-page-*.js` emitted at ~49 kB
 
+- **Unit 36: PDF Report Backend (36-PDF-Report-B)** ✅ implemented & verified
+  - `backend/apps/reports/` — new Django report generation app with export model, serializers, views, URLs, service layer, tasks shim, utilities, migrations, and print-safe templates.
+  - `backend/apps/reports/models.py` — `ReportExport` tracks owner, survey, template, sections, status, progress, file path, download expiry, analytics snapshot, AI snapshot, and asset manifest.
+  - `backend/apps/reports/services/report_builder.py` — composes report payloads from analytics, AI insights, generated chart assets, and HTML templates.
+  - `backend/apps/reports/services/pdf_renderer.py` — HTML-to-PDF rendering via WeasyPrint when available, with a minimal PDF fallback so exports remain resilient.
+  - `backend/apps/reports/services/chart_renderer.py` — generates PDF-compatible chart assets using matplotlib when available, with SVG fallback.
+  - `backend/apps/reports/services/analytics_embedder.py` and `ai_embedder.py` — embed survey analytics and clearly labeled AI-generated insight sections without modifying source data.
+  - `backend/apps/reports/services/export_service.py` — creates exports, advances status/progress, stores generated PDFs under media storage, and sets authenticated 24-hour download expiry.
+  - API routes added: `POST /api/v1/reports/generate/`, `GET /api/v1/reports/<id>/status/`, `GET /api/v1/reports/<id>/download/`, `GET /api/v1/reports/templates/`.
+  - `backend/config/settings/base.py` — registered existing `apps.ai_analytics`, added `apps.reports`, and configured reports logger.
+  - `backend/config/urls.py` — wired report URLs under `/api/v1/`.
+  - `backend/requirements/base.txt` — added PDF/report rendering dependencies.
+  - `context/architecture.md` — documented the reports backend domain and download delivery responsibility.
+  - Verification: `.\venv\Scripts\python.exe manage.py check` passes; `.\venv\Scripts\python.exe manage.py makemigrations reports --check --dry-run` reports no changes; report URL/template smoke check passes.
+
+- **Unit 12: Google Forms Import UI** ✅ implemented & verified
+  - `frontend/src/features/google-forms-import/types/index.ts` — ImportStatus, ImportErrorCode, ImportError, ImportedSurvey, ImportResult, GoogleFormImportPayload, ImportFormValues
+  - `frontend/src/features/google-forms-import/constants/index.ts` — URL pattern, status labels, loading messages, error messages, recovery hints
+  - `frontend/src/features/google-forms-import/utils/index.ts` — isGoogleFormsUrl(), classifyImportError(), sanitizeUrl()
+  - `frontend/src/features/google-forms-import/services/google-form-import-api.ts` — importGoogleForm() calling POST /api/v1/surveys/import/google/
+  - `frontend/src/features/google-forms-import/hooks/use-import-form.ts` — react-hook-form + zod URL validation hook
+  - `frontend/src/features/google-forms-import/hooks/use-google-form-import.ts` — React Query mutation hook with onSuccess/onError callbacks
+  - `frontend/src/features/google-forms-import/components/import-status.tsx` — status badge (idle/validating/importing/success/error)
+  - `frontend/src/features/google-forms-import/components/import-guide.tsx` — step-by-step Google Forms URL guide
+  - `frontend/src/features/google-forms-import/components/import-form.tsx` — URL input with inline validation, auto-focus, aria attributes
+  - `frontend/src/features/google-forms-import/components/import-loading.tsx` — animated spinner with cycling messages, aria-live
+  - `frontend/src/features/google-forms-import/components/import-error.tsx` — typed error display with recovery guidance and Retry button
+  - `frontend/src/features/google-forms-import/components/import-success.tsx` — success confirmation with survey title/question count, Open Editor + Back to Surveys actions
+  - `frontend/src/features/google-forms-import/components/import-preview.tsx` — future-ready preview shell (no backend logic required)
+  - `frontend/src/features/google-forms-import/components/import-modal.tsx` — Dialog container managing full workflow (idle → importing → success/error); blocks close during import
+  - `frontend/src/features/google-forms-import/pages/import-page.tsx` — full-page layout for mobile/direct navigation at /surveys/import/google
+  - `frontend/src/lib/api/endpoints.ts` — added googleFormsImport.import endpoint
+  - `frontend/src/app/router/index.tsx` — added /surveys/import/google route (ProtectedRoute)
+  - `frontend/src/features/surveys/pages/survey-list-page.tsx` — added "Import Google Form" button next to "Create New Survey" CTA; mounts ImportModal
+  - Verification: npm.cmd run build passes (0 TS errors)
+
 - **Unit 34: Simulation Mode Frontend (34-Simulation-Mode-B)** completed and verified
   - Added full simulation frontend feature slice under `frontend/src/features/simulation/` with dedicated pages for workspace, personas, runs, and analytics.
   - Implemented simulation shell/banners/warnings, persona card + form + selector workflows, simulation configuration form, execution runner, progress monitoring, synthetic response preview, results view, and synthetic metrics panel.
@@ -59,6 +95,38 @@ Update this file after every meaningful implementation change.
   - `backend/config/urls.py` - wired simulation URLs under `/api/v1/`.
   - `backend/trigger/src/schemas/simulation.schema.ts` and simulation tasks - added Trigger.dev scaffolding for validate, run, and cleanup workflows.
   - Verification: `.\venv\Scripts\python.exe manage.py check` passes; `.\venv\Scripts\python.exe manage.py makemigrations simulation --check --dry-run` reports no changes; `npm.cmd run typecheck` passes in `backend/trigger`.
+
+- **Unit 32: AI Analytics** ✅ implemented & verified
+  - `backend/apps/ai/__init__.py`
+  - `backend/apps/ai/services/__init__.py`
+  - `backend/apps/ai/services/gemini_service.py` — Gemini gateway helpers: `call_gemini()`, `is_gemini_configured()`
+  - `backend/apps/ai/services/prompt_builder.py` — AI analytics prompt builders
+  - `backend/apps/ai/services/ai_response_parser.py` — JSON parsing helpers: `parse_json_response()`, `safe_parse_json()`
+  - `backend/apps/ai_analytics/__init__.py` + `apps.py` — Django app scaffold
+  - `backend/apps/ai_analytics/constants/__init__.py`
+  - `backend/apps/ai_analytics/models/ai_summary.py`, `ai_sentiment.py`, `ai_quality_score.py`, `ai_question_insight.py`, `models/__init__.py`
+  - `backend/apps/ai_analytics/services/ai_analytics_cache.py`, `summarization_service.py`, `sentiment_service.py`, `quality_scoring_service.py`, `question_analysis_service.py`, `insight_generation_service.py`, `ai_dashboard_service.py`, `services/__init__.py`
+  - `backend/apps/ai_analytics/schemas/__init__.py` — Pydantic schemas
+  - `backend/apps/ai_analytics/validators/__init__.py`, `serializers/__init__.py`, `utils/__init__.py`
+  - `backend/apps/ai_analytics/views/ai_analytics_views.py`, `views/__init__.py` — AI analytics API views
+  - `backend/apps/ai_analytics/urls.py`
+  - `backend/apps/ai_analytics/migrations/0001_initial.py`, `migrations/__init__.py`
+  - `backend/config/settings/base.py` — added `apps.ai_analytics` plus Gemini/AI settings
+  - `backend/config/urls.py` — registered AI analytics URLs
+  - `backend/requirements/base.txt` — added `numpy`, `textblob`, `google-generativeai`, `pydantic`, `tenacity`
+  - `backend/.env` — added Gemini/AI env stubs
+  - `backend/trigger/src/tasks/summarize_responses.ts` — Trigger.dev summarize workflow
+  - `backend/trigger/src/tasks/analyze_sentiment.ts` — Trigger.dev sentiment workflow
+  - `backend/trigger/src/tasks/generate_insights.ts` — Trigger.dev insights workflow
+  - `backend/trigger/src/constants/index.ts` — added `SUMMARIZE_RESPONSES`, `ANALYZE_SENTIMENT`, `GENERATE_INSIGHTS`
+  - `backend/trigger/src/index.ts` — registered all 3 AI analytics tasks
+  - `frontend/src/components/analytics/ai/ai-summary-card.tsx`
+  - `frontend/src/components/analytics/ai/sentiment-widget.tsx`
+  - `frontend/src/components/analytics/ai/quality-score-widget.tsx`
+  - `frontend/src/components/analytics/ai/ai-insight-panel.tsx`
+  - `frontend/src/components/analytics/ai/question-insight-list.tsx`
+  - `frontend/src/lib/api/endpoints.ts` — added `aiAnalytics` endpoint registry
+  - Verification: `npm.cmd run typecheck` in `backend/trigger` passes; `npm.cmd run build` in `frontend` passes; `venv\Scripts\python.exe manage.py check` passes with 0 issues
 
 - **Unit 31: Gemini AI Infrastructure** âœ… implemented & verified
   - `backend/apps/ai/__init__.py` + `apps.py` â€” new Django app scaffold (`AiConfig`, label=`ai`)
@@ -645,37 +713,6 @@ Update this file after every meaningful implementation change.
   - Production build passes, dev server runs on localhost:5173
 
 ## In Progress
-
-- **Unit 32: AI Analytics** ðŸ”„
-  - AI-powered analytics layer: response summarization, sentiment analysis, quality scoring, question-level insights, AI-enhanced dashboard integration
-  - Backend: `apps/ai` Gemini gateway is available; AI analytics app work is pending implementation before it can be registered.
-  - Frontend: 5 AI analytics components in `src/components/analytics/ai/`
-
-- **Unit 35: PDF Report Frontend (35-PDF-Report-A)** ✅ implemented & verified
-  - `frontend/src/features/reports/types/index.ts` — ReportSectionKey, ReportTemplate, ReportConfig, ExportStatus, ExportRecord, ReportPreviewState, ReportMetric, ReportChartData, ReportInsight
-  - `frontend/src/features/reports/constants/index.ts` — 5 templates, section labels/descriptions, export status maps, mock data, default config
-  - `frontend/src/features/reports/services/report-api.ts` — getRecentExports, getExportById (mock; wire to /api/v1/reports/ when backend ready)
-  - `frontend/src/features/reports/services/export-api.ts` — initiateExport, pollExportStatus (simulated async lifecycle)
-  - `frontend/src/features/reports/hooks/use-report-templates.ts` — template list + selection state
-  - `frontend/src/features/reports/hooks/use-report-preview.ts` — preview open/close, page nav, zoom in/out
-  - `frontend/src/features/reports/hooks/use-report-export.ts` — full export lifecycle with interval polling, status ref, reset
-  - `frontend/src/features/reports/components/report-cover.tsx` — professional cover page
-  - `frontend/src/features/reports/components/report-header.tsx` + `report-footer.tsx` — consistent section framing
-  - `frontend/src/features/reports/components/report-metrics-block.tsx` — KPI grid with trend icons
-  - `frontend/src/features/reports/components/report-chart-block.tsx` — bar/line/pie via recharts
-  - `frontend/src/features/reports/components/report-insight-block.tsx` — AI insight panels with teal accent
-  - `frontend/src/features/reports/components/report-layout.tsx` — section router (cover → summary → metrics → charts → AI → sentiment → questions → conclusions)
-  - `frontend/src/features/reports/components/report-template-card.tsx` + `report-template-selector.tsx` + `report-template-selector-inline.tsx`
-  - `frontend/src/features/reports/components/report-section-selector.tsx` — cover locked, optional sections togglable
-  - `frontend/src/features/reports/components/report-config-form.tsx` — react-hook-form + zod validated
-  - `frontend/src/features/reports/components/report-preview.tsx` — full-screen modal with zoom/page controls and validation banners
-  - `frontend/src/features/reports/components/export-progress.tsx` — live progress bar, stage indicators, download link
-  - `frontend/src/features/reports/components/export-actions.tsx` — Preview/Export/Download/Retry workflow
-  - `frontend/src/features/reports/pages/reports-page.tsx` — /dashboard/reports: template tab + config+export tab + recent exports panel
-  - `frontend/src/app/router/index.tsx` — ReportsPage lazy import + /dashboard/reports route
-  - `frontend/src/routes/route-config.ts` — Reports nav entry (FileDown icon)
-  - `frontend/src/lib/api/endpoints.ts` — reports.exports/exportDetail/initiate/status endpoint stubs
-  - npm run build: passes (0 TS errors)
 
 - **Unit 26: Campaign Scheduling and Automation** â€” in progress
   - Implement scheduled campaign execution, cancellation, reminder eligibility, reminder workflows, and automation logging per `context/feature-specs/26-Campaign-Scheduling-and-Automation.md`.

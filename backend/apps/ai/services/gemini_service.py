@@ -10,6 +10,9 @@ Responsibilities:
 
 Application code must NOT call this service directly.
 Use AIGateway instead so provider logic stays isolated.
+
+Backward-compatible helpers (call_gemini, is_gemini_configured) are
+provided at module level for existing callers in apps.ai_analytics.
 """
 
 import time
@@ -17,6 +20,9 @@ import logging
 from typing import Any, Optional
 
 logger = logging.getLogger("apps.ai")
+
+# Default model to use when GEMINI_MODEL is not configured
+_DEFAULT_MODEL = "gemini-1.5-flash"
 
 
 class GeminiService:
@@ -56,7 +62,7 @@ class GeminiService:
                 )
 
             model_name: str = getattr(
-                settings, "GEMINI_MODEL", "gemini-1.5-flash"
+                settings, "GEMINI_MODEL", _DEFAULT_MODEL
             )
             genai.configure(api_key=api_key)
             self._client = genai.GenerativeModel(model_name)
@@ -67,7 +73,7 @@ class GeminiService:
     @property
     def model_name(self) -> str:
         from django.conf import settings
-        return getattr(settings, "GEMINI_MODEL", "gemini-1.5-flash")
+        return getattr(settings, "GEMINI_MODEL", _DEFAULT_MODEL)
 
     def _call(self, prompt: str) -> dict:
         """
@@ -179,3 +185,73 @@ class GeminiService:
         result = self._call(json_prompt)
         result["output_type"] = "structured_json"
         return result
+
+
+# ---------------------------------------------------------------------------
+# Backward-compatible module-level helpers
+# Used by apps.ai_analytics services that were built against the original
+# function-based API. New code should use GeminiService or AIGateway.
+# ---------------------------------------------------------------------------
+
+def call_gemini(
+    prompt: str,
+    *,
+    model: str | None = None,
+    timeout: int | None = None,
+    temperature: float = 0.2,
+) -> str | None:
+    """
+    Submit a prompt to the Gemini API and return the response text.
+
+    Backward-compatible wrapper — new code should use GeminiService.
+
+    Returns the raw text response, or None on any error / missing key.
+    Errors are logged but never raised — callers must handle a None result.
+    """
+    from django.conf import settings
+
+    api_key: str = getattr(settings, "GEMINI_API_KEY", "") or ""
+    if not api_key:
+        logger.warning(
+            "GEMINI_API_KEY is not configured — AI call skipped. "
+            "Set GEMINI_API_KEY in your .env to enable AI features."
+        )
+        return None
+
+    model_name = model or getattr(settings, "GEMINI_MODEL", _DEFAULT_MODEL)
+    request_timeout = timeout or getattr(settings, "AI_TIMEOUT_SECONDS", 30)
+
+    try:
+        import google.generativeai as genai  # lazy import — optional dependency
+
+        genai.configure(api_key=api_key)
+        generation_config = genai.GenerationConfig(temperature=temperature)
+        ai_model = genai.GenerativeModel(model_name, generation_config=generation_config)
+
+        logger.debug("Gemini request — model=%s prompt_length=%d", model_name, len(prompt))
+        response = ai_model.generate_content(prompt, request_options={"timeout": request_timeout})
+        text = response.text
+        logger.debug("Gemini response received — length=%d", len(text) if text else 0)
+        return text
+
+    except ImportError:
+        logger.error(
+            "google-generativeai is not installed. "
+            "Run: pip install google-generativeai"
+        )
+        return None
+    except Exception as exc:
+        logger.error("Gemini API call failed: %s", exc)
+        return None
+
+
+def is_gemini_configured() -> bool:
+    """Return True if the Gemini API key is set and the SDK is importable."""
+    from django.conf import settings
+    if not getattr(settings, "GEMINI_API_KEY", ""):
+        return False
+    try:
+        import google.generativeai  # noqa: F401
+        return True
+    except ImportError:
+        return False

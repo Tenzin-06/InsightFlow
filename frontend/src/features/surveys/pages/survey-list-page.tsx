@@ -1,11 +1,12 @@
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Search, SlidersHorizontal, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Search, SlidersHorizontal, ChevronLeft, ChevronRight, FileInput } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PageContainer } from "@/components/layout/page-container";
 import { SurveyTable } from "@/features/surveys/components/survey-table";
 import { useSurveys, useDeleteSurvey, useUpdateSurvey } from "@/features/surveys/hooks/use-surveys";
+import { ImportModal } from "@/features/google-forms-import/components/import-modal";
 
 const PAGE_SIZE = 8;
 
@@ -14,6 +15,7 @@ export default function SurveyListPage() {
   const { data: surveys = [], isLoading, dataUpdatedAt } = useSurveys();
   const deleteSurvey = useDeleteSurvey();
   const updateSurvey = useUpdateSurvey();
+  const [importModalOpen, setImportModalOpen] = useState(false);
 
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -66,13 +68,23 @@ export default function SurveyListPage() {
               Create, manage, and track all your surveys in one place.
             </p>
           </div>
-          <Button
-            onClick={() => navigate("/surveys/create")}
-            className="shrink-0 gap-2 bg-primary-500 hover:bg-primary-600"
-          >
-            <Plus className="h-4 w-4" />
-            Create New Survey
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={() => setImportModalOpen(true)}
+              variant="outline"
+              className="shrink-0 gap-2"
+            >
+              <FileInput className="h-4 w-4" />
+              Import Google Form
+            </Button>
+            <Button
+              onClick={() => navigate("/surveys/create")}
+              className="shrink-0 gap-2 bg-primary-500 hover:bg-primary-600"
+            >
+              <Plus className="h-4 w-4" />
+              Create New Survey
+            </Button>
+          </div>
         </div>
 
         {/* Table with search + filter floated to the top-right */}
@@ -153,6 +165,7 @@ export default function SurveyListPage() {
           </div>
         )}
       </div>
+      <ImportModal open={importModalOpen} onOpenChange={setImportModalOpen} />
     </PageContainer>
   );
 }

@@ -10,10 +10,14 @@ Responsibilities:
     - provide safe fallback variants for non-critical pipelines
 
 All parsing errors raise AIParseError so callers can handle them uniformly.
+
+Backward-compatible module-level helpers (parse_json_response, safe_parse_json,
+extract_field) are provided for existing callers in apps.ai_analytics.
 """
 
 import json
 import logging
+import re
 from typing import Any, Optional, Type, TypeVar
 
 from pydantic import BaseModel, ValidationError
@@ -166,3 +170,69 @@ class AIResponseParser:
             return AIResponseParser.parse_list(raw)
         except AIParseError:
             return []
+
+
+# ---------------------------------------------------------------------------
+# Backward-compatible module-level helpers
+# Used by apps.ai_analytics services that were built against the original
+# function-based API. New code should use AIResponseParser directly.
+# ---------------------------------------------------------------------------
+
+def _strip_code_fences(text: str) -> str:
+    """Remove ```json ... ``` or ``` ... ``` wrappers if present."""
+    text = text.strip()
+    text = re.sub(r"^```(?:json)?\s*", "", text)
+    text = re.sub(r"\s*```$", "", text)
+    return text.strip()
+
+
+def parse_json_response(text: str | None) -> dict | list | None:
+    """
+    Parse a JSON payload from a raw Gemini response string.
+
+    Backward-compatible wrapper — new code should use AIResponseParser.
+
+    Handles markdown code fences, trailing commas, and extra whitespace.
+    Returns the parsed Python object (dict or list), or None on failure.
+    """
+    if not text:
+        return None
+
+    cleaned = _strip_code_fences(text)
+
+    try:
+        return json.loads(cleaned)
+    except json.JSONDecodeError as exc:
+        logger.warning("JSON parse failed on first attempt (%s) — trying cleanup", exc)
+
+    # Attempt light cleanup: remove trailing commas before } or ]
+    cleaned_retry = re.sub(r",\s*([}\]])", r"\1", cleaned)
+    try:
+        return json.loads(cleaned_retry)
+    except json.JSONDecodeError as exc:
+        logger.error(
+            "AI response JSON parse failed after cleanup: %s | raw=%r",
+            exc,
+            text[:200],
+        )
+        return None
+
+
+def safe_parse_json(text: str | None, fallback: Any = None) -> Any:
+    """
+    Like parse_json_response but returns `fallback` instead of None on failure.
+
+    Backward-compatible wrapper — new code should use AIResponseParser.
+    """
+    result = parse_json_response(text)
+    return result if result is not None else fallback
+
+
+def extract_field(data: dict | None, field: str, fallback: Any = None) -> Any:
+    """
+    Safely extract a field from a parsed AI response dict.
+    Returns `fallback` when data is None or the field is missing.
+    """
+    if not isinstance(data, dict):
+        return fallback
+    return data.get(field, fallback)

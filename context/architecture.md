@@ -45,6 +45,7 @@ Modular monolithic Django application.
 - `/apps/responses` → response collection and storage
 - `/apps/distribution` → email campaigns, link generation, QR codes
 - `/apps/analytics` → metrics computation and reporting logic
+- `/apps/reports` → PDF report generation, analytics/AI embedding, chart assets, export records, and authenticated downloads
 - `/apps/engagement` → email opens, link clicks, survey sessions, drop-off events, and raw engagement event persistence
 - `/apps/ai` → AI orchestration layer (Gemini API integration)
 - `/apps/simulation` → synthetic response generation (controlled mode)
@@ -210,6 +211,7 @@ Used for async and scheduled workloads:
 - **Report Generation**
   - PDF export creation
   - analytics packaging
+  - chart asset rendering and authenticated report download delivery
 
 ---
 

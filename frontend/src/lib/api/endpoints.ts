@@ -21,6 +21,14 @@ export const API_ENDPOINTS = {
     upload: (id: string) => `/audiences/${id}/upload/`,
     recipients: (id: string) => `/audiences/${id}/recipients/`,
   },
+  aiAnalytics: {
+    summary: (surveyId: number) => `/api/v1/ai-analytics/summary/${surveyId}/`,
+    sentiment: (surveyId: number) =>
+      `/api/v1/ai-analytics/sentiment/${surveyId}/`,
+    quality: (surveyId: number) => `/api/v1/ai-analytics/quality/${surveyId}/`,
+    questions: (surveyId: number) =>
+      `/api/v1/ai-analytics/questions/${surveyId}/`,
+  },
   simulation: {
     health: "/simulation/health/",
     runs: "/simulation/runs/",
@@ -28,5 +36,8 @@ export const API_ENDPOINTS = {
     results: (id: string) => `/simulation/results/${id}/`,
     personas: "/simulation/personas/",
     personaDetail: (id: string) => `/simulation/personas/${id}/`,
+  },
+  googleFormsImport: {
+    import: "/surveys/import/google/",
   },
 };

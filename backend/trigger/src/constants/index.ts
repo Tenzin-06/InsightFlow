@@ -33,7 +33,11 @@ export const TASK_IDS = {
   GENERATE_SUMMARY: "generate-summary",
   CLASSIFY_RESPONSES: "classify-responses",
   PROCESS_AI_TASK: "process-ai-task",
-  // Unit 33a - Simulation Mode Foundation
+  // Unit 32 — AI Analytics
+  SUMMARIZE_RESPONSES: "summarize-responses",
+  ANALYZE_SENTIMENT: "analyze-sentiment",
+  GENERATE_INSIGHTS: "generate-insights",
+  // Unit 33a — Simulation Mode Foundation
   RUN_SIMULATION: "run-simulation",
   VALIDATE_SIMULATION: "validate-simulation",
   CLEANUP_SIMULATION: "cleanup-simulation",
