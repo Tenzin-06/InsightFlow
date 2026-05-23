@@ -1,4 +1,4 @@
-﻿from django.contrib import admin
+from django.contrib import admin
 from django.urls import path, include
 from apps.engagement.urls import tracking_urlpatterns
 
@@ -11,9 +11,11 @@ api_v1_urlpatterns = [
     path("", include("apps.campaigns.urls")),
     path("", include("apps.sharing.urls")),
     path("", include("apps.email_campaigns.urls")),
+    path("analytics/", include("apps.analytics.urls")),
     path("", include("apps.automation.urls")),
     path("", include("apps.engagement.urls")),
     path("", include("apps.engagement_optimization.urls")),
+    path("", include("apps.ai_analytics.urls")),
 ]
 
 urlpatterns = [

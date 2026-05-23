@@ -102,6 +102,35 @@ Update this file after every meaningful implementation change.
   - `frontend/src/features/audiences/pages/audience-detail-page.tsx` — uses `useAudienceContacts` (dedicated endpoint) + `useDeleteAudience` with confirmation dialog; stat cards show live loaded-contact count
   - `npm.cmd run build`: passes (0 TS errors)
 
+- **Unit 30: Analytics Metrics Engine** ✅ implemented & verified
+  - `backend/requirements/base.txt` — added `django-redis>=5.4`, `pandas>=2.2`
+  - `backend/config/settings/base.py` — `CACHES` config: Redis when `REDIS_URL` env set, `LocMemCache` fallback for dev
+  - `backend/apps/analytics/constants/__init__.py` — snapshot types, metric name constants, cache TTLs, pagination defaults
+  - `backend/apps/analytics/models/aggregated_metric.py` — `AggregatedMetric`: owner, entity_type, entity_id, metric_name, metric_value, bucket_date; 4 DB indexes
+  - `backend/apps/analytics/models/analytics_snapshot.py` — `AnalyticsSnapshot`: owner, snapshot_type, entity_id (null for user-wide), JSON payload, computed_at; 3 DB indexes
+  - `backend/apps/analytics/models/metric_cache.py` — `MetricCache`: cache_key (unique), JSON payload, expires_at; DB-backed fallback cache
+  - `backend/apps/analytics/models.py` — updated stub to re-export all 3 models for Django app registry discovery
+  - `backend/apps/analytics/utils/__init__.py` — `success_response`, `error_response`, `build_time_series_point`, `build_funnel_step`
+  - `backend/apps/analytics/validators/__init__.py` — `validate_days_param`, `validate_survey_ownership`, `validate_campaign_ownership`
+  - `backend/apps/analytics/permissions.py` — `IsAnalyticsOwner`: object-level permission checking `owner_id == request.user.id`
+  - `backend/apps/analytics/services/metrics_service.py` — centralized KPI formulas: `safe_divide`, `compute_rate`, `compute_completion_rate`, `compute_open_rate`, `compute_click_rate`, `compute_response_rate`, `compute_delivery_rate`, `compute_drop_off_rate`, `compute_trend_change`, `normalize_metric`, `summarize_metrics`
+  - `backend/apps/analytics/services/analytics_cache.py` — Redis-backed cache with LocMemCache fallback; `get/set_cached`, `invalidate`, pattern invalidation, per-entity convenience wrappers (dashboard, survey, campaign, engagement)
+  - `backend/apps/analytics/services/aggregation_service.py` — raw event aggregation: `get_response_time_series`, `get_campaign_delivery_trend`, `get_dashboard_response_trend`, `aggregate_survey_responses`, `aggregate_campaign_deliveries`, `get_question_response_counts`, `get_top_surveys_by_responses`; full 0-fill date ranges
+  - `backend/apps/analytics/services/survey_analytics.py` — `get_survey_metrics`, `get_survey_funnel`, `get_survey_question_engagement`, `get_survey_analytics`; computes response rate vs. emails sent across linked campaigns
+  - `backend/apps/analytics/services/campaign_analytics.py` — `get_campaign_metrics`, `get_campaign_delivery_funnel`, `get_campaign_analytics`; delivery rate + response rate computation
+  - `backend/apps/analytics/services/engagement_analytics.py` — `get_engagement_overview`, `get_engagement_funnel`, `get_engagement_drop_off`, `get_interaction_timeline`, `get_audience_segments`, `get_engagement_analytics`; user-wide funnel across all campaigns
+  - `backend/apps/analytics/services/dashboard_service.py` — `get_dashboard_overview`: aggregates total_surveys, total_responses, total_campaigns, total_emails_sent, overall_response_rate; response trend + top surveys chart data
+  - `backend/apps/analytics/services/__init__.py` — re-exports all service functions
+  - `backend/apps/analytics/serializers/__init__.py` — DRF serializers for all response shapes: TimeSeriesPoint, FunnelStep, CategoryPoint, QuestionEngagement, SurveyAnalytics, CampaignAnalytics, EngagementAnalytics, DashboardAnalytics
+  - `backend/apps/analytics/views/analytics_views.py` — `DashboardAnalyticsView` (GET /analytics/dashboard/), `EngagementAnalyticsView` (GET /analytics/engagement/); cache-first, graceful error handling
+  - `backend/apps/analytics/views/survey_views.py` — `SurveyAnalyticsView` (GET /analytics/surveys/:pk/); ownership enforced via `IsAnalyticsOwner`
+  - `backend/apps/analytics/views/campaign_views.py` — `CampaignAnalyticsView` (GET /analytics/campaigns/:pk/); ownership enforced via `IsAnalyticsOwner`
+  - `backend/apps/analytics/views/__init__.py` — re-exports all 4 view classes
+  - `backend/apps/analytics/urls.py` — 4 URL patterns wired
+  - `backend/config/urls.py` — analytics URLs registered under `/api/v1/analytics/`
+  - `backend/apps/analytics/migrations/0001_initial.py` — migration created and applied (`analytics.0001_initial... OK`)
+  - `django-admin check`: 0 issues; all imports verified; all 4 URLs resolve correctly
+
 - **Unit 29: Analytics Dashboard UI** ✅ implemented & verified
   - `npm install recharts` — chart rendering library
   - `frontend/src/features/analytics/types/index.ts` — `MetricCardData`, `TrendDirection`, `TimeSeriesPoint`, `CategoryPoint`, `FunnelStep`, `SurveyAnalyticsSummary`, `CampaignAnalyticsSummary`, `EngagementSummary`, `DashboardOverview` types
@@ -536,18 +565,24 @@ Update this file after every meaningful implementation change.
 
 ## In Progress
 
+- **Unit 32: AI Analytics** 🔄
+  - AI-powered analytics layer: response summarization, sentiment analysis, quality scoring, question-level insights, AI-enhanced dashboard integration
+  - Backend: `apps/ai` Gemini gateway + `apps/ai_analytics` Django app (models, services, views, URLs)
+  - Frontend: 5 AI analytics components in `src/components/analytics/ai/`
+
 - **Unit 31: Gemini AI Infrastructure** — in progress
   - Implement Gemini API integration, AI abstraction gateway, prompt builder, response parser, execution manager, retry handler, AI logger, async Trigger.dev AI workflows, AIJob/AIExecution/AIPromptTemplate/AIUsageRecord models, Pydantic output schemas, and AI configuration per `context/feature-specs/31-Gemini-AI-Infrastructure.md`.
 
 - **Unit 26: Campaign Scheduling and Automation** — in progress
   - Implement scheduled campaign execution, cancellation, reminder eligibility, reminder workflows, and automation logging per `context/feature-specs/26-Campaign-Scheduling-and-Automation.md`.
+
 - **Unit 27: Engagement Tracking System** — in progress
   - Implement email open tracking, link click tracking, survey response tracking, response sessions, drop-off detection, attribution, and raw engagement analytics per `context/feature-specs/27-Engagement-Tracking-System.md`.
   - Added backend engagement app scaffold with tracking tokens, raw events, email opens, link clicks, response sessions, drop-off events, services, tracking endpoints, campaign analytics endpoint, and initial migration.
   - Wired campaign email rendering to generate per-recipient tracking tokens, tracked survey links, and email open pixels.
   - Wired public survey UI to record survey start, question answered, and completion events with session IDs.
   - Added engagement throttling settings and backend/frontend URL env documentation for safe tracking redirects and email pixel URLs.
-  - Verification: `npm.cmd run build` passes; `.\venv\Scripts\python.exe manage.py check` passes; `.\venv\Scripts\python.exe manage.py makemigrations engagement --check --dry-run` reports no engagement changes. Full migration dry-run still reports pre-existing migration drift in automation, campaigns, and email_campaigns.
+  - Verification: `npm.cmd run build` passes; `.env\Scripts\python.exe manage.py check` passes; `.env\Scripts\python.exe manage.py makemigrations engagement --check --dry-run` reports no engagement changes. Full migration dry-run still reports pre-existing migration drift in automation, campaigns, and email_campaigns.
 
 ## Next Up
 

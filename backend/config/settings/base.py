@@ -39,6 +39,7 @@ LOCAL_APPS = [
     "apps.automation",
     "apps.engagement",
     "apps.engagement_optimization",
+    "apps.ai_analytics",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -94,6 +95,44 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# ── Analytics caching ────────────────────────────────────────────────────────
+# Uses Redis when REDIS_URL is configured; falls back to local-memory cache
+# in development environments that don't have Redis running.
+_REDIS_URL = env("REDIS_URL", default="")
+
+if _REDIS_URL:
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": _REDIS_URL,
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+                "IGNORE_EXCEPTIONS": True,  # Degrade gracefully if Redis is down
+            },
+        },
+        "analytics": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": _REDIS_URL,
+            "KEY_PREFIX": "insightflow_analytics",
+            "TIMEOUT": 60 * 15,  # 15 minutes default TTL
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+                "IGNORE_EXCEPTIONS": True,
+            },
+        },
+    }
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "insightflow-default",
+        },
+        "analytics": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "insightflow-analytics",
+        },
+    }
+
 REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
@@ -121,6 +160,13 @@ DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="noreply@insightflow.ai")
 RESEND_AUDIENCE_DOMAIN = env("RESEND_AUDIENCE_DOMAIN", default="insightflow.ai")
 APP_FRONTEND_URL = env("APP_FRONTEND_URL", default="http://localhost:5173")
 APP_BACKEND_URL = env("APP_BACKEND_URL", default="http://localhost:8000")
+
+# ── Gemini AI configuration ───────────────────────────────────────────────────
+GEMINI_API_KEY = env("GEMINI_API_KEY", default="")
+GEMINI_MODEL = env("GEMINI_MODEL", default="gemini-1.5-flash")
+AI_TIMEOUT_SECONDS = int(env("AI_TIMEOUT_SECONDS", default="30"))
+AI_MAX_RETRIES = int(env("AI_MAX_RETRIES", default="3"))
+AI_ENABLE_LOGGING = env.bool("AI_ENABLE_LOGGING", default=True)
 
 # Trigger.dev -- background job infrastructure
 TRIGGER_SECRET_KEY = env("TRIGGER_SECRET_KEY", default="")
