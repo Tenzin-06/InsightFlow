@@ -1,0 +1,43 @@
+<section class="section">
+  <h2>Question-Level Breakdown</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Question</th>
+        <th>Answers</th>
+        <th>Engagement</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for question in analytics.question_breakdown %}
+        <tr>
+          <td>{{ question.question_text }}</td>
+          <td>{{ question.answer_count }}</td>
+          <td>{{ question.engagement_rate }}%</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="3" class="muted">No question-level analytics are available yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% if ai.question_insights %}
+    <h3>AI Question Insights</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Question</th>
+          <th>Insight</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for insight in ai.question_insights %}
+          <tr>
+            <td>{{ insight.question_text }}</td>
+            <td>{{ insight.sentiment_summary }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+</section>
+

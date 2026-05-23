@@ -12,6 +12,21 @@ Update this file after every meaningful implementation change.
 
 ## Completed
 
+- **Unit 36: PDF Report Backend (36-PDF-Report-B)** ✅ implemented & verified
+  - `backend/apps/reports/` — new Django report generation app with export model, serializers, views, URLs, service layer, tasks shim, utilities, migrations, and print-safe templates.
+  - `backend/apps/reports/models.py` — `ReportExport` tracks owner, survey, template, sections, status, progress, file path, download expiry, analytics snapshot, AI snapshot, and asset manifest.
+  - `backend/apps/reports/services/report_builder.py` — composes report payloads from analytics, AI insights, generated chart assets, and HTML templates.
+  - `backend/apps/reports/services/pdf_renderer.py` — HTML-to-PDF rendering via WeasyPrint when available, with a minimal PDF fallback so exports remain resilient.
+  - `backend/apps/reports/services/chart_renderer.py` — generates PDF-compatible chart assets using matplotlib when available, with SVG fallback.
+  - `backend/apps/reports/services/analytics_embedder.py` and `ai_embedder.py` — embed survey analytics and clearly labeled AI-generated insight sections without modifying source data.
+  - `backend/apps/reports/services/export_service.py` — creates exports, advances status/progress, stores generated PDFs under media storage, and sets authenticated 24-hour download expiry.
+  - API routes added: `POST /api/v1/reports/generate/`, `GET /api/v1/reports/<id>/status/`, `GET /api/v1/reports/<id>/download/`, `GET /api/v1/reports/templates/`.
+  - `backend/config/settings/base.py` — registered existing `apps.ai_analytics`, added `apps.reports`, and configured reports logger.
+  - `backend/config/urls.py` — wired report URLs under `/api/v1/`.
+  - `backend/requirements/base.txt` — added PDF/report rendering dependencies.
+  - `context/architecture.md` — documented the reports backend domain and download delivery responsibility.
+  - Verification: `.\venv\Scripts\python.exe manage.py check` passes; `.\venv\Scripts\python.exe manage.py makemigrations reports --check --dry-run` reports no changes; report URL/template smoke check passes.
+
 - **Unit 12: Google Forms Import UI** ✅ implemented & verified
   - `frontend/src/features/google-forms-import/types/index.ts` — ImportStatus, ImportErrorCode, ImportError, ImportedSurvey, ImportResult, GoogleFormImportPayload, ImportFormValues
   - `frontend/src/features/google-forms-import/constants/index.ts` — URL pattern, status labels, loading messages, error messages, recovery hints
