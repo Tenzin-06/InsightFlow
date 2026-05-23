@@ -8,6 +8,7 @@ import {
   LineChart,
   Megaphone,
   Activity,
+  FlaskConical,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -33,6 +34,7 @@ export const mainNavRoutes: RouteConfig[] = [
       { label: "Engagement", path: "/dashboard/analytics/engagement", icon: Activity },
     ],
   },
+  { label: "Simulation", path: "/dashboard/simulation", icon: FlaskConical },
   { label: "Campaigns", path: "/dashboard/campaigns", icon: Send },
 ];
 

@@ -1,16 +1,56 @@
-# Progress Tracker
+﻿# Progress Tracker
 
 Update this file after every meaningful implementation change.
 
 ## Current Phase
 
-- Phase 1 — Foundation
+- Phase 1 â€” Foundation
 
 ## Current Goal
 
-- Unit 27 — Engagement Tracking System
+- Unit 12 - Google Forms Import UI
 
 ## Completed
+
+- **Unit 12: Google Forms Import UI** ✅ implemented & verified
+  - `frontend/src/features/google-forms-import/types/index.ts` — ImportStatus, ImportErrorCode, ImportError, ImportedSurvey, ImportResult, GoogleFormImportPayload, ImportFormValues
+  - `frontend/src/features/google-forms-import/constants/index.ts` — URL pattern, status labels, loading messages, error messages, recovery hints
+  - `frontend/src/features/google-forms-import/utils/index.ts` — isGoogleFormsUrl(), classifyImportError(), sanitizeUrl()
+  - `frontend/src/features/google-forms-import/services/google-form-import-api.ts` — importGoogleForm() calling POST /api/v1/surveys/import/google/
+  - `frontend/src/features/google-forms-import/hooks/use-import-form.ts` — react-hook-form + zod URL validation hook
+  - `frontend/src/features/google-forms-import/hooks/use-google-form-import.ts` — React Query mutation hook with onSuccess/onError callbacks
+  - `frontend/src/features/google-forms-import/components/import-status.tsx` — status badge (idle/validating/importing/success/error)
+  - `frontend/src/features/google-forms-import/components/import-guide.tsx` — step-by-step Google Forms URL guide
+  - `frontend/src/features/google-forms-import/components/import-form.tsx` — URL input with inline validation, auto-focus, aria attributes
+  - `frontend/src/features/google-forms-import/components/import-loading.tsx` — animated spinner with cycling messages, aria-live
+  - `frontend/src/features/google-forms-import/components/import-error.tsx` — typed error display with recovery guidance and Retry button
+  - `frontend/src/features/google-forms-import/components/import-success.tsx` — success confirmation with survey title/question count, Open Editor + Back to Surveys actions
+  - `frontend/src/features/google-forms-import/components/import-preview.tsx` — future-ready preview shell (no backend logic required)
+  - `frontend/src/features/google-forms-import/components/import-modal.tsx` — Dialog container managing full workflow (idle → importing → success/error); blocks close during import
+  - `frontend/src/features/google-forms-import/pages/import-page.tsx` — full-page layout for mobile/direct navigation at /surveys/import/google
+  - `frontend/src/lib/api/endpoints.ts` — added googleFormsImport.import endpoint
+  - `frontend/src/app/router/index.tsx` — added /surveys/import/google route (ProtectedRoute)
+  - `frontend/src/features/surveys/pages/survey-list-page.tsx` — added "Import Google Form" button next to "Create New Survey" CTA; mounts ImportModal
+  - Verification: npm.cmd run build passes (0 TS errors)
+
+- **Unit 34: Simulation Mode Frontend (34-Simulation-Mode-B)** completed and verified
+  - Added full simulation frontend feature slice under `frontend/src/features/simulation/` with dedicated pages for workspace, personas, runs, and analytics.
+  - Implemented simulation shell/banners/warnings, persona card + form + selector workflows, simulation configuration form, execution runner, progress monitoring, synthetic response preview, results view, and synthetic metrics panel.
+  - Added simulation API and hooks with polling-based run updates (`useSimulation`, `useSimulationRuns`, `useSimulationRunDetails`) and local persona management service/hook set (`usePersonas`, create/edit).
+  - Wired app navigation: routes for `/dashboard/simulation`, `/dashboard/simulation/personas`, `/dashboard/simulation/runs`, `/dashboard/simulation/analytics`; added Simulation nav entry in dashboard sidebar routing config.
+  - Updated API endpoint registry with simulation routes for runs, run details, personas, results, and health.
+  - Verification: `npm.cmd exec vite build` passes; `npm.cmd run build` remains blocked by pre-existing Unit 35 TypeScript errors in `frontend/src/features/reports/components/report-layout.tsx` (`idx` and `currentPage` unused).
+
+- **Unit 33a: Simulation Mode Foundation (33-Simulation-mode-A)** completed and verified
+  - `backend/apps/simulation/` - new Django app scaffold for simulation infrastructure.
+  - `backend/apps/simulation/models/` - added isolated `SimulationConfig`, `SimulationRun`, `SimulationEvent`, and `SyntheticDataset` models with explicit `is_simulated` tagging.
+  - `backend/apps/simulation/services/` - added simulation isolation, safeguards, constraints, validation, execution, manager, and audit logging services.
+  - `backend/apps/simulation/serializers/`, `schemas/`, `validators/`, `permissions/`, `views/`, and `urls.py` - added ownership-scoped simulation APIs plus internal Trigger endpoints.
+  - `backend/apps/simulation/migrations/0001_initial.py` - initial simulation schema migration.
+  - `backend/config/settings/base.py` - registered `apps.simulation`, simulation settings, and logger configuration.
+  - `backend/config/urls.py` - wired simulation URLs under `/api/v1/`.
+  - `backend/trigger/src/schemas/simulation.schema.ts` and simulation tasks - added Trigger.dev scaffolding for validate, run, and cleanup workflows.
+  - Verification: `.\venv\Scripts\python.exe manage.py check` passes; `.\venv\Scripts\python.exe manage.py makemigrations simulation --check --dry-run` reports no changes; `npm.cmd run typecheck` passes in `backend/trigger`.
 
 - **Unit 32: AI Analytics** ✅ implemented & verified
   - `backend/apps/ai/__init__.py`
@@ -44,191 +84,224 @@ Update this file after every meaningful implementation change.
   - `frontend/src/lib/api/endpoints.ts` — added `aiAnalytics` endpoint registry
   - Verification: `npm.cmd run typecheck` in `backend/trigger` passes; `npm.cmd run build` in `frontend` passes; `venv\Scripts\python.exe manage.py check` passes with 0 issues
 
-- **Unit 28: Engagement Optimization System** ✅ implemented & verified
-  - `backend/apps/engagement_optimization/__init__.py` + `apps.py` — new Django app scaffold (`EngagementOptimizationConfig`)
-  - `backend/apps/engagement_optimization/constants.py` — trigger types (`non_response`, `dropoff_detected`), segment types (5), opt event types (3), execution statuses (5), reminder frequency defaults, Trigger.dev task ID constants
-  - `backend/apps/engagement_optimization/utils.py` — `success_response` / `error_response` helpers
-  - `backend/apps/engagement_optimization/permissions.py` — `IsCampaignOwner` object-level permission
-  - `backend/apps/engagement_optimization/validators.py` — `validate_trigger_type`, `validate_delay_days`, `validate_reminder_limit`
-  - `backend/apps/engagement_optimization/models/optimization_rule.py` — `OptimizationRule`: owner FK, campaign FK (nullable), rule_name, trigger_type, delay_days, reminder_limit, is_active; 4 DB indexes
-  - `backend/apps/engagement_optimization/models/optimization_event.py` — `OptimizationEvent`: campaign FK, optimization_rule FK (nullable), recipient_email, event_type, triggered_at, outcome; 4 DB indexes
-  - `backend/apps/engagement_optimization/models/engagement_segment.py` — `EngagementSegment`: campaign FK, recipient_email, segment_type, previous_segment, assigned_at; UniqueConstraint(campaign+recipient_email); 4 DB indexes
-  - `backend/apps/engagement_optimization/models/followup_execution.py` — `FollowupExecution`: campaign FK, optimization_rule FK (nullable), recipient_email, status, executed_at, error_message; 4 DB indexes
-  - `backend/apps/engagement_optimization/migrations/0001_initial.py` — creates all 4 tables with indexes and constraint; depends on authentication+campaigns
-  - `backend/apps/engagement_optimization/services/optimization_logger.py` — structured logger: `log_rule_evaluated`, `log_reminder_triggered`, `log_action_skipped`, `log_optimization_failure`, `log_segment_updated`
-  - `backend/apps/engagement_optimization/services/targeting_service.py` — `NonRespondent` dataclass; `get_nonrespondents()`: cross-references DeliveryLog + Response to identify non-completers
-  - `backend/apps/engagement_optimization/services/engagement_evaluator.py` — `has_opened_email`, `has_clicked_link`, `has_started_survey`, `has_completed_survey`, `has_dropped_off`; `count_reminders_sent`, `is_reminder_eligible` (returns `(bool, reason)` with limit + gap enforcement)
-  - `backend/apps/engagement_optimization/services/segmentation_service.py` — `_resolve_segment` (deterministic 5-tier logic); `assign_segment` (upsert + transition logging); `generate_segments_for_campaign` (batch)
-  - `backend/apps/engagement_optimization/services/reminder_orchestrator.py` — `orchestrate_reminder`: eligibility gate → create OptimizationEvent + FollowupExecution; returns `{status, reason}`; prevents duplicate outreach
-  - `backend/apps/engagement_optimization/services/optimization_engine.py` — `run_optimization_for_rule` (evaluates one rule per trigger type); `run_optimization_for_campaign` (refresh segments → evaluate all active rules → return full summary)
-  - `backend/apps/engagement_optimization/serializers/optimization_serializer.py` — `OptimizationRuleSerializer`, `OptimizationEventSerializer`, `EngagementSegmentSerializer`, `FollowupExecutionSerializer`, `OptimizationRunSerializer`
-  - `backend/apps/engagement_optimization/views/optimization_views.py` — `OptimizationRuleListCreateView` (`GET/POST /optimization/rules/`), `OptimizationEventListView` (`GET /optimization/events/?campaign_id&limit&offset`), `OptimizationRunView` (`POST /optimization/run/`)
-  - `backend/apps/engagement_optimization/views/internal_views.py` — `InternalProcessNonrespondentsView`, `InternalEvaluateOptRulesView`, `InternalTriggerFollowupsView`, `InternalGenerateSegmentsView`; all use `InternalSecretPermission`
-  - `backend/apps/engagement_optimization/urls.py` — 3 public routes + 4 internal routes
-  - `backend/config/settings/base.py` — added `apps.engagement_optimization` to `LOCAL_APPS`
-  - `backend/config/urls.py` — wired `apps.engagement_optimization.urls` under `/api/v1/`
-  - `backend/trigger/src/schemas/optimization.schema.ts` — Zod schemas: `ProcessNonrespondentsPayloadSchema`, `EvaluateOptRulesPayloadSchema`, `TriggerFollowupsPayloadSchema`, `GenerateSegmentsPayloadSchema`
-  - `backend/trigger/src/tasks/process_nonrespondents.ts` — `processNonrespondentsTask` (`id: process-nonrespondents`)
-  - `backend/trigger/src/tasks/evaluate_opt_rules.ts` — `evaluateOptRulesTask` (`id: evaluate-opt-rules`)
-  - `backend/trigger/src/tasks/trigger_followups.ts` — `triggerFollowupsTask` (`id: trigger-followups`)
-  - `backend/trigger/src/tasks/generate_segments.ts` — `generateSegmentsTask` (`id: generate-segments`)
-  - `backend/trigger/src/constants/index.ts` — added 4 new `TASK_IDS` entries
-  - `backend/trigger/src/index.ts` — registered all 4 new tasks
+- **Unit 31: Gemini AI Infrastructure** âœ… implemented & verified
+  - `backend/apps/ai/__init__.py` + `apps.py` â€” new Django app scaffold (`AiConfig`, label=`ai`)
+  - `backend/apps/ai/constants/ai_constants.py` â€” `AIJobStatus`, `AIJobType`, `AIRequestType`, `PromptCategory` + provider defaults (`DEFAULT_GEMINI_MODEL`, `DEFAULT_AI_MAX_RETRIES=3`, `DEFAULT_AI_TIMEOUT_SECONDS=30`)
+  - `backend/apps/ai/models/ai_job.py` â€” `AIJob`: job_type, status (pending/processing/completed/failed), payload (JSON), result (JSON), error_message; `mark_processing()`, `mark_completed()`, `mark_failed()` lifecycle helpers; 2 compound indexes
+  - `backend/apps/ai/models/ai_execution.py` â€” `AIExecution`: FK â†’ AIJob, model_name, prompt_preview, raw_response, started_at, completed_at, attempt_number, success, error_message; tracks individual retry attempts
+  - `backend/apps/ai/models/ai_prompt_template.py` â€” `AIPromptTemplate`: name (unique), category, system_context, user_context_template, task_instructions, output_constraints, is_active, version; `build_prompt(variables)` injects `{{key}}` placeholders
+  - `backend/apps/ai/models/ai_usage_record.py` â€” `AIUsageRecord`: FK â†’ AIJob (SET_NULL), model_name, tokens_used, request_type, execution_time, estimated_cost (optional); observability per API call
+  - `backend/apps/ai/migrations/0001_initial.py` â€” auto-generated by Django; all 4 tables + 8 indexes applied OK
+  - `backend/apps/ai/services/ai_logger.py` â€” `AILogger`: static methods `log_request`, `log_response`, `log_failure`, `log_retry`, `log_malformed_output`, `log_provider_down`; respects `AI_ENABLE_LOGGING` setting
+  - `backend/apps/ai/services/ai_retry_handler.py` â€” `with_ai_retry()`: exponential backoff (2^attempt seconds), configurable `AI_MAX_RETRIES`; `is_retryable_error()` classifies rate-limits/timeouts as retryable, auth errors as permanent; `AIRetryError`, `AIRateLimitError`, `AITimeoutError`, `AIAuthError` exception types
+  - `backend/apps/ai/services/gemini_service.py` â€” `GeminiService`: lazy client init from `GEMINI_API_KEY`; `generate_text()`, `summarize()`, `classify()`, `generate_structured_output()`; normalises every response to `{text, model, latency_ms, tokens_used}` dict
+  - `backend/apps/ai/services/prompt_builder.py` â€” `PromptBuilder`: `build_survey_analysis_prompt()`, `build_summarization_prompt()`, `build_classification_prompt()`, `build_recommendation_prompt()`; `inject_variables()` for `{{key}}` substitution; `sanitize()` removes null bytes + truncates at 100k chars
+  - `backend/apps/ai/services/ai_response_parser.py` â€” `AIResponseParser`: `parse_text()`, `parse_json()` (strips markdown fences), `parse_list()` (JSON array or newline fallback), `validate_with_schema()` (Pydantic), `safe_parse_json()` / `safe_parse_list()` fallback variants; `AIParseError` exception
+  - `backend/apps/ai/services/ai_gateway.py` â€” `AIGateway`: `run_text_generation()`, `run_summarization()`, `run_classification()`, `run_structured_output()`; all operations route through retry handler + logger; structured output auto-parsed to `result["parsed"]` dict
+  - `backend/apps/ai/services/ai_execution_manager.py` â€” `AIExecutionManager`: `create_job()`, `execute_job()` (full lifecycle: processing â†’ AIExecution record â†’ AIUsageRecord â†’ completed/failed), `get_job_status()`
+  - `backend/apps/ai/schemas/ai_schemas.py` â€” Pydantic: `SurveyAnalysisOutput`, `ClassificationOutput`, `SummarizationOutput`, `RecommendationOutput`, `AIJobStatusResponse`
+  - `backend/apps/ai/validators/ai_validators.py` â€” `validate_prompt_not_empty()`, `validate_prompt_length()`, `validate_prompt()`, `validate_job_payload()`, `sanitize_prompt()`
+  - `backend/apps/ai/serializers/ai_serializers.py` â€” `AIJobSerializer` (read-only), `AIJobCreateSerializer`, `AIUsageRecordSerializer`
+  - `backend/apps/ai/views/ai_views.py` â€” `AIHealthView` (`GET /api/v1/ai/health/`), `AIJobListCreateView` (`POST /api/v1/ai/jobs/`), `AIJobDetailView` (`GET /api/v1/ai/jobs/<id>/`), `InternalAIJobExecuteView` (`POST /api/v1/internal/ai/jobs/<id>/execute/`) with `_NoAuthentication` + `_InternalSecretPermission`
+  - `backend/apps/ai/urls.py` â€” 4 URL patterns wired
+  - `backend/config/settings/base.py` â€” added `apps.ai` to LOCAL_APPS; added `GEMINI_API_KEY`, `GEMINI_MODEL`, `AI_TIMEOUT_SECONDS=30`, `AI_MAX_RETRIES=3`, `AI_ENABLE_LOGGING=True` settings; added `apps.ai` logger
+  - `backend/config/urls.py` â€” wired `apps.ai.urls` under `/api/v1/`
+  - `backend/.env` â€” added `GEMINI_API_KEY`, `GEMINI_MODEL`, `AI_TIMEOUT_SECONDS`, `AI_MAX_RETRIES`, `AI_ENABLE_LOGGING` stubs
+  - `backend/requirements/base.txt` â€” added `google-generativeai>=0.8`, `pydantic>=2.0`, `tenacity>=8.2`
+  - `backend/trigger/src/schemas/ai.schema.ts` â€” Zod: `AnalyzeTextPayloadSchema`, `GenerateSummaryPayloadSchema`, `ClassifyResponsesPayloadSchema`, `ProcessAITaskPayloadSchema`
+  - `backend/trigger/src/tasks/analyze_text.ts` â€” `analyzeTextTask` (`id: analyze-text`); calls `internal/ai/jobs/:id/execute/`
+  - `backend/trigger/src/tasks/generate_summary.ts` â€” `generateSummaryTask` (`id: generate-summary`)
+  - `backend/trigger/src/tasks/classify_responses.ts` â€” `classifyResponsesTask` (`id: classify-responses`)
+  - `backend/trigger/src/tasks/process_ai_task.ts` â€” `processAITaskTask` (`id: process-ai-task`); generic dispatcher for pre-created jobs
+  - `backend/trigger/src/constants/index.ts` â€” added `ANALYZE_TEXT`, `GENERATE_SUMMARY`, `CLASSIFY_RESPONSES`, `PROCESS_AI_TASK` task IDs
+  - `backend/trigger/src/index.ts` â€” exported all 4 new AI tasks
+  - `django-admin check`: 0 issues; `ai.0001_initial` migration applied OK; `npm run typecheck`: 0 errors
+
+- **Unit 28: Engagement Optimization System** âœ… implemented & verified
+  - `backend/apps/engagement_optimization/__init__.py` + `apps.py` â€” new Django app scaffold (`EngagementOptimizationConfig`)
+  - `backend/apps/engagement_optimization/constants.py` â€” trigger types (`non_response`, `dropoff_detected`), segment types (5), opt event types (3), execution statuses (5), reminder frequency defaults, Trigger.dev task ID constants
+  - `backend/apps/engagement_optimization/utils.py` â€” `success_response` / `error_response` helpers
+  - `backend/apps/engagement_optimization/permissions.py` â€” `IsCampaignOwner` object-level permission
+  - `backend/apps/engagement_optimization/validators.py` â€” `validate_trigger_type`, `validate_delay_days`, `validate_reminder_limit`
+  - `backend/apps/engagement_optimization/models/optimization_rule.py` â€” `OptimizationRule`: owner FK, campaign FK (nullable), rule_name, trigger_type, delay_days, reminder_limit, is_active; 4 DB indexes
+  - `backend/apps/engagement_optimization/models/optimization_event.py` â€” `OptimizationEvent`: campaign FK, optimization_rule FK (nullable), recipient_email, event_type, triggered_at, outcome; 4 DB indexes
+  - `backend/apps/engagement_optimization/models/engagement_segment.py` â€” `EngagementSegment`: campaign FK, recipient_email, segment_type, previous_segment, assigned_at; UniqueConstraint(campaign+recipient_email); 4 DB indexes
+  - `backend/apps/engagement_optimization/models/followup_execution.py` â€” `FollowupExecution`: campaign FK, optimization_rule FK (nullable), recipient_email, status, executed_at, error_message; 4 DB indexes
+  - `backend/apps/engagement_optimization/migrations/0001_initial.py` â€” creates all 4 tables with indexes and constraint; depends on authentication+campaigns
+  - `backend/apps/engagement_optimization/services/optimization_logger.py` â€” structured logger: `log_rule_evaluated`, `log_reminder_triggered`, `log_action_skipped`, `log_optimization_failure`, `log_segment_updated`
+  - `backend/apps/engagement_optimization/services/targeting_service.py` â€” `NonRespondent` dataclass; `get_nonrespondents()`: cross-references DeliveryLog + Response to identify non-completers
+  - `backend/apps/engagement_optimization/services/engagement_evaluator.py` â€” `has_opened_email`, `has_clicked_link`, `has_started_survey`, `has_completed_survey`, `has_dropped_off`; `count_reminders_sent`, `is_reminder_eligible` (returns `(bool, reason)` with limit + gap enforcement)
+  - `backend/apps/engagement_optimization/services/segmentation_service.py` â€” `_resolve_segment` (deterministic 5-tier logic); `assign_segment` (upsert + transition logging); `generate_segments_for_campaign` (batch)
+  - `backend/apps/engagement_optimization/services/reminder_orchestrator.py` â€” `orchestrate_reminder`: eligibility gate â†’ create OptimizationEvent + FollowupExecution; returns `{status, reason}`; prevents duplicate outreach
+  - `backend/apps/engagement_optimization/services/optimization_engine.py` â€” `run_optimization_for_rule` (evaluates one rule per trigger type); `run_optimization_for_campaign` (refresh segments â†’ evaluate all active rules â†’ return full summary)
+  - `backend/apps/engagement_optimization/serializers/optimization_serializer.py` â€” `OptimizationRuleSerializer`, `OptimizationEventSerializer`, `EngagementSegmentSerializer`, `FollowupExecutionSerializer`, `OptimizationRunSerializer`
+  - `backend/apps/engagement_optimization/views/optimization_views.py` â€” `OptimizationRuleListCreateView` (`GET/POST /optimization/rules/`), `OptimizationEventListView` (`GET /optimization/events/?campaign_id&limit&offset`), `OptimizationRunView` (`POST /optimization/run/`)
+  - `backend/apps/engagement_optimization/views/internal_views.py` â€” `InternalProcessNonrespondentsView`, `InternalEvaluateOptRulesView`, `InternalTriggerFollowupsView`, `InternalGenerateSegmentsView`; all use `InternalSecretPermission`
+  - `backend/apps/engagement_optimization/urls.py` â€” 3 public routes + 4 internal routes
+  - `backend/config/settings/base.py` â€” added `apps.engagement_optimization` to `LOCAL_APPS`
+  - `backend/config/urls.py` â€” wired `apps.engagement_optimization.urls` under `/api/v1/`
+  - `backend/trigger/src/schemas/optimization.schema.ts` â€” Zod schemas: `ProcessNonrespondentsPayloadSchema`, `EvaluateOptRulesPayloadSchema`, `TriggerFollowupsPayloadSchema`, `GenerateSegmentsPayloadSchema`
+  - `backend/trigger/src/tasks/process_nonrespondents.ts` â€” `processNonrespondentsTask` (`id: process-nonrespondents`)
+  - `backend/trigger/src/tasks/evaluate_opt_rules.ts` â€” `evaluateOptRulesTask` (`id: evaluate-opt-rules`)
+  - `backend/trigger/src/tasks/trigger_followups.ts` â€” `triggerFollowupsTask` (`id: trigger-followups`)
+  - `backend/trigger/src/tasks/generate_segments.ts` â€” `generateSegmentsTask` (`id: generate-segments`)
+  - `backend/trigger/src/constants/index.ts` â€” added 4 new `TASK_IDS` entries
+  - `backend/trigger/src/index.ts` â€” registered all 4 new tasks
   - `django-admin check`: 0 issues; `makemigrations --check --dry-run`: no changes; `npm run typecheck`: 0 errors
 
-- **Unit 25: Background Job Infrastructure** ✅ implemented & verified
-  - `backend/trigger/package.json` — Node.js worker project; @trigger.dev/sdk, zod, dotenv, pino, pino-pretty; `dev`/`deploy`/`typecheck` scripts
-  - `backend/trigger/tsconfig.json` — TypeScript config (ES2022, NodeNext, strict)
-  - `backend/trigger/trigger.config.ts` — Trigger.dev project config; 3-attempt exponential backoff default; `./src/tasks` task directory
-  - `backend/trigger/.env` — environment variable template (TRIGGER_SECRET_KEY, TRIGGER_PROJECT_ID, TRIGGER_API_URL, DJANGO_API_URL, TRIGGER_INTERNAL_SECRET)
-  - `backend/trigger/src/constants/index.ts` — `JOB_STATUS` and `TASK_IDS` constants
-  - `backend/trigger/src/schemas/campaign.schema.ts` — `SendCampaignPayloadSchema` (Zod) + `SendTestEmailPayloadSchema`
-  - `backend/trigger/src/schemas/upload.schema.ts` — `ProcessUploadPayloadSchema` (Zod)
-  - `backend/trigger/src/utils/logging_utils.ts` — pino-based structured logger; `logTaskStart`, `logTaskComplete`, `logTaskRetry`, `logTaskError`, `logProviderResponse`
-  - `backend/trigger/src/utils/retry_utils.ts` — `DEFAULT_RETRY_CONFIG`, `NETWORK_RETRY_CONFIG`, `UPLOAD_RETRY_CONFIG`; `isRetryableError()` (permanent vs transient classification); `withRetryGuard()`
-  - `backend/trigger/src/utils/trigger_client.ts` — `callDjangoApi()` — authenticates with `X-Trigger-Internal-Secret` header; fetches Django internal endpoints from workers
-  - `backend/trigger/src/tasks/send_campaign.ts` — `sendCampaignTask` (`id: send-campaign`); Zod payload validation → `AbortTaskRunError` on invalid input; calls `/api/v1/internal/campaigns/:id/process/`; permanent-vs-transient retry guard; `onFailure` logging
-  - `backend/trigger/src/tasks/send_test_email.ts` — `sendTestEmailTask` (`id: send-test-email`); same retry pattern; calls `/api/v1/internal/campaigns/:id/test-process/`
-  - `backend/trigger/src/tasks/process_audience_upload.ts` — `processAudienceUploadTask` (`id: process-audience-upload`); UPLOAD_RETRY_CONFIG (4 attempts); calls `/api/v1/internal/audiences/:id/process-upload/`
-  - `backend/trigger/src/tasks/generate_report.ts` — `generateReportTask` (`id: generate-report`); calls `/api/v1/internal/surveys/:id/generate-report/`
-  - `backend/trigger/src/tasks/cleanup_jobs.ts` — `cleanupJobsTask` (`id: cleanup-jobs`); calls `/api/v1/internal/jobs/cleanup/`
+- **Unit 25: Background Job Infrastructure** âœ… implemented & verified
+  - `backend/trigger/package.json` â€” Node.js worker project; @trigger.dev/sdk, zod, dotenv, pino, pino-pretty; `dev`/`deploy`/`typecheck` scripts
+  - `backend/trigger/tsconfig.json` â€” TypeScript config (ES2022, NodeNext, strict)
+  - `backend/trigger/trigger.config.ts` â€” Trigger.dev project config; 3-attempt exponential backoff default; `./src/tasks` task directory
+  - `backend/trigger/.env` â€” environment variable template (TRIGGER_SECRET_KEY, TRIGGER_PROJECT_ID, TRIGGER_API_URL, DJANGO_API_URL, TRIGGER_INTERNAL_SECRET)
+  - `backend/trigger/src/constants/index.ts` â€” `JOB_STATUS` and `TASK_IDS` constants
+  - `backend/trigger/src/schemas/campaign.schema.ts` â€” `SendCampaignPayloadSchema` (Zod) + `SendTestEmailPayloadSchema`
+  - `backend/trigger/src/schemas/upload.schema.ts` â€” `ProcessUploadPayloadSchema` (Zod)
+  - `backend/trigger/src/utils/logging_utils.ts` â€” pino-based structured logger; `logTaskStart`, `logTaskComplete`, `logTaskRetry`, `logTaskError`, `logProviderResponse`
+  - `backend/trigger/src/utils/retry_utils.ts` â€” `DEFAULT_RETRY_CONFIG`, `NETWORK_RETRY_CONFIG`, `UPLOAD_RETRY_CONFIG`; `isRetryableError()` (permanent vs transient classification); `withRetryGuard()`
+  - `backend/trigger/src/utils/trigger_client.ts` â€” `callDjangoApi()` â€” authenticates with `X-Trigger-Internal-Secret` header; fetches Django internal endpoints from workers
+  - `backend/trigger/src/tasks/send_campaign.ts` â€” `sendCampaignTask` (`id: send-campaign`); Zod payload validation â†’ `AbortTaskRunError` on invalid input; calls `/api/v1/internal/campaigns/:id/process/`; permanent-vs-transient retry guard; `onFailure` logging
+  - `backend/trigger/src/tasks/send_test_email.ts` â€” `sendTestEmailTask` (`id: send-test-email`); same retry pattern; calls `/api/v1/internal/campaigns/:id/test-process/`
+  - `backend/trigger/src/tasks/process_audience_upload.ts` â€” `processAudienceUploadTask` (`id: process-audience-upload`); UPLOAD_RETRY_CONFIG (4 attempts); calls `/api/v1/internal/audiences/:id/process-upload/`
+  - `backend/trigger/src/tasks/generate_report.ts` â€” `generateReportTask` (`id: generate-report`); calls `/api/v1/internal/surveys/:id/generate-report/`
+  - `backend/trigger/src/tasks/cleanup_jobs.ts` â€” `cleanupJobsTask` (`id: cleanup-jobs`); calls `/api/v1/internal/jobs/cleanup/`
   - Trigger.dev task `onFailure` hooks updated to the v4 single-params signature so `npm run typecheck` passes
-  - `backend/trigger/src/index.ts` — task registry re-exporting all 5 tasks
-  - `backend/apps/email_campaigns/models/background_job.py` — `BackgroundJob` model: task_id, trigger_job_id, status (queued/running/completed/failed/retrying), payload (JSONField), result (JSONField), error_message, timestamps; `mark_running()`, `mark_completed()`, `mark_failed()` helpers; 4 DB indexes
-  - `backend/apps/email_campaigns/models/__init__.py` — re-exports `BackgroundJob`
-  - `backend/apps/email_campaigns/migrations/0002_background_job.py` — migration applied OK
-  - `backend/apps/email_campaigns/services/queue_service.py` — `enqueue_campaign_send()` + `enqueue_test_email()`: create BackgroundJob (status=queued) → call Trigger.dev REST API → return job_id; graceful fallback to synchronous execution when `TRIGGER_SECRET_KEY` not set (dev mode); `get_job_status()` helper
-  - `backend/apps/email_campaigns/views/send_views.py` — `CampaignSendView` + `CampaignTestSendView` now return HTTP 202 with `{ success: true, data: { job_id: "..." } }` immediately
-  - `backend/apps/email_campaigns/views/internal_views.py` — `InternalCampaignProcessView`, `InternalCampaignTestProcessView`, `InternalJobCleanupView`; `NoAuthentication` bypasses JWT; `InternalSecretPermission` validates `X-Trigger-Internal-Secret` header; updates BackgroundJob status on completion
-  - `backend/apps/email_campaigns/urls.py` — added 3 internal routes: `internal/campaigns/:pk/process/`, `internal/campaigns/:pk/test-process/`, `internal/jobs/cleanup/`
-  - `backend/config/settings/base.py` — added `TRIGGER_SECRET_KEY`, `TRIGGER_PROJECT_ID`, `TRIGGER_API_URL`, `TRIGGER_INTERNAL_SECRET` settings
-  - `backend/.env` — added Trigger.dev env var stubs
-  - `backend/requirements/base.txt` — added `requests>=2.31.0`
+  - `backend/trigger/src/index.ts` â€” task registry re-exporting all 5 tasks
+  - `backend/apps/email_campaigns/models/background_job.py` â€” `BackgroundJob` model: task_id, trigger_job_id, status (queued/running/completed/failed/retrying), payload (JSONField), result (JSONField), error_message, timestamps; `mark_running()`, `mark_completed()`, `mark_failed()` helpers; 4 DB indexes
+  - `backend/apps/email_campaigns/models/__init__.py` â€” re-exports `BackgroundJob`
+  - `backend/apps/email_campaigns/migrations/0002_background_job.py` â€” migration applied OK
+  - `backend/apps/email_campaigns/services/queue_service.py` â€” `enqueue_campaign_send()` + `enqueue_test_email()`: create BackgroundJob (status=queued) â†’ call Trigger.dev REST API â†’ return job_id; graceful fallback to synchronous execution when `TRIGGER_SECRET_KEY` not set (dev mode); `get_job_status()` helper
+  - `backend/apps/email_campaigns/views/send_views.py` â€” `CampaignSendView` + `CampaignTestSendView` now return HTTP 202 with `{ success: true, data: { job_id: "..." } }` immediately
+  - `backend/apps/email_campaigns/views/internal_views.py` â€” `InternalCampaignProcessView`, `InternalCampaignTestProcessView`, `InternalJobCleanupView`; `NoAuthentication` bypasses JWT; `InternalSecretPermission` validates `X-Trigger-Internal-Secret` header; updates BackgroundJob status on completion
+  - `backend/apps/email_campaigns/urls.py` â€” added 3 internal routes: `internal/campaigns/:pk/process/`, `internal/campaigns/:pk/test-process/`, `internal/jobs/cleanup/`
+  - `backend/config/settings/base.py` â€” added `TRIGGER_SECRET_KEY`, `TRIGGER_PROJECT_ID`, `TRIGGER_API_URL`, `TRIGGER_INTERNAL_SECRET` settings
+  - `backend/.env` â€” added Trigger.dev env var stubs
+  - `backend/requirements/base.txt` â€” added `requests>=2.31.0`
   - `django-admin check`: 0 issues; migrations: applied OK; all imports verified
 
-- **Unit 22: Audience Management Functionality** ✅ implemented & verified
-  - `backend/apps/campaigns/models/recipient.py` — added `UniqueConstraint(["audience", "email"], "unique_recipient_per_audience")` + `Index(["audience"])` 
-  - `backend/apps/campaigns/migrations/0002_recipient_unique_constraint.py` — migration applied (`campaigns.0002... OK`)
-  - `backend/apps/campaigns/services/validation_service.py` — `is_valid_email()`, `normalize_contact()` with email strip+lowercase + format validation
-  - `backend/apps/campaigns/services/upload_service.py` — `process_bulk_upload()`: validate → batch-deduplicate → existing-email check → `bulk_create(ignore_conflicts=True)` inside `transaction.atomic()`; returns `{uploaded, duplicates, invalid}` summary
-  - `backend/apps/campaigns/serializers/audience_serializer.py` — added nested `RecipientSerializer(many=True, read_only=True)` recipients field; optimized `get_recipient_count` via prefetch cache
-  - `backend/apps/campaigns/views/audience_views.py` — added `@action upload` (`POST /audiences/:id/upload/`) and `@action recipients` (`GET /audiences/:id/recipients/?q&limit&offset`) with search and manual pagination
-  - `backend/apps/campaigns/views/upload_views.py` — `UploadContactsView` + `RecipientListView` standalone class-based views (spec compliance; same logic as viewset actions)
-  - `frontend/src/lib/api/endpoints.ts` — added `audiences.recipients(id)` endpoint
-  - `frontend/src/features/audiences/types/index.ts` — added `UploadSummary` + `AudienceRecipientPage` types
-  - `frontend/src/features/audiences/services/audience-api.ts` — added `deleteAudience`, `getAudienceRecipients`; updated `uploadAudienceContacts` return type to `UploadSummary`
-  - `frontend/src/features/audiences/services/validation-service.ts` — `isValidEmail`, `validateContactRow`, `validateContactBatch` (mirrors backend rules)
-  - `frontend/src/features/audiences/services/upload-service.ts` — `parseUploadFile`, `submitContactUpload`, re-exports `validateContactBatch`
-  - `frontend/src/features/audiences/hooks/use-delete-audience.ts` — `useDeleteAudience` with cache removal, list invalidation, optional redirect
-  - `frontend/src/features/audiences/hooks/use-audience-contacts.ts` — `useAudienceContacts` querying `/audiences/:id/recipients/` with q/limit/offset support
-  - `frontend/src/features/audiences/hooks/use-contact-validation.ts` — `useContactValidation` hook deriving validCount/errors/isValid from draft
-  - `frontend/src/features/audiences/hooks/use-contact-upload.ts` — updated to return `UploadSummary` from mutation, show `formatUploadSummary` toast, invalidate audience-contacts query key
-  - `frontend/src/features/audiences/utils/csv-parser.ts` — re-exports `parseContactsFromCsv`, `isValidEmail`, `summarizeMetadata`
-  - `frontend/src/features/audiences/utils/recipient-normalizer.ts` — `normalizeContact`, `normalizeContacts`, `deduplicateContacts`
-  - `frontend/src/features/audiences/utils/upload-utils.ts` — `formatUploadSummary`, `isDraftSubmittable`, `isAcceptedCsvFile`, `isWithinSizeLimit`, constants
-  - `frontend/src/features/audiences/state/audience-store.ts` — `useUploadState` + `useAudienceListState` hooks for ephemeral UI state
-  - `frontend/src/features/audiences/components/audience-actions.tsx` — added `onDelete` prop + Delete menu item with red styling and separator
-  - `frontend/src/features/audiences/components/audience-card.tsx` — added `onDelete` prop, passes to `AudienceActions`
-  - `frontend/src/features/audiences/components/audience-table.tsx` — added `onDelete` prop, passes through to `AudienceCard`
-  - `frontend/src/features/audiences/pages/audiences-page.tsx` — wired `useDeleteAudience` + confirmation dialog; passes `onDelete` to `AudienceTable`
-  - `frontend/src/features/audiences/pages/audience-detail-page.tsx` — uses `useAudienceContacts` (dedicated endpoint) + `useDeleteAudience` with confirmation dialog; stat cards show live loaded-contact count
+- **Unit 22: Audience Management Functionality** âœ… implemented & verified
+  - `backend/apps/campaigns/models/recipient.py` â€” added `UniqueConstraint(["audience", "email"], "unique_recipient_per_audience")` + `Index(["audience"])` 
+  - `backend/apps/campaigns/migrations/0002_recipient_unique_constraint.py` â€” migration applied (`campaigns.0002... OK`)
+  - `backend/apps/campaigns/services/validation_service.py` â€” `is_valid_email()`, `normalize_contact()` with email strip+lowercase + format validation
+  - `backend/apps/campaigns/services/upload_service.py` â€” `process_bulk_upload()`: validate â†’ batch-deduplicate â†’ existing-email check â†’ `bulk_create(ignore_conflicts=True)` inside `transaction.atomic()`; returns `{uploaded, duplicates, invalid}` summary
+  - `backend/apps/campaigns/serializers/audience_serializer.py` â€” added nested `RecipientSerializer(many=True, read_only=True)` recipients field; optimized `get_recipient_count` via prefetch cache
+  - `backend/apps/campaigns/views/audience_views.py` â€” added `@action upload` (`POST /audiences/:id/upload/`) and `@action recipients` (`GET /audiences/:id/recipients/?q&limit&offset`) with search and manual pagination
+  - `backend/apps/campaigns/views/upload_views.py` â€” `UploadContactsView` + `RecipientListView` standalone class-based views (spec compliance; same logic as viewset actions)
+  - `frontend/src/lib/api/endpoints.ts` â€” added `audiences.recipients(id)` endpoint
+  - `frontend/src/features/audiences/types/index.ts` â€” added `UploadSummary` + `AudienceRecipientPage` types
+  - `frontend/src/features/audiences/services/audience-api.ts` â€” added `deleteAudience`, `getAudienceRecipients`; updated `uploadAudienceContacts` return type to `UploadSummary`
+  - `frontend/src/features/audiences/services/validation-service.ts` â€” `isValidEmail`, `validateContactRow`, `validateContactBatch` (mirrors backend rules)
+  - `frontend/src/features/audiences/services/upload-service.ts` â€” `parseUploadFile`, `submitContactUpload`, re-exports `validateContactBatch`
+  - `frontend/src/features/audiences/hooks/use-delete-audience.ts` â€” `useDeleteAudience` with cache removal, list invalidation, optional redirect
+  - `frontend/src/features/audiences/hooks/use-audience-contacts.ts` â€” `useAudienceContacts` querying `/audiences/:id/recipients/` with q/limit/offset support
+  - `frontend/src/features/audiences/hooks/use-contact-validation.ts` â€” `useContactValidation` hook deriving validCount/errors/isValid from draft
+  - `frontend/src/features/audiences/hooks/use-contact-upload.ts` â€” updated to return `UploadSummary` from mutation, show `formatUploadSummary` toast, invalidate audience-contacts query key
+  - `frontend/src/features/audiences/utils/csv-parser.ts` â€” re-exports `parseContactsFromCsv`, `isValidEmail`, `summarizeMetadata`
+  - `frontend/src/features/audiences/utils/recipient-normalizer.ts` â€” `normalizeContact`, `normalizeContacts`, `deduplicateContacts`
+  - `frontend/src/features/audiences/utils/upload-utils.ts` â€” `formatUploadSummary`, `isDraftSubmittable`, `isAcceptedCsvFile`, `isWithinSizeLimit`, constants
+  - `frontend/src/features/audiences/state/audience-store.ts` â€” `useUploadState` + `useAudienceListState` hooks for ephemeral UI state
+  - `frontend/src/features/audiences/components/audience-actions.tsx` â€” added `onDelete` prop + Delete menu item with red styling and separator
+  - `frontend/src/features/audiences/components/audience-card.tsx` â€” added `onDelete` prop, passes to `AudienceActions`
+  - `frontend/src/features/audiences/components/audience-table.tsx` â€” added `onDelete` prop, passes through to `AudienceCard`
+  - `frontend/src/features/audiences/pages/audiences-page.tsx` â€” wired `useDeleteAudience` + confirmation dialog; passes `onDelete` to `AudienceTable`
+  - `frontend/src/features/audiences/pages/audience-detail-page.tsx` â€” uses `useAudienceContacts` (dedicated endpoint) + `useDeleteAudience` with confirmation dialog; stat cards show live loaded-contact count
   - `npm.cmd run build`: passes (0 TS errors)
 
-- **Unit 30: Analytics Metrics Engine** ✅ implemented & verified
-  - `backend/requirements/base.txt` — added `django-redis>=5.4`, `pandas>=2.2`
-  - `backend/config/settings/base.py` — `CACHES` config: Redis when `REDIS_URL` env set, `LocMemCache` fallback for dev
-  - `backend/apps/analytics/constants/__init__.py` — snapshot types, metric name constants, cache TTLs, pagination defaults
-  - `backend/apps/analytics/models/aggregated_metric.py` — `AggregatedMetric`: owner, entity_type, entity_id, metric_name, metric_value, bucket_date; 4 DB indexes
-  - `backend/apps/analytics/models/analytics_snapshot.py` — `AnalyticsSnapshot`: owner, snapshot_type, entity_id (null for user-wide), JSON payload, computed_at; 3 DB indexes
-  - `backend/apps/analytics/models/metric_cache.py` — `MetricCache`: cache_key (unique), JSON payload, expires_at; DB-backed fallback cache
-  - `backend/apps/analytics/models.py` — updated stub to re-export all 3 models for Django app registry discovery
-  - `backend/apps/analytics/utils/__init__.py` — `success_response`, `error_response`, `build_time_series_point`, `build_funnel_step`
-  - `backend/apps/analytics/validators/__init__.py` — `validate_days_param`, `validate_survey_ownership`, `validate_campaign_ownership`
-  - `backend/apps/analytics/permissions.py` — `IsAnalyticsOwner`: object-level permission checking `owner_id == request.user.id`
-  - `backend/apps/analytics/services/metrics_service.py` — centralized KPI formulas: `safe_divide`, `compute_rate`, `compute_completion_rate`, `compute_open_rate`, `compute_click_rate`, `compute_response_rate`, `compute_delivery_rate`, `compute_drop_off_rate`, `compute_trend_change`, `normalize_metric`, `summarize_metrics`
-  - `backend/apps/analytics/services/analytics_cache.py` — Redis-backed cache with LocMemCache fallback; `get/set_cached`, `invalidate`, pattern invalidation, per-entity convenience wrappers (dashboard, survey, campaign, engagement)
-  - `backend/apps/analytics/services/aggregation_service.py` — raw event aggregation: `get_response_time_series`, `get_campaign_delivery_trend`, `get_dashboard_response_trend`, `aggregate_survey_responses`, `aggregate_campaign_deliveries`, `get_question_response_counts`, `get_top_surveys_by_responses`; full 0-fill date ranges
-  - `backend/apps/analytics/services/survey_analytics.py` — `get_survey_metrics`, `get_survey_funnel`, `get_survey_question_engagement`, `get_survey_analytics`; computes response rate vs. emails sent across linked campaigns
-  - `backend/apps/analytics/services/campaign_analytics.py` — `get_campaign_metrics`, `get_campaign_delivery_funnel`, `get_campaign_analytics`; delivery rate + response rate computation
-  - `backend/apps/analytics/services/engagement_analytics.py` — `get_engagement_overview`, `get_engagement_funnel`, `get_engagement_drop_off`, `get_interaction_timeline`, `get_audience_segments`, `get_engagement_analytics`; user-wide funnel across all campaigns
-  - `backend/apps/analytics/services/dashboard_service.py` — `get_dashboard_overview`: aggregates total_surveys, total_responses, total_campaigns, total_emails_sent, overall_response_rate; response trend + top surveys chart data
-  - `backend/apps/analytics/services/__init__.py` — re-exports all service functions
-  - `backend/apps/analytics/serializers/__init__.py` — DRF serializers for all response shapes: TimeSeriesPoint, FunnelStep, CategoryPoint, QuestionEngagement, SurveyAnalytics, CampaignAnalytics, EngagementAnalytics, DashboardAnalytics
-  - `backend/apps/analytics/views/analytics_views.py` — `DashboardAnalyticsView` (GET /analytics/dashboard/), `EngagementAnalyticsView` (GET /analytics/engagement/); cache-first, graceful error handling
-  - `backend/apps/analytics/views/survey_views.py` — `SurveyAnalyticsView` (GET /analytics/surveys/:pk/); ownership enforced via `IsAnalyticsOwner`
-  - `backend/apps/analytics/views/campaign_views.py` — `CampaignAnalyticsView` (GET /analytics/campaigns/:pk/); ownership enforced via `IsAnalyticsOwner`
-  - `backend/apps/analytics/views/__init__.py` — re-exports all 4 view classes
-  - `backend/apps/analytics/urls.py` — 4 URL patterns wired
-  - `backend/config/urls.py` — analytics URLs registered under `/api/v1/analytics/`
-  - `backend/apps/analytics/migrations/0001_initial.py` — migration created and applied (`analytics.0001_initial... OK`)
+- **Unit 30: Analytics Metrics Engine** âœ… implemented & verified
+  - `backend/requirements/base.txt` â€” added `django-redis>=5.4`, `pandas>=2.2`
+  - `backend/config/settings/base.py` â€” `CACHES` config: Redis when `REDIS_URL` env set, `LocMemCache` fallback for dev
+  - `backend/apps/analytics/constants/__init__.py` â€” snapshot types, metric name constants, cache TTLs, pagination defaults
+  - `backend/apps/analytics/models/aggregated_metric.py` â€” `AggregatedMetric`: owner, entity_type, entity_id, metric_name, metric_value, bucket_date; 4 DB indexes
+  - `backend/apps/analytics/models/analytics_snapshot.py` â€” `AnalyticsSnapshot`: owner, snapshot_type, entity_id (null for user-wide), JSON payload, computed_at; 3 DB indexes
+  - `backend/apps/analytics/models/metric_cache.py` â€” `MetricCache`: cache_key (unique), JSON payload, expires_at; DB-backed fallback cache
+  - `backend/apps/analytics/models.py` â€” updated stub to re-export all 3 models for Django app registry discovery
+  - `backend/apps/analytics/utils/__init__.py` â€” `success_response`, `error_response`, `build_time_series_point`, `build_funnel_step`
+  - `backend/apps/analytics/validators/__init__.py` â€” `validate_days_param`, `validate_survey_ownership`, `validate_campaign_ownership`
+  - `backend/apps/analytics/permissions.py` â€” `IsAnalyticsOwner`: object-level permission checking `owner_id == request.user.id`
+  - `backend/apps/analytics/services/metrics_service.py` â€” centralized KPI formulas: `safe_divide`, `compute_rate`, `compute_completion_rate`, `compute_open_rate`, `compute_click_rate`, `compute_response_rate`, `compute_delivery_rate`, `compute_drop_off_rate`, `compute_trend_change`, `normalize_metric`, `summarize_metrics`
+  - `backend/apps/analytics/services/analytics_cache.py` â€” Redis-backed cache with LocMemCache fallback; `get/set_cached`, `invalidate`, pattern invalidation, per-entity convenience wrappers (dashboard, survey, campaign, engagement)
+  - `backend/apps/analytics/services/aggregation_service.py` â€” raw event aggregation: `get_response_time_series`, `get_campaign_delivery_trend`, `get_dashboard_response_trend`, `aggregate_survey_responses`, `aggregate_campaign_deliveries`, `get_question_response_counts`, `get_top_surveys_by_responses`; full 0-fill date ranges
+  - `backend/apps/analytics/services/survey_analytics.py` â€” `get_survey_metrics`, `get_survey_funnel`, `get_survey_question_engagement`, `get_survey_analytics`; computes response rate vs. emails sent across linked campaigns
+  - `backend/apps/analytics/services/campaign_analytics.py` â€” `get_campaign_metrics`, `get_campaign_delivery_funnel`, `get_campaign_analytics`; delivery rate + response rate computation
+  - `backend/apps/analytics/services/engagement_analytics.py` â€” `get_engagement_overview`, `get_engagement_funnel`, `get_engagement_drop_off`, `get_interaction_timeline`, `get_audience_segments`, `get_engagement_analytics`; user-wide funnel across all campaigns
+  - `backend/apps/analytics/services/dashboard_service.py` â€” `get_dashboard_overview`: aggregates total_surveys, total_responses, total_campaigns, total_emails_sent, overall_response_rate; response trend + top surveys chart data
+  - `backend/apps/analytics/services/__init__.py` â€” re-exports all service functions
+  - `backend/apps/analytics/serializers/__init__.py` â€” DRF serializers for all response shapes: TimeSeriesPoint, FunnelStep, CategoryPoint, QuestionEngagement, SurveyAnalytics, CampaignAnalytics, EngagementAnalytics, DashboardAnalytics
+  - `backend/apps/analytics/views/analytics_views.py` â€” `DashboardAnalyticsView` (GET /analytics/dashboard/), `EngagementAnalyticsView` (GET /analytics/engagement/); cache-first, graceful error handling
+  - `backend/apps/analytics/views/survey_views.py` â€” `SurveyAnalyticsView` (GET /analytics/surveys/:pk/); ownership enforced via `IsAnalyticsOwner`
+  - `backend/apps/analytics/views/campaign_views.py` â€” `CampaignAnalyticsView` (GET /analytics/campaigns/:pk/); ownership enforced via `IsAnalyticsOwner`
+  - `backend/apps/analytics/views/__init__.py` â€” re-exports all 4 view classes
+  - `backend/apps/analytics/urls.py` â€” 4 URL patterns wired
+  - `backend/config/urls.py` â€” analytics URLs registered under `/api/v1/analytics/`
+  - `backend/apps/analytics/migrations/0001_initial.py` â€” migration created and applied (`analytics.0001_initial... OK`)
   - `django-admin check`: 0 issues; all imports verified; all 4 URLs resolve correctly
 
-- **Unit 29: Analytics Dashboard UI** ✅ implemented & verified
-  - `npm install recharts` — chart rendering library
-  - `frontend/src/features/analytics/types/index.ts` — `MetricCardData`, `TrendDirection`, `TimeSeriesPoint`, `CategoryPoint`, `FunnelStep`, `SurveyAnalyticsSummary`, `CampaignAnalyticsSummary`, `EngagementSummary`, `DashboardOverview` types
-  - `frontend/src/features/analytics/constants/index.ts` — `CHART_COLORS`, `PIE_COLORS`, `MOCK_DASHBOARD_OVERVIEW`, `MOCK_SURVEY_ANALYTICS`, `MOCK_CAMPAIGN_ANALYTICS`, `MOCK_ENGAGEMENT` mock data
-  - `frontend/src/features/analytics/components/charts/line-chart.tsx` — `AnalyticsLineChart` (dual-series, dashed secondary, legend)
-  - `frontend/src/features/analytics/components/charts/bar-chart.tsx` — `AnalyticsBarChart` (Cell per-item colours, radius caps)
-  - `frontend/src/features/analytics/components/charts/pie-chart.tsx` — `AnalyticsPieChart` (donut, legend)
-  - `frontend/src/features/analytics/components/charts/funnel-chart.tsx` — `AnalyticsFunnelChart` (custom accessible horizontal-bar funnel, no Recharts Funnel)
-  - `frontend/src/features/analytics/components/charts/trend-chart.tsx` — `AnalyticsTrendChart` (area chart with gradient fill)
-  - `frontend/src/features/analytics/components/metrics/metric-card.tsx` — `MetricCard` with value, trend icon, change badge, optional icon
-  - `frontend/src/features/analytics/components/metrics/stat-grid.tsx` — `StatGrid` responsive 1→2→4-col KPI grid
-  - `frontend/src/features/analytics/components/metrics/percentage-card.tsx` — `PercentageCard` with animated progress bar
-  - `frontend/src/features/analytics/components/layouts/analytics-shell.tsx` — `AnalyticsShell` page outer container
-  - `frontend/src/features/analytics/components/layouts/analytics-grid.tsx` — `AnalyticsGrid` responsive chart grid (1/2/3 cols)
-  - `frontend/src/features/analytics/components/layouts/dashboard-header.tsx` — `AnalyticsDashboardHeader` with title, description, date-range placeholder
-  - `frontend/src/features/analytics/components/widgets/analytics-card.tsx` — `AnalyticsCard` standard widget card (header/content/footer + action slot)
-  - `frontend/src/features/analytics/components/states/analytics-skeleton.tsx` — `AnalyticsSkeleton` + `ChartCardSkeleton` loading states
-  - `frontend/src/features/analytics/components/states/empty-analytics-state.tsx` — `EmptyAnalyticsState`
-  - `frontend/src/features/analytics/components/states/error-analytics-state.tsx` — `ErrorAnalyticsState` with retry button
-  - `frontend/src/features/analytics/pages/analytics-page.tsx` — main overview: KPIs, response trend, top surveys bar chart, click-rate spotlight, quick insights panel
-  - `frontend/src/features/analytics/pages/survey-analytics-page.tsx` — survey detail: KPIs, response trend, completion funnel, question engagement bar chart; route `/dashboard/analytics/surveys/:surveyId`
-  - `frontend/src/features/analytics/pages/campaign-analytics-page.tsx` — campaign detail: KPIs, 3 percentage cards, open/click line trend, reminder bar chart; route `/dashboard/analytics/campaigns/:campaignId`
-  - `frontend/src/features/analytics/pages/engagement-analytics-page.tsx` — engagement funnel, drop-off bar chart, interaction timeline trend, audience segment donut; route `/dashboard/analytics/engagement`
-  - `frontend/src/app/router/index.tsx` — added `SurveyAnalyticsPage`, `CampaignAnalyticsPage`, `EngagementAnalyticsPage` lazy imports + 3 new routes
-  - `frontend/src/routes/route-config.ts` — added `children` to `RouteConfig` type; wired Analytics sub-nav (Overview, Surveys, Campaigns, Engagement)
-  - `frontend/src/components/layout/sidebar-item.tsx` — collapsible nav group: auto-expands on active child route, chevron toggle, indented child links
+- **Unit 29: Analytics Dashboard UI** âœ… implemented & verified
+  - `npm install recharts` â€” chart rendering library
+  - `frontend/src/features/analytics/types/index.ts` â€” `MetricCardData`, `TrendDirection`, `TimeSeriesPoint`, `CategoryPoint`, `FunnelStep`, `SurveyAnalyticsSummary`, `CampaignAnalyticsSummary`, `EngagementSummary`, `DashboardOverview` types
+  - `frontend/src/features/analytics/constants/index.ts` â€” `CHART_COLORS`, `PIE_COLORS`, `MOCK_DASHBOARD_OVERVIEW`, `MOCK_SURVEY_ANALYTICS`, `MOCK_CAMPAIGN_ANALYTICS`, `MOCK_ENGAGEMENT` mock data
+  - `frontend/src/features/analytics/components/charts/line-chart.tsx` â€” `AnalyticsLineChart` (dual-series, dashed secondary, legend)
+  - `frontend/src/features/analytics/components/charts/bar-chart.tsx` â€” `AnalyticsBarChart` (Cell per-item colours, radius caps)
+  - `frontend/src/features/analytics/components/charts/pie-chart.tsx` â€” `AnalyticsPieChart` (donut, legend)
+  - `frontend/src/features/analytics/components/charts/funnel-chart.tsx` â€” `AnalyticsFunnelChart` (custom accessible horizontal-bar funnel, no Recharts Funnel)
+  - `frontend/src/features/analytics/components/charts/trend-chart.tsx` â€” `AnalyticsTrendChart` (area chart with gradient fill)
+  - `frontend/src/features/analytics/components/metrics/metric-card.tsx` â€” `MetricCard` with value, trend icon, change badge, optional icon
+  - `frontend/src/features/analytics/components/metrics/stat-grid.tsx` â€” `StatGrid` responsive 1â†’2â†’4-col KPI grid
+  - `frontend/src/features/analytics/components/metrics/percentage-card.tsx` â€” `PercentageCard` with animated progress bar
+  - `frontend/src/features/analytics/components/layouts/analytics-shell.tsx` â€” `AnalyticsShell` page outer container
+  - `frontend/src/features/analytics/components/layouts/analytics-grid.tsx` â€” `AnalyticsGrid` responsive chart grid (1/2/3 cols)
+  - `frontend/src/features/analytics/components/layouts/dashboard-header.tsx` â€” `AnalyticsDashboardHeader` with title, description, date-range placeholder
+  - `frontend/src/features/analytics/components/widgets/analytics-card.tsx` â€” `AnalyticsCard` standard widget card (header/content/footer + action slot)
+  - `frontend/src/features/analytics/components/states/analytics-skeleton.tsx` â€” `AnalyticsSkeleton` + `ChartCardSkeleton` loading states
+  - `frontend/src/features/analytics/components/states/empty-analytics-state.tsx` â€” `EmptyAnalyticsState`
+  - `frontend/src/features/analytics/components/states/error-analytics-state.tsx` â€” `ErrorAnalyticsState` with retry button
+  - `frontend/src/features/analytics/pages/analytics-page.tsx` â€” main overview: KPIs, response trend, top surveys bar chart, click-rate spotlight, quick insights panel
+  - `frontend/src/features/analytics/pages/survey-analytics-page.tsx` â€” survey detail: KPIs, response trend, completion funnel, question engagement bar chart; route `/dashboard/analytics/surveys/:surveyId`
+  - `frontend/src/features/analytics/pages/campaign-analytics-page.tsx` â€” campaign detail: KPIs, 3 percentage cards, open/click line trend, reminder bar chart; route `/dashboard/analytics/campaigns/:campaignId`
+  - `frontend/src/features/analytics/pages/engagement-analytics-page.tsx` â€” engagement funnel, drop-off bar chart, interaction timeline trend, audience segment donut; route `/dashboard/analytics/engagement`
+  - `frontend/src/app/router/index.tsx` â€” added `SurveyAnalyticsPage`, `CampaignAnalyticsPage`, `EngagementAnalyticsPage` lazy imports + 3 new routes
+  - `frontend/src/routes/route-config.ts` â€” added `children` to `RouteConfig` type; wired Analytics sub-nav (Overview, Surveys, Campaigns, Engagement)
+  - `frontend/src/components/layout/sidebar-item.tsx` â€” collapsible nav group: auto-expands on active child route, chevron toggle, indented child links
   - `npm run build`: passes (0 TS errors)
 
-- **Unit 24: Email Distribution System** ✅ implemented & verified
-  - `backend/requirements/base.txt` — added `resend>=2.0`, `html2text>=2024.2.26`
-  - `backend/.env` + `config/settings/base.py` — added `RESEND_API_KEY`, `DEFAULT_FROM_EMAIL`, `RESEND_AUDIENCE_DOMAIN`, `APP_FRONTEND_URL` settings
-  - `backend/apps/campaigns/constants.py` — added `CAMPAIGN_STATUS_SENDING`, `CAMPAIGN_STATUS_SENT`, `CAMPAIGN_STATUS_FAILED`; added email template constants `TEMPLATE_SURVEY_INVITATION`, `TEMPLATE_REMINDER`, `TEMPLATE_TEST`, `TEMPLATE_CHOICES`; extended `VALID_TRANSITIONS`
-  - `backend/apps/campaigns/models/campaign.py` — added `subject` (CharField) + `template_name` (ChoiceField) fields
-  - `backend/apps/campaigns/migrations/0003_campaign_email_fields.py` — migration applied
-  - `backend/apps/campaigns/serializers/campaign_serializer.py` — added `subject`, `template_name` to serializer fields
-  - `backend/apps/email_campaigns/__init__.py` + `apps.py` — new Django app scaffold
-  - `backend/apps/email_campaigns/constants.py` — delivery status constants (`pending`, `sent`, `failed`), re-exports template constants
-  - `backend/apps/email_campaigns/permissions.py` — `IsCampaignOwner` permission class
-  - `backend/apps/email_campaigns/validators.py` — `validate_email_format`, `validate_campaign_ready_to_send`, `validate_test_email_address`
-  - `backend/apps/email_campaigns/models/delivery_log.py` — `DeliveryLog` model: campaign FK, recipient_email, recipient_first_name, status, provider_message_id, sent_at, error_message, timestamps; 4 DB indexes
-  - `backend/apps/email_campaigns/models/__init__.py` — re-exports DeliveryLog
-  - `backend/apps/email_campaigns/migrations/0001_initial.py` — migration applied
-  - `backend/apps/email_campaigns/services/resend_service.py` — lazy Resend SDK wrapper; `SendEmailRequest`/`SendEmailResult` dataclasses; `send_email()` never raises — captures all errors in result
-  - `backend/apps/email_campaigns/services/email_renderer.py` — `render_html()`, `render_plain_text()` (html2text with tag-strip fallback), `render_email()` → (html, text) tuple
-  - `backend/apps/email_campaigns/services/delivery_service.py` — `create_pending_log`, `record_send_result`, `get_campaign_delivery_summary`
-  - `backend/apps/email_campaigns/services/campaign_processor.py` — `process_campaign()` orchestrator: load → validate → sending status → per-recipient render+send+log → sent/failed status; `process_test_send()` for QA
-  - `backend/apps/email_campaigns/services/queue_service.py` — synchronous placeholder, Celery-ready signature
-  - `backend/apps/email_campaigns/services/tracking_service.py` — `record_send_event()` stub, prepared for future analytics
-  - `backend/apps/email_campaigns/utils/template_utils.py` — `get_survey_link()` (slug-first, fallback to pk; standard + conversational), `resolve_template_name()`
-  - `backend/apps/email_campaigns/utils/personalization_utils.py` — `build_email_context()` with first_name/survey_link/campaign_name/recipient_email variables
-  - `backend/apps/email_campaigns/utils/recipient_utils.py` — `iter_valid_recipients()` with cross-audience dedup + malformed-email skipping; `collect_recipients()`
-  - `backend/apps/email_campaigns/utils/__init__.py` — re-exports all utils + `success_response`/`error_response` helpers
-  - `backend/apps/email_campaigns/templates/email_campaigns/base_email.html` — responsive table-based base layout (light/dark safe, mobile-first, screen-reader compatible)
-  - `backend/apps/email_campaigns/templates/email_campaigns/survey_invitation.html` — survey invite template with CTA button + link fallback
-  - `backend/apps/email_campaigns/templates/email_campaigns/reminder_email.html` — follow-up reminder template
-  - `backend/apps/email_campaigns/templates/email_campaigns/test_email.html` — QA preview template with variable debug panel
-  - `backend/apps/email_campaigns/serializers/campaign_serializer.py` — `EmailCampaignSerializer`
-  - `backend/apps/email_campaigns/serializers/send_serializer.py` — `SendCampaignSerializer` + `TestEmailSerializer`
-  - `backend/apps/email_campaigns/serializers/delivery_serializer.py` — `DeliveryLogSerializer`
-  - `backend/apps/email_campaigns/views/send_views.py` — `CampaignSendView` (`POST /campaigns/:pk/send/`) + `CampaignTestSendView` (`POST /campaigns/:pk/test/`); duplicate-send guard; thin orchestration only
-  - `backend/apps/email_campaigns/views/preview_views.py` — `CampaignPreviewView` (`GET /campaigns/:pk/preview/`) returns rendered html+text without sending
-  - `backend/apps/email_campaigns/views/campaign_views.py` — `CampaignDeliveryLogView` (`GET /campaigns/:pk/delivery-logs/`)
-  - `backend/apps/email_campaigns/tasks/send_campaign_task.py` — `send_campaign_task()` synchronous wrapper; Celery-ready signature
-  - `backend/apps/email_campaigns/urls.py` — 4 URL patterns wired
-  - `backend/config/settings/base.py` — added `apps.email_campaigns` to `LOCAL_APPS` + Resend settings block
-  - `backend/config/urls.py` — wired `apps.email_campaigns.urls` under `/api/v1/`
+- **Unit 24: Email Distribution System** âœ… implemented & verified
+  - `backend/requirements/base.txt` â€” added `resend>=2.0`, `html2text>=2024.2.26`
+  - `backend/.env` + `config/settings/base.py` â€” added `RESEND_API_KEY`, `DEFAULT_FROM_EMAIL`, `RESEND_AUDIENCE_DOMAIN`, `APP_FRONTEND_URL` settings
+  - `backend/apps/campaigns/constants.py` â€” added `CAMPAIGN_STATUS_SENDING`, `CAMPAIGN_STATUS_SENT`, `CAMPAIGN_STATUS_FAILED`; added email template constants `TEMPLATE_SURVEY_INVITATION`, `TEMPLATE_REMINDER`, `TEMPLATE_TEST`, `TEMPLATE_CHOICES`; extended `VALID_TRANSITIONS`
+  - `backend/apps/campaigns/models/campaign.py` â€” added `subject` (CharField) + `template_name` (ChoiceField) fields
+  - `backend/apps/campaigns/migrations/0003_campaign_email_fields.py` â€” migration applied
+  - `backend/apps/campaigns/serializers/campaign_serializer.py` â€” added `subject`, `template_name` to serializer fields
+  - `backend/apps/email_campaigns/__init__.py` + `apps.py` â€” new Django app scaffold
+  - `backend/apps/email_campaigns/constants.py` â€” delivery status constants (`pending`, `sent`, `failed`), re-exports template constants
+  - `backend/apps/email_campaigns/permissions.py` â€” `IsCampaignOwner` permission class
+  - `backend/apps/email_campaigns/validators.py` â€” `validate_email_format`, `validate_campaign_ready_to_send`, `validate_test_email_address`
+  - `backend/apps/email_campaigns/models/delivery_log.py` â€” `DeliveryLog` model: campaign FK, recipient_email, recipient_first_name, status, provider_message_id, sent_at, error_message, timestamps; 4 DB indexes
+  - `backend/apps/email_campaigns/models/__init__.py` â€” re-exports DeliveryLog
+  - `backend/apps/email_campaigns/migrations/0001_initial.py` â€” migration applied
+  - `backend/apps/email_campaigns/services/resend_service.py` â€” lazy Resend SDK wrapper; `SendEmailRequest`/`SendEmailResult` dataclasses; `send_email()` never raises â€” captures all errors in result
+  - `backend/apps/email_campaigns/services/email_renderer.py` â€” `render_html()`, `render_plain_text()` (html2text with tag-strip fallback), `render_email()` â†’ (html, text) tuple
+  - `backend/apps/email_campaigns/services/delivery_service.py` â€” `create_pending_log`, `record_send_result`, `get_campaign_delivery_summary`
+  - `backend/apps/email_campaigns/services/campaign_processor.py` â€” `process_campaign()` orchestrator: load â†’ validate â†’ sending status â†’ per-recipient render+send+log â†’ sent/failed status; `process_test_send()` for QA
+  - `backend/apps/email_campaigns/services/queue_service.py` â€” synchronous placeholder, Celery-ready signature
+  - `backend/apps/email_campaigns/services/tracking_service.py` â€” `record_send_event()` stub, prepared for future analytics
+  - `backend/apps/email_campaigns/utils/template_utils.py` â€” `get_survey_link()` (slug-first, fallback to pk; standard + conversational), `resolve_template_name()`
+  - `backend/apps/email_campaigns/utils/personalization_utils.py` â€” `build_email_context()` with first_name/survey_link/campaign_name/recipient_email variables
+  - `backend/apps/email_campaigns/utils/recipient_utils.py` â€” `iter_valid_recipients()` with cross-audience dedup + malformed-email skipping; `collect_recipients()`
+  - `backend/apps/email_campaigns/utils/__init__.py` â€” re-exports all utils + `success_response`/`error_response` helpers
+  - `backend/apps/email_campaigns/templates/email_campaigns/base_email.html` â€” responsive table-based base layout (light/dark safe, mobile-first, screen-reader compatible)
+  - `backend/apps/email_campaigns/templates/email_campaigns/survey_invitation.html` â€” survey invite template with CTA button + link fallback
+  - `backend/apps/email_campaigns/templates/email_campaigns/reminder_email.html` â€” follow-up reminder template
+  - `backend/apps/email_campaigns/templates/email_campaigns/test_email.html` â€” QA preview template with variable debug panel
+  - `backend/apps/email_campaigns/serializers/campaign_serializer.py` â€” `EmailCampaignSerializer`
+  - `backend/apps/email_campaigns/serializers/send_serializer.py` â€” `SendCampaignSerializer` + `TestEmailSerializer`
+  - `backend/apps/email_campaigns/serializers/delivery_serializer.py` â€” `DeliveryLogSerializer`
+  - `backend/apps/email_campaigns/views/send_views.py` â€” `CampaignSendView` (`POST /campaigns/:pk/send/`) + `CampaignTestSendView` (`POST /campaigns/:pk/test/`); duplicate-send guard; thin orchestration only
+  - `backend/apps/email_campaigns/views/preview_views.py` â€” `CampaignPreviewView` (`GET /campaigns/:pk/preview/`) returns rendered html+text without sending
+  - `backend/apps/email_campaigns/views/campaign_views.py` â€” `CampaignDeliveryLogView` (`GET /campaigns/:pk/delivery-logs/`)
+  - `backend/apps/email_campaigns/tasks/send_campaign_task.py` â€” `send_campaign_task()` synchronous wrapper; Celery-ready signature
+  - `backend/apps/email_campaigns/urls.py` â€” 4 URL patterns wired
+  - `backend/config/settings/base.py` â€” added `apps.email_campaigns` to `LOCAL_APPS` + Resend settings block
+  - `backend/config/urls.py` â€” wired `apps.email_campaigns.urls` under `/api/v1/`
   - `django-admin check`: 0 issues; migrations: applied OK
 
 - **Unit 23: Email Campaign UI** implemented and verified
@@ -266,304 +339,304 @@ Update this file after every meaningful implementation change.
   - `frontend/src/app/router/index.tsx` - deployment fix: restored Campaigns import to the committed Unit 23 placeholder path so Unit 21 branch does not depend on uncommitted email-campaign files
   - `npm.cmd run build`: passes
 
-- **Unit 20: Survey Sharing System** ✅ implemented (backend + frontend)
-  - `backend/apps/surveys/models/survey.py` — added `slug` field (`SlugField`, unique, null=True, db_index=True); `save()` override auto-generates `<slugified-title>-<8-char-uuid>` on first save
-  - `backend/apps/surveys/serializers/survey_serializer.py` — added `"slug"` to `fields` and `read_only_fields`
-  - `backend/apps/surveys/migrations/0002_survey_slug.py` — `AddField` for slug + `RunPython` data migration `populate_slugs` to backfill existing rows
-  - `backend/apps/sharing/__init__.py` — app package
-  - `backend/apps/sharing/apps.py` — `SharingConfig` (`default_auto_field`, `name = "apps.sharing"`)
-  - `backend/apps/sharing/utils.py` — `success_response` / `error_response` helpers
-  - `backend/apps/sharing/permissions.py` — `PublicSharingPermission(AllowAny)`
-  - `backend/apps/sharing/validators.py` — `validate_survey_is_published(survey)` raises NotFound for non-published
-  - `backend/apps/sharing/serializers/__init__.py` — empty
-  - `backend/apps/sharing/serializers/survey_share_serializer.py` — `SurveyShareSerializer` (read-only: title, slug, description, status, is_public)
-  - `backend/apps/sharing/services/__init__.py` — empty
-  - `backend/apps/sharing/services/sharing_validation_service.py` — `get_published_survey_by_slug(slug)`: raises NotFound for missing or non-published surveys
-  - `backend/apps/sharing/views/__init__.py` — empty
-  - `backend/apps/sharing/views/sharing_views.py` — `SurveyShareMetadataView` (APIView, AllowAny, `authentication_classes=[]`); `GET /api/v1/sharing/surveys/<slug>/`
-  - `backend/apps/sharing/urls.py` — `sharing/surveys/<slug:slug>/` → `SurveyShareMetadataView`
-  - `backend/config/settings/base.py` — added `"apps.sharing"` to `LOCAL_APPS`
-  - `backend/config/urls.py` — wired `apps.sharing.urls` under `/api/v1/`
-  - `frontend/.env` + `.env.development` — added `VITE_APP_BASE_URL=http://localhost:5173`
-  - `frontend/.env.production` — added `VITE_APP_BASE_URL=https://app.insightflow.ai`
-  - `frontend/src/features/surveys/types/index.ts` — added `slug?: string | null` to `Survey` type
-  - `frontend/src/lib/env/index.ts` — added `getOptionalEnv` helper + `APP_BASE_URL` export
-  - `frontend/src/lib/api/endpoints.ts` — added `sharing.surveyMeta(slug)` endpoint
-  - `frontend/package.json` — added `qrcode.react ^4.2.0` dependency (run `npm install`)
-  - `frontend/src/features/survey-sharing/types/index.ts` — `ShareMetadata`, `ShareLinkMode`, `QRSize` types
-  - `frontend/src/features/survey-sharing/constants/index.ts` — `APP_BASE_URL`, `QR_SIZES`, `QR_SIZE_LABELS`
-  - `frontend/src/features/survey-sharing/utils/url-builder.ts` — `generateSurveyShareLink`, `generateConversationalShareLink`
-  - `frontend/src/features/survey-sharing/utils/qr-utils.ts` — `downloadQRCodeAsPNG`, `printQRCode`
-  - `frontend/src/features/survey-sharing/utils/share-utils.ts` — `generateShareText`, `canUseNativeShare`, `triggerNativeShare`
-  - `frontend/src/features/survey-sharing/services/sharing-api.ts` — `getSurveyShareMetadata(slug)` (public axios client, no auth)
-  - `frontend/src/features/survey-sharing/hooks/use-share-link.ts` — `useShareLink(slug)` → `{ standardLink, conversationalLink }`
-  - `frontend/src/features/survey-sharing/hooks/use-copy-to-clipboard.ts` — `useCopyToClipboard(resetDelay)` with native clipboard + textarea fallback
-  - `frontend/src/features/survey-sharing/hooks/use-qr-code.ts` — `useQRCode(initialSize)` → `{ size, setSize, pixelSize }`
-  - `frontend/src/features/survey-sharing/components/copy-button.tsx` — animated copy → "Copied!" button with Check icon
-  - `frontend/src/features/survey-sharing/components/share-link-card.tsx` — readonly URL input + CopyButton + external link
-  - `frontend/src/features/survey-sharing/components/qr-code-card.tsx` — QRCodeCanvas with size selector, Download PNG, Print actions
-  - `frontend/src/features/survey-sharing/components/social-share-buttons.tsx` — native Share, Email, Twitter/X links
-  - `frontend/src/features/survey-sharing/components/distribution-helper.tsx` — quick distribution panel with copy + preview buttons
-  - `frontend/src/features/survey-sharing/components/share-preview.tsx` — link preview card (Globe icon, title, description, URL)
-  - `frontend/src/features/survey-sharing/components/share-modal.tsx` — full Dialog with SharePreview, both links, QR code, social sharing
-  - `frontend/src/features/surveys/pages/survey-detail-page.tsx` — integrated `ShareModal` (shown when published && slug set)
+- **Unit 20: Survey Sharing System** âœ… implemented (backend + frontend)
+  - `backend/apps/surveys/models/survey.py` â€” added `slug` field (`SlugField`, unique, null=True, db_index=True); `save()` override auto-generates `<slugified-title>-<8-char-uuid>` on first save
+  - `backend/apps/surveys/serializers/survey_serializer.py` â€” added `"slug"` to `fields` and `read_only_fields`
+  - `backend/apps/surveys/migrations/0002_survey_slug.py` â€” `AddField` for slug + `RunPython` data migration `populate_slugs` to backfill existing rows
+  - `backend/apps/sharing/__init__.py` â€” app package
+  - `backend/apps/sharing/apps.py` â€” `SharingConfig` (`default_auto_field`, `name = "apps.sharing"`)
+  - `backend/apps/sharing/utils.py` â€” `success_response` / `error_response` helpers
+  - `backend/apps/sharing/permissions.py` â€” `PublicSharingPermission(AllowAny)`
+  - `backend/apps/sharing/validators.py` â€” `validate_survey_is_published(survey)` raises NotFound for non-published
+  - `backend/apps/sharing/serializers/__init__.py` â€” empty
+  - `backend/apps/sharing/serializers/survey_share_serializer.py` â€” `SurveyShareSerializer` (read-only: title, slug, description, status, is_public)
+  - `backend/apps/sharing/services/__init__.py` â€” empty
+  - `backend/apps/sharing/services/sharing_validation_service.py` â€” `get_published_survey_by_slug(slug)`: raises NotFound for missing or non-published surveys
+  - `backend/apps/sharing/views/__init__.py` â€” empty
+  - `backend/apps/sharing/views/sharing_views.py` â€” `SurveyShareMetadataView` (APIView, AllowAny, `authentication_classes=[]`); `GET /api/v1/sharing/surveys/<slug>/`
+  - `backend/apps/sharing/urls.py` â€” `sharing/surveys/<slug:slug>/` â†’ `SurveyShareMetadataView`
+  - `backend/config/settings/base.py` â€” added `"apps.sharing"` to `LOCAL_APPS`
+  - `backend/config/urls.py` â€” wired `apps.sharing.urls` under `/api/v1/`
+  - `frontend/.env` + `.env.development` â€” added `VITE_APP_BASE_URL=http://localhost:5173`
+  - `frontend/.env.production` â€” added `VITE_APP_BASE_URL=https://app.insightflow.ai`
+  - `frontend/src/features/surveys/types/index.ts` â€” added `slug?: string | null` to `Survey` type
+  - `frontend/src/lib/env/index.ts` â€” added `getOptionalEnv` helper + `APP_BASE_URL` export
+  - `frontend/src/lib/api/endpoints.ts` â€” added `sharing.surveyMeta(slug)` endpoint
+  - `frontend/package.json` â€” added `qrcode.react ^4.2.0` dependency (run `npm install`)
+  - `frontend/src/features/survey-sharing/types/index.ts` â€” `ShareMetadata`, `ShareLinkMode`, `QRSize` types
+  - `frontend/src/features/survey-sharing/constants/index.ts` â€” `APP_BASE_URL`, `QR_SIZES`, `QR_SIZE_LABELS`
+  - `frontend/src/features/survey-sharing/utils/url-builder.ts` â€” `generateSurveyShareLink`, `generateConversationalShareLink`
+  - `frontend/src/features/survey-sharing/utils/qr-utils.ts` â€” `downloadQRCodeAsPNG`, `printQRCode`
+  - `frontend/src/features/survey-sharing/utils/share-utils.ts` â€” `generateShareText`, `canUseNativeShare`, `triggerNativeShare`
+  - `frontend/src/features/survey-sharing/services/sharing-api.ts` â€” `getSurveyShareMetadata(slug)` (public axios client, no auth)
+  - `frontend/src/features/survey-sharing/hooks/use-share-link.ts` â€” `useShareLink(slug)` â†’ `{ standardLink, conversationalLink }`
+  - `frontend/src/features/survey-sharing/hooks/use-copy-to-clipboard.ts` â€” `useCopyToClipboard(resetDelay)` with native clipboard + textarea fallback
+  - `frontend/src/features/survey-sharing/hooks/use-qr-code.ts` â€” `useQRCode(initialSize)` â†’ `{ size, setSize, pixelSize }`
+  - `frontend/src/features/survey-sharing/components/copy-button.tsx` â€” animated copy â†’ "Copied!" button with Check icon
+  - `frontend/src/features/survey-sharing/components/share-link-card.tsx` â€” readonly URL input + CopyButton + external link
+  - `frontend/src/features/survey-sharing/components/qr-code-card.tsx` â€” QRCodeCanvas with size selector, Download PNG, Print actions
+  - `frontend/src/features/survey-sharing/components/social-share-buttons.tsx` â€” native Share, Email, Twitter/X links
+  - `frontend/src/features/survey-sharing/components/distribution-helper.tsx` â€” quick distribution panel with copy + preview buttons
+  - `frontend/src/features/survey-sharing/components/share-preview.tsx` â€” link preview card (Globe icon, title, description, URL)
+  - `frontend/src/features/survey-sharing/components/share-modal.tsx` â€” full Dialog with SharePreview, both links, QR code, social sharing
+  - `frontend/src/features/surveys/pages/survey-detail-page.tsx` â€” integrated `ShareModal` (shown when published && slug set)
 
-- **Unit 19: Campaign and Distribution Layer** ✅ implemented & verified
-  - `backend/apps/campaigns/constants.py` — status constants + `VALID_TRANSITIONS` state machine map
-  - `backend/apps/campaigns/migrations/__init__.py` — migrations package created
-  - `backend/apps/campaigns/models/audience.py` — `Audience` model: owner FK, name, description, metadata, UniqueConstraint per owner, index on owner
-  - `backend/apps/campaigns/models/recipient.py` — `Recipient` model: audience FK (string ref), email, first_name, last_name, metadata, index on email
-  - `backend/apps/campaigns/models/campaign.py` — `Campaign` model: survey FK, owner FK, status (choices+default), M2M audiences (related_name=campaign_set), metadata, timestamps; 4 DB indexes
-  - `backend/apps/campaigns/models/__init__.py` — re-exports Campaign, Audience, Recipient
-  - `backend/apps/campaigns/permissions.py` — `IsCampaignOwner` + `IsAudienceOwner` object-level permissions
-  - `backend/apps/campaigns/validators.py` — `validate_campaign_status_transition`, `validate_email_format`
-  - `backend/apps/campaigns/utils.py` — `success_response` / `error_response` helpers
-  - `backend/apps/campaigns/serializers/campaign_serializer.py` — `CampaignSerializer`: status transition validation, survey ownership check, title strip/length
-  - `backend/apps/campaigns/serializers/audience_serializer.py` — `AudienceSerializer`: recipient_count computed field, duplicate name guard per owner
-  - `backend/apps/campaigns/serializers/recipient_serializer.py` — `RecipientSerializer`: email strip+lowercase
-  - `backend/apps/campaigns/serializers/__init__.py` — re-exports all three serializers
-  - `backend/apps/campaigns/views/campaign_views.py` — `CampaignViewSet`: owner-scoped queryset, standardized responses, pagination_class=None
-  - `backend/apps/campaigns/views/audience_views.py` — `AudienceViewSet`: owner-scoped queryset, standardized responses, pagination_class=None
-  - `backend/apps/campaigns/services/campaign_service.py` — CRUD + owner-scoped retrieval/listing functions
-  - `backend/apps/campaigns/services/audience_service.py` — CRUD + owner-scoped retrieval/listing functions
-  - `backend/apps/campaigns/services/recipient_service.py` — create, delete, list per audience
-  - `backend/apps/campaigns/urls.py` — DRF DefaultRouter: `campaigns/` + `audiences/` endpoints
-  - `backend/config/urls.py` — wired `apps.campaigns.urls` under `/api/v1/`
-  - `backend/apps/campaigns/migrations/0001_initial.py` — migration created and applied (`campaigns.0001_initial... OK`)
+- **Unit 19: Campaign and Distribution Layer** âœ… implemented & verified
+  - `backend/apps/campaigns/constants.py` â€” status constants + `VALID_TRANSITIONS` state machine map
+  - `backend/apps/campaigns/migrations/__init__.py` â€” migrations package created
+  - `backend/apps/campaigns/models/audience.py` â€” `Audience` model: owner FK, name, description, metadata, UniqueConstraint per owner, index on owner
+  - `backend/apps/campaigns/models/recipient.py` â€” `Recipient` model: audience FK (string ref), email, first_name, last_name, metadata, index on email
+  - `backend/apps/campaigns/models/campaign.py` â€” `Campaign` model: survey FK, owner FK, status (choices+default), M2M audiences (related_name=campaign_set), metadata, timestamps; 4 DB indexes
+  - `backend/apps/campaigns/models/__init__.py` â€” re-exports Campaign, Audience, Recipient
+  - `backend/apps/campaigns/permissions.py` â€” `IsCampaignOwner` + `IsAudienceOwner` object-level permissions
+  - `backend/apps/campaigns/validators.py` â€” `validate_campaign_status_transition`, `validate_email_format`
+  - `backend/apps/campaigns/utils.py` â€” `success_response` / `error_response` helpers
+  - `backend/apps/campaigns/serializers/campaign_serializer.py` â€” `CampaignSerializer`: status transition validation, survey ownership check, title strip/length
+  - `backend/apps/campaigns/serializers/audience_serializer.py` â€” `AudienceSerializer`: recipient_count computed field, duplicate name guard per owner
+  - `backend/apps/campaigns/serializers/recipient_serializer.py` â€” `RecipientSerializer`: email strip+lowercase
+  - `backend/apps/campaigns/serializers/__init__.py` â€” re-exports all three serializers
+  - `backend/apps/campaigns/views/campaign_views.py` â€” `CampaignViewSet`: owner-scoped queryset, standardized responses, pagination_class=None
+  - `backend/apps/campaigns/views/audience_views.py` â€” `AudienceViewSet`: owner-scoped queryset, standardized responses, pagination_class=None
+  - `backend/apps/campaigns/services/campaign_service.py` â€” CRUD + owner-scoped retrieval/listing functions
+  - `backend/apps/campaigns/services/audience_service.py` â€” CRUD + owner-scoped retrieval/listing functions
+  - `backend/apps/campaigns/services/recipient_service.py` â€” create, delete, list per audience
+  - `backend/apps/campaigns/urls.py` â€” DRF DefaultRouter: `campaigns/` + `audiences/` endpoints
+  - `backend/config/urls.py` â€” wired `apps.campaigns.urls` under `/api/v1/`
+  - `backend/apps/campaigns/migrations/0001_initial.py` â€” migration created and applied (`campaigns.0001_initial... OK`)
   - `django-admin check`: 0 issues; `python manage.py test`: 0 failures
 
-- **Unit 18: Conversational Survey Logic** ✅ implemented & verified
-  - `npm install zustand` — centralized state management
-  - `src/features/conversational-surveys/utils/progression-utils.ts` — pure fns: `isAutoAdvanceType`, `isLastQuestion`, `getNextIndex`, `calculateProgressPercentage`
-  - `src/features/conversational-surveys/utils/validation-utils.ts` — pure fns: `validateRequiredAnswer`, `validateRatingBounds`, `validateCheckboxMinimum`
-  - `src/features/conversational-surveys/utils/response-utils.ts` — pure fn: `buildConversationalPayload`
-  - `src/features/conversational-surveys/services/validation-service.ts` — `validateConversationalAnswer(question, value): string | null`
-  - `src/features/conversational-surveys/services/answer-normalizer.ts` — `normalizeConversationalAnswers` (strip, coerce, dedup)
-  - `src/features/conversational-surveys/state/index.ts` — `ConversationStateSnapshot` type (future autosave/draft restoration)
-  - `src/features/conversational-surveys/stores/conversation-store.ts` — Zustand store: full state + actions (initialize, advanceTo, recordAnswer, addCompletedQuestion, addMessage, setIsTyping, setValidationError, setPhase, reset)
-  - `src/features/conversational-surveys/hooks/use-conversation-state.ts` — read-only store state slice
-  - `src/features/conversational-surveys/hooks/use-question-sequence.ts` — progression predicates (checkIsAutoAdvance, checkIsLast, nextIndex)
-  - `src/features/conversational-surveys/hooks/use-conversation-validation.ts` — validate/clear interface backed by store
-  - `src/features/conversational-surveys/hooks/use-conversation-transitions.ts` — typing indicator + TYPING_DELAY_MS timing via scheduleTransition
-  - `src/features/conversational-surveys/hooks/use-conversation-progress.ts` — completedQuestions-based progress (answeredCount, displayNumber, percentage)
-  - `src/features/conversational-surveys/hooks/use-conversation-flow.ts` — refactored: composes all specialized hooks + Zustand store; stale-closure-safe via getState() in async callbacks; same public interface
-  - `src/features/conversational-surveys/components/progress-indicator.tsx` — updated to accept explicit displayNumber/total/percentage props
-  - `src/features/conversational-surveys/pages/conversational-survey-page.tsx` — updated: uses useConversationProgress instead of useQuestionNavigation
+- **Unit 18: Conversational Survey Logic** âœ… implemented & verified
+  - `npm install zustand` â€” centralized state management
+  - `src/features/conversational-surveys/utils/progression-utils.ts` â€” pure fns: `isAutoAdvanceType`, `isLastQuestion`, `getNextIndex`, `calculateProgressPercentage`
+  - `src/features/conversational-surveys/utils/validation-utils.ts` â€” pure fns: `validateRequiredAnswer`, `validateRatingBounds`, `validateCheckboxMinimum`
+  - `src/features/conversational-surveys/utils/response-utils.ts` â€” pure fn: `buildConversationalPayload`
+  - `src/features/conversational-surveys/services/validation-service.ts` â€” `validateConversationalAnswer(question, value): string | null`
+  - `src/features/conversational-surveys/services/answer-normalizer.ts` â€” `normalizeConversationalAnswers` (strip, coerce, dedup)
+  - `src/features/conversational-surveys/state/index.ts` â€” `ConversationStateSnapshot` type (future autosave/draft restoration)
+  - `src/features/conversational-surveys/stores/conversation-store.ts` â€” Zustand store: full state + actions (initialize, advanceTo, recordAnswer, addCompletedQuestion, addMessage, setIsTyping, setValidationError, setPhase, reset)
+  - `src/features/conversational-surveys/hooks/use-conversation-state.ts` â€” read-only store state slice
+  - `src/features/conversational-surveys/hooks/use-question-sequence.ts` â€” progression predicates (checkIsAutoAdvance, checkIsLast, nextIndex)
+  - `src/features/conversational-surveys/hooks/use-conversation-validation.ts` â€” validate/clear interface backed by store
+  - `src/features/conversational-surveys/hooks/use-conversation-transitions.ts` â€” typing indicator + TYPING_DELAY_MS timing via scheduleTransition
+  - `src/features/conversational-surveys/hooks/use-conversation-progress.ts` â€” completedQuestions-based progress (answeredCount, displayNumber, percentage)
+  - `src/features/conversational-surveys/hooks/use-conversation-flow.ts` â€” refactored: composes all specialized hooks + Zustand store; stale-closure-safe via getState() in async callbacks; same public interface
+  - `src/features/conversational-surveys/components/progress-indicator.tsx` â€” updated to accept explicit displayNumber/total/percentage props
+  - `src/features/conversational-surveys/pages/conversational-survey-page.tsx` â€” updated: uses useConversationProgress instead of useQuestionNavigation
   - `tsc -b --noEmit`: 0 errors
 
-- **Unit 17: Conversational Survey UI** ✅ implemented & verified
-  - `npm install framer-motion` — animation library
-  - `src/features/conversational-surveys/types/index.ts` — re-exports shared types + `ConversationPhase`, `QuestionMessage`, `AnswerMessage`, `ConversationMessage`, `ConversationFlowResult`
-  - `src/features/conversational-surveys/constants/index.ts` — `TYPING_DELAY_MS=800`, animation durations, rating defaults
-  - `src/features/conversational-surveys/utils/index.ts` — `buildQuestionMessage`, `buildAnswerMessage`, `formatAnswerDisplay`; re-exports `isAnswered`, `buildAnswerPayload`
-  - `src/features/conversational-surveys/services/conversational-survey-api.ts` — re-exports `getPublicSurvey` + `submitSurvey` (same Unit 16 endpoints)
-  - `src/features/conversational-surveys/hooks/use-conversation-flow.ts` — core orchestrator: phase state machine (active→submitting→complete/submission_error), message stream, typing delay, per-question validation
-  - `src/features/conversational-surveys/hooks/use-question-navigation.ts` — derives currentQuestion, displayNumber, percentage, isFirst/Last from index
-  - `src/features/conversational-surveys/hooks/use-conversation-animation.ts` — centralised framer-motion variants (question/answer/fade/completion) + transition config
-  - `src/features/conversational-surveys/hooks/use-conversational-submission.ts` — `useMutation` wrapper for conversational submission
-  - `src/features/conversational-surveys/components/conversation-container.tsx` — `h-dvh` full-viewport flex-column, max-w-2xl centered
-  - `src/features/conversational-surveys/components/conversation-header.tsx` — survey title + X exit link
-  - `src/features/conversational-surveys/components/progress-indicator.tsx` — "Question N of M" + progress bar (minimal, preserves immersion)
-  - `src/features/conversational-surveys/components/transition-wrapper.tsx` — framer-motion slide-in wrapper (left for questions, right for answers)
-  - `src/features/conversational-surveys/components/question-bubble.tsx` — left-aligned assistant bubble with avatar dot + `aria-live`
-  - `src/features/conversational-surveys/components/answer-bubble.tsx` — right-aligned primary-500 bubble
-  - `src/features/conversational-surveys/components/typing-indicator.tsx` — three bouncing dots with `AnimatePresence` fade in/out
-  - `src/features/conversational-surveys/components/message-stream.tsx` — scrollable log, auto-scrolls to bottom on new messages
-  - `src/features/conversational-surveys/components/conversational-input.tsx` — sticky footer dispatcher + animated validation error
-  - `src/features/conversational-surveys/components/completion-screen.tsx` — scale+fade completion card
-  - `src/features/conversational-surveys/question-components/conversational-short-text.tsx` — Input + Send button, Enter-to-submit, auto-focus
-  - `src/features/conversational-surveys/question-components/conversational-long-text.tsx` — Textarea + Send, Ctrl+Enter-to-submit
-  - `src/features/conversational-surveys/question-components/conversational-multiple-choice.tsx` — pill buttons, auto-advance on tap
-  - `src/features/conversational-surveys/question-components/conversational-checkbox.tsx` — toggle checkboxes + Continue button, Skip if empty
-  - `src/features/conversational-surveys/question-components/conversational-rating.tsx` — large numeric buttons, auto-advance on tap
-  - `src/features/conversational-surveys/pages/conversational-survey-page.tsx` — page entry + inner `ConversationalSurvey` component; reuses `usePublicSurvey`, `SurveyLoading`, `SurveyError`; submission_error retry UI
-  - `src/app/router/index.tsx` — added `/s/:surveyId/chat` route (before `/s/:surveyId` to match first)
+- **Unit 17: Conversational Survey UI** âœ… implemented & verified
+  - `npm install framer-motion` â€” animation library
+  - `src/features/conversational-surveys/types/index.ts` â€” re-exports shared types + `ConversationPhase`, `QuestionMessage`, `AnswerMessage`, `ConversationMessage`, `ConversationFlowResult`
+  - `src/features/conversational-surveys/constants/index.ts` â€” `TYPING_DELAY_MS=800`, animation durations, rating defaults
+  - `src/features/conversational-surveys/utils/index.ts` â€” `buildQuestionMessage`, `buildAnswerMessage`, `formatAnswerDisplay`; re-exports `isAnswered`, `buildAnswerPayload`
+  - `src/features/conversational-surveys/services/conversational-survey-api.ts` â€” re-exports `getPublicSurvey` + `submitSurvey` (same Unit 16 endpoints)
+  - `src/features/conversational-surveys/hooks/use-conversation-flow.ts` â€” core orchestrator: phase state machine (activeâ†’submittingâ†’complete/submission_error), message stream, typing delay, per-question validation
+  - `src/features/conversational-surveys/hooks/use-question-navigation.ts` â€” derives currentQuestion, displayNumber, percentage, isFirst/Last from index
+  - `src/features/conversational-surveys/hooks/use-conversation-animation.ts` â€” centralised framer-motion variants (question/answer/fade/completion) + transition config
+  - `src/features/conversational-surveys/hooks/use-conversational-submission.ts` â€” `useMutation` wrapper for conversational submission
+  - `src/features/conversational-surveys/components/conversation-container.tsx` â€” `h-dvh` full-viewport flex-column, max-w-2xl centered
+  - `src/features/conversational-surveys/components/conversation-header.tsx` â€” survey title + X exit link
+  - `src/features/conversational-surveys/components/progress-indicator.tsx` â€” "Question N of M" + progress bar (minimal, preserves immersion)
+  - `src/features/conversational-surveys/components/transition-wrapper.tsx` â€” framer-motion slide-in wrapper (left for questions, right for answers)
+  - `src/features/conversational-surveys/components/question-bubble.tsx` â€” left-aligned assistant bubble with avatar dot + `aria-live`
+  - `src/features/conversational-surveys/components/answer-bubble.tsx` â€” right-aligned primary-500 bubble
+  - `src/features/conversational-surveys/components/typing-indicator.tsx` â€” three bouncing dots with `AnimatePresence` fade in/out
+  - `src/features/conversational-surveys/components/message-stream.tsx` â€” scrollable log, auto-scrolls to bottom on new messages
+  - `src/features/conversational-surveys/components/conversational-input.tsx` â€” sticky footer dispatcher + animated validation error
+  - `src/features/conversational-surveys/components/completion-screen.tsx` â€” scale+fade completion card
+  - `src/features/conversational-surveys/question-components/conversational-short-text.tsx` â€” Input + Send button, Enter-to-submit, auto-focus
+  - `src/features/conversational-surveys/question-components/conversational-long-text.tsx` â€” Textarea + Send, Ctrl+Enter-to-submit
+  - `src/features/conversational-surveys/question-components/conversational-multiple-choice.tsx` â€” pill buttons, auto-advance on tap
+  - `src/features/conversational-surveys/question-components/conversational-checkbox.tsx` â€” toggle checkboxes + Continue button, Skip if empty
+  - `src/features/conversational-surveys/question-components/conversational-rating.tsx` â€” large numeric buttons, auto-advance on tap
+  - `src/features/conversational-surveys/pages/conversational-survey-page.tsx` â€” page entry + inner `ConversationalSurvey` component; reuses `usePublicSurvey`, `SurveyLoading`, `SurveyError`; submission_error retry UI
+  - `src/app/router/index.tsx` â€” added `/s/:surveyId/chat` route (before `/s/:surveyId` to match first)
   - `tsc -b --noEmit`: 0 errors
 
-- **Unit 16: Public Survey Functionality** ✅ implemented & verified
-  - `backend/apps/public_surveys/__init__.py` + `apps.py` — app scaffold
-  - `backend/apps/public_surveys/permissions.py` — `PublicSurveyPermission` (AllowAny, extensible for rate-limiting)
-  - `backend/apps/public_surveys/validators.py` — re-exports `validate_submission`; ready for rate-limit / CAPTCHA extensions
-  - `backend/apps/public_surveys/utils.py` — re-exports `success_response` / `error_response` helpers
-  - `backend/apps/public_surveys/serializers/public_survey_serializer.py` — `PublicQuestionSerializer` + `PublicSurveySerializer` (id, title, description, question_count, nested questions)
-  - `backend/apps/public_surveys/views/public_survey_views.py` — `PublicSurveyDetailView` (GET) + `PublicSurveySubmitView` (POST); AllowAny; published-only guard; delegates to existing submission service
-  - `backend/apps/public_surveys/urls.py` — `GET public/surveys/<pk>/` + `POST public/surveys/<pk>/submit/`
-  - `backend/apps/public_surveys/services/__init__.py` — empty; ready for future public-survey-specific services
-  - `backend/config/settings/base.py` — added `apps.public_surveys` to `LOCAL_APPS`
-  - `backend/config/urls.py` — wired `apps.public_surveys.urls` under `/api/v1/`
-  - `frontend/src/features/public-surveys/services/public-survey-api.ts` — updated URLs: `GET /public/surveys/${id}/` + `POST /public/surveys/${id}/submit/`; return type of `submitSurvey` updated to `{ response_id: number }`
-  - `frontend/src/features/public-surveys/hooks/use-survey-submission.ts` — updated `useMutation` TData generic to `{ response_id: number }` to match updated API service
+- **Unit 16: Public Survey Functionality** âœ… implemented & verified
+  - `backend/apps/public_surveys/__init__.py` + `apps.py` â€” app scaffold
+  - `backend/apps/public_surveys/permissions.py` â€” `PublicSurveyPermission` (AllowAny, extensible for rate-limiting)
+  - `backend/apps/public_surveys/validators.py` â€” re-exports `validate_submission`; ready for rate-limit / CAPTCHA extensions
+  - `backend/apps/public_surveys/utils.py` â€” re-exports `success_response` / `error_response` helpers
+  - `backend/apps/public_surveys/serializers/public_survey_serializer.py` â€” `PublicQuestionSerializer` + `PublicSurveySerializer` (id, title, description, question_count, nested questions)
+  - `backend/apps/public_surveys/views/public_survey_views.py` â€” `PublicSurveyDetailView` (GET) + `PublicSurveySubmitView` (POST); AllowAny; published-only guard; delegates to existing submission service
+  - `backend/apps/public_surveys/urls.py` â€” `GET public/surveys/<pk>/` + `POST public/surveys/<pk>/submit/`
+  - `backend/apps/public_surveys/services/__init__.py` â€” empty; ready for future public-survey-specific services
+  - `backend/config/settings/base.py` â€” added `apps.public_surveys` to `LOCAL_APPS`
+  - `backend/config/urls.py` â€” wired `apps.public_surveys.urls` under `/api/v1/`
+  - `frontend/src/features/public-surveys/services/public-survey-api.ts` â€” updated URLs: `GET /public/surveys/${id}/` + `POST /public/surveys/${id}/submit/`; return type of `submitSurvey` updated to `{ response_id: number }`
+  - `frontend/src/features/public-surveys/hooks/use-survey-submission.ts` â€” updated `useMutation` TData generic to `{ response_id: number }` to match updated API service
   - `django-admin check`: 0 issues; `tsc -b --noEmit`: 0 errors
 
-- **Unit 15: Public Survey Experience UI** ✅ implemented & verified
-  - `src/components/ui/progress.tsx` — Progress bar component (div-based, no Radix needed)
-  - `src/components/ui/radio-group.tsx` — RadioGroup + RadioGroupItem via `@radix-ui/react-radio-group`
-  - `src/components/ui/checkbox.tsx` — Checkbox via `@radix-ui/react-checkbox`
-  - `src/components/ui/alert.tsx` — Alert, AlertTitle, AlertDescription with default/destructive/success variants
-  - `src/features/public-surveys/types/index.ts` — PublicQuestion, PublicSurvey, AnswerValue, SurveyFormValues, SubmissionPayload, PublicSurveyErrorType
-  - `src/features/public-surveys/constants/index.ts` — QUESTION_TYPE_LABELS, rating defaults, SECONDS_PER_QUESTION
-  - `src/features/public-surveys/utils/index.ts` — buildAnswerPayload, estimateCompletionTime, isAnswered
-  - `src/features/public-surveys/services/public-survey-api.ts` — standalone publicClient (no auth injection); getPublicSurvey, submitSurvey
-  - `src/features/public-surveys/hooks/use-public-survey.ts` — usePublicSurvey (TanStack Query, retry:1, 5 min stale)
-  - `src/features/public-surveys/hooks/use-survey-submission.ts` — useSurveySubmission (useMutation)
-  - `src/features/public-surveys/hooks/use-survey-progress.ts` — useSurveyProgress (pure fn, answeredCount/totalCount/percentage)
-  - `src/features/public-surveys/components/survey-container.tsx` — centered max-w-2xl layout
-  - `src/features/public-surveys/components/survey-header.tsx` — title, description, clock estimate, question count
-  - `src/features/public-surveys/components/survey-progress.tsx` — "X of Y questions" + Progress bar
-  - `src/features/public-surveys/components/survey-footer.tsx` — minimal branding footer
-  - `src/features/public-surveys/components/completion-screen.tsx` — success icon, thank-you, Return Home
-  - `src/features/public-surveys/components/survey-loading.tsx` — skeleton placeholders mirroring final layout
-  - `src/features/public-surveys/components/survey-error.tsx` — error icon, message, Retry + Go Home actions
-  - `src/features/public-surveys/components/submit-button.tsx` — loading state + disabled during submission
-  - `src/features/public-surveys/components/question-renderer.tsx` — numbered card wrapper + type dispatcher
-  - `src/features/public-surveys/question-components/short-text-question.tsx` — Input with validation
-  - `src/features/public-surveys/question-components/long-text-question.tsx` — Textarea with validation
-  - `src/features/public-surveys/question-components/multiple-choice-question.tsx` — RadioGroup, full-row touch targets
-  - `src/features/public-surveys/question-components/checkbox-question.tsx` — multi-select array via watch/setValue
-  - `src/features/public-surveys/question-components/rating-question.tsx` — clickable numeric buttons (1–5 or 1–10)
-  - `src/features/public-surveys/pages/public-survey-page.tsx` — full page: FormProvider, validation, submission, completion
-  - `src/app/router/index.tsx` — added `/s/:surveyId` public route under PublicLayout (no auth guard)
-  - `package.json` — added `@radix-ui/react-radio-group`, `@radix-ui/react-checkbox`
+- **Unit 15: Public Survey Experience UI** âœ… implemented & verified
+  - `src/components/ui/progress.tsx` â€” Progress bar component (div-based, no Radix needed)
+  - `src/components/ui/radio-group.tsx` â€” RadioGroup + RadioGroupItem via `@radix-ui/react-radio-group`
+  - `src/components/ui/checkbox.tsx` â€” Checkbox via `@radix-ui/react-checkbox`
+  - `src/components/ui/alert.tsx` â€” Alert, AlertTitle, AlertDescription with default/destructive/success variants
+  - `src/features/public-surveys/types/index.ts` â€” PublicQuestion, PublicSurvey, AnswerValue, SurveyFormValues, SubmissionPayload, PublicSurveyErrorType
+  - `src/features/public-surveys/constants/index.ts` â€” QUESTION_TYPE_LABELS, rating defaults, SECONDS_PER_QUESTION
+  - `src/features/public-surveys/utils/index.ts` â€” buildAnswerPayload, estimateCompletionTime, isAnswered
+  - `src/features/public-surveys/services/public-survey-api.ts` â€” standalone publicClient (no auth injection); getPublicSurvey, submitSurvey
+  - `src/features/public-surveys/hooks/use-public-survey.ts` â€” usePublicSurvey (TanStack Query, retry:1, 5 min stale)
+  - `src/features/public-surveys/hooks/use-survey-submission.ts` â€” useSurveySubmission (useMutation)
+  - `src/features/public-surveys/hooks/use-survey-progress.ts` â€” useSurveyProgress (pure fn, answeredCount/totalCount/percentage)
+  - `src/features/public-surveys/components/survey-container.tsx` â€” centered max-w-2xl layout
+  - `src/features/public-surveys/components/survey-header.tsx` â€” title, description, clock estimate, question count
+  - `src/features/public-surveys/components/survey-progress.tsx` â€” "X of Y questions" + Progress bar
+  - `src/features/public-surveys/components/survey-footer.tsx` â€” minimal branding footer
+  - `src/features/public-surveys/components/completion-screen.tsx` â€” success icon, thank-you, Return Home
+  - `src/features/public-surveys/components/survey-loading.tsx` â€” skeleton placeholders mirroring final layout
+  - `src/features/public-surveys/components/survey-error.tsx` â€” error icon, message, Retry + Go Home actions
+  - `src/features/public-surveys/components/submit-button.tsx` â€” loading state + disabled during submission
+  - `src/features/public-surveys/components/question-renderer.tsx` â€” numbered card wrapper + type dispatcher
+  - `src/features/public-surveys/question-components/short-text-question.tsx` â€” Input with validation
+  - `src/features/public-surveys/question-components/long-text-question.tsx` â€” Textarea with validation
+  - `src/features/public-surveys/question-components/multiple-choice-question.tsx` â€” RadioGroup, full-row touch targets
+  - `src/features/public-surveys/question-components/checkbox-question.tsx` â€” multi-select array via watch/setValue
+  - `src/features/public-surveys/question-components/rating-question.tsx` â€” clickable numeric buttons (1â€“5 or 1â€“10)
+  - `src/features/public-surveys/pages/public-survey-page.tsx` â€” full page: FormProvider, validation, submission, completion
+  - `src/app/router/index.tsx` â€” added `/s/:surveyId` public route under PublicLayout (no auth guard)
+  - `package.json` â€” added `@radix-ui/react-radio-group`, `@radix-ui/react-checkbox`
 
 - **Unit 14: Survey Response Infrastructure**
-  - `backend/apps/responses/__init__.py` + `apps.py` + `constants.py` + `exceptions.py` + `permissions.py` + `utils.py` — full app scaffold
-  - `backend/apps/responses/models/response.py` — `Response` model: survey FK, optional respondent FK, JSONField metadata, submitted_at; indexes on survey + submitted_at
-  - `backend/apps/responses/models/answer.py` — `Answer` model: response FK, question FK, JSONField value, JSONField metadata; index on question
-  - `backend/apps/responses/serializers/submission_serializer.py` — `SubmissionSerializer` + `AnswerInputSerializer`; validates non-empty answers, max payload size, no duplicate question_ids
-  - `backend/apps/responses/serializers/response_serializer.py` — read-only `ResponseSerializer` with nested answers
-  - `backend/apps/responses/serializers/answer_serializer.py` — `AnswerSerializer` ModelSerializer
-  - `backend/apps/responses/services/validation_service.py` — `validate_submission`: question-survey membership, supported types, type-specific value checks (rating=numeric, checkbox=list), required-question enforcement
-  - `backend/apps/responses/services/answer_normalization_service.py` — `normalize_answers`: sanitizes text (strip), normalizes checkbox lists, coerces integer ratings from float
-  - `backend/apps/responses/services/submission_service.py` — `submit_survey_response`: validate → normalize → atomic `Response.create` + `Answer.bulk_create`; full rollback on any failure
-  - `backend/apps/responses/views/submission_views.py` — `SurveySubmitView` (APIView, AllowAny); resolves published survey, validates payload, links optional respondent via `request.clerk_user`
-  - `backend/apps/responses/urls.py` — `POST surveys/<int:survey_pk>/submit/`
-  - `backend/config/settings/base.py` — added `apps.responses` to `LOCAL_APPS`
-  - `backend/config/urls.py` — wired `apps.responses.urls` under `/api/v1/`
-  - `backend/apps/authentication/middleware.py` — added `OPTIONAL_AUTH_PATH_SUFFIXES = ["/submit/"]`; try-auth-don't-require block for anonymous + authenticated submissions
-  - `backend/apps/responses/migrations/0001_initial.py` — migration created and applied (`responses.0001_initial... OK`)
+  - `backend/apps/responses/__init__.py` + `apps.py` + `constants.py` + `exceptions.py` + `permissions.py` + `utils.py` â€” full app scaffold
+  - `backend/apps/responses/models/response.py` â€” `Response` model: survey FK, optional respondent FK, JSONField metadata, submitted_at; indexes on survey + submitted_at
+  - `backend/apps/responses/models/answer.py` â€” `Answer` model: response FK, question FK, JSONField value, JSONField metadata; index on question
+  - `backend/apps/responses/serializers/submission_serializer.py` â€” `SubmissionSerializer` + `AnswerInputSerializer`; validates non-empty answers, max payload size, no duplicate question_ids
+  - `backend/apps/responses/serializers/response_serializer.py` â€” read-only `ResponseSerializer` with nested answers
+  - `backend/apps/responses/serializers/answer_serializer.py` â€” `AnswerSerializer` ModelSerializer
+  - `backend/apps/responses/services/validation_service.py` â€” `validate_submission`: question-survey membership, supported types, type-specific value checks (rating=numeric, checkbox=list), required-question enforcement
+  - `backend/apps/responses/services/answer_normalization_service.py` â€” `normalize_answers`: sanitizes text (strip), normalizes checkbox lists, coerces integer ratings from float
+  - `backend/apps/responses/services/submission_service.py` â€” `submit_survey_response`: validate â†’ normalize â†’ atomic `Response.create` + `Answer.bulk_create`; full rollback on any failure
+  - `backend/apps/responses/views/submission_views.py` â€” `SurveySubmitView` (APIView, AllowAny); resolves published survey, validates payload, links optional respondent via `request.clerk_user`
+  - `backend/apps/responses/urls.py` â€” `POST surveys/<int:survey_pk>/submit/`
+  - `backend/config/settings/base.py` â€” added `apps.responses` to `LOCAL_APPS`
+  - `backend/config/urls.py` â€” wired `apps.responses.urls` under `/api/v1/`
+  - `backend/apps/authentication/middleware.py` â€” added `OPTIONAL_AUTH_PATH_SUFFIXES = ["/submit/"]`; try-auth-don't-require block for anonymous + authenticated submissions
+  - `backend/apps/responses/migrations/0001_initial.py` â€” migration created and applied (`responses.0001_initial... OK`)
 
 - **Unit 11: Survey Management Functionality**
-  - `src/features/surveys/types/index.ts` — Added `SurveyMetadata` and `QuestionMetadata` named types; updated `Question.metadata` to `QuestionMetadata`
-  - `src/features/surveys/services/survey-api.ts` — Added `reorderQuestions(orderedIds)` API method (batch PATCH for stable ordering)
-  - `src/features/surveys/utils/normalize.ts` — New file: `normalizeQuestion`, `normalizeSurvey`, `normalizeQuestionMetadata`, `normalizeSurveyMetadata` utilities
-  - `src/features/surveys/hooks/use-questions.ts` — Full optimistic updates for `useCreateQuestion`, `useUpdateQuestion`, `useDeleteQuestion`; new `useReorderQuestions` hook with optimistic cache reorder + rollback
-  - `src/features/surveys/hooks/use-surveys.ts` — Optimistic updates for `useUpdateSurvey` (immediate cache update for `["survey", id]` and `["surveys"]` with rollback on error)
-  - `src/features/surveys/components/survey-editor.tsx` — Uses `useReorderQuestions` for move-up/move-down; exposes `onSaveStateChange` prop to report mutation state to parent
-  - `src/features/surveys/pages/survey-editor-page.tsx` — `SaveIndicator` component in top bar showing "Saving…" / "Saved" / "Error saving" driven by combined survey + question mutation state
+  - `src/features/surveys/types/index.ts` â€” Added `SurveyMetadata` and `QuestionMetadata` named types; updated `Question.metadata` to `QuestionMetadata`
+  - `src/features/surveys/services/survey-api.ts` â€” Added `reorderQuestions(orderedIds)` API method (batch PATCH for stable ordering)
+  - `src/features/surveys/utils/normalize.ts` â€” New file: `normalizeQuestion`, `normalizeSurvey`, `normalizeQuestionMetadata`, `normalizeSurveyMetadata` utilities
+  - `src/features/surveys/hooks/use-questions.ts` â€” Full optimistic updates for `useCreateQuestion`, `useUpdateQuestion`, `useDeleteQuestion`; new `useReorderQuestions` hook with optimistic cache reorder + rollback
+  - `src/features/surveys/hooks/use-surveys.ts` â€” Optimistic updates for `useUpdateSurvey` (immediate cache update for `["survey", id]` and `["surveys"]` with rollback on error)
+  - `src/features/surveys/components/survey-editor.tsx` â€” Uses `useReorderQuestions` for move-up/move-down; exposes `onSaveStateChange` prop to report mutation state to parent
+  - `src/features/surveys/pages/survey-editor-page.tsx` â€” `SaveIndicator` component in top bar showing "Savingâ€¦" / "Saved" / "Error saving" driven by combined survey + question mutation state
 
 - **Unit 10: Survey Management UI**
-  - `src/components/ui/badge.tsx` — Badge component with success/warning/muted/outline variants
-  - `src/components/ui/skeleton.tsx` — Skeleton loading component
-  - `src/components/ui/textarea.tsx` — Textarea form input
-  - `src/components/ui/select.tsx` — Radix-based Select component (installed @radix-ui/react-select)
-  - `src/features/surveys/types/index.ts` — Survey, Question, payload types + SurveyStatus/QuestionType enums
-  - `src/lib/api/endpoints.ts` — Added surveys and questions endpoint registry
-  - `src/features/surveys/services/survey-api.ts` — Full CRUD service: getSurveys, getSurveyById, createSurvey, updateSurvey, deleteSurvey, getQuestions, createQuestion, updateQuestion, deleteQuestion
-  - `src/features/surveys/hooks/use-surveys.ts` — useSurveys, useCreateSurvey, useUpdateSurvey, useDeleteSurvey with TanStack Query + toast notifications
-  - `src/features/surveys/hooks/use-survey.ts` — useSurvey (single survey by id)
-  - `src/features/surveys/hooks/use-questions.ts` — useQuestions, useCreateQuestion, useUpdateQuestion, useDeleteQuestion
-  - `src/features/surveys/components/survey-status-badge.tsx` — Status badge (Draft/Published/Archived)
-  - `src/features/surveys/components/empty-state.tsx` — Reusable empty state with optional CTA
-  - `src/features/surveys/components/survey-card.tsx` — Survey card with dropdown actions (edit, view, publish, delete)
-  - `src/features/surveys/components/survey-list.tsx` — Responsive grid with skeleton loading + empty state
-  - `src/features/surveys/components/survey-header.tsx` — Page header with back button, status badge, and action slots
-  - `src/features/surveys/components/survey-form.tsx` — react-hook-form + zod validated create/edit form
-  - `src/features/surveys/components/question-card.tsx` — Question card with ordering controls, type/required badges, edit/delete
-  - `src/features/surveys/components/question-editor.tsx` — Question create/edit form with type Select, required toggle
-  - `src/features/surveys/components/question-toolbar.tsx` — Add question toolbar strip
-  - `src/features/surveys/components/survey-editor.tsx` — Full editor with add/edit/delete/reorder via dialogs + TanStack Query
-  - `src/features/surveys/pages/survey-list-page.tsx` — /surveys route: survey grid, create button, delete + publish actions
-  - `src/features/surveys/pages/survey-create-page.tsx` — /surveys/create: creation form, redirects to editor on success
-  - `src/features/surveys/pages/survey-detail-page.tsx` — /surveys/:surveyId: overview card, question summary card, management actions
-  - `src/features/surveys/pages/survey-editor-page.tsx` — /surveys/:surveyId/edit: two-column layout (editor + info sidebar)
-  - `src/app/router/index.tsx` — Added /surveys/create, /surveys/:surveyId, /surveys/:surveyId/edit routes
+  - `src/components/ui/badge.tsx` â€” Badge component with success/warning/muted/outline variants
+  - `src/components/ui/skeleton.tsx` â€” Skeleton loading component
+  - `src/components/ui/textarea.tsx` â€” Textarea form input
+  - `src/components/ui/select.tsx` â€” Radix-based Select component (installed @radix-ui/react-select)
+  - `src/features/surveys/types/index.ts` â€” Survey, Question, payload types + SurveyStatus/QuestionType enums
+  - `src/lib/api/endpoints.ts` â€” Added surveys and questions endpoint registry
+  - `src/features/surveys/services/survey-api.ts` â€” Full CRUD service: getSurveys, getSurveyById, createSurvey, updateSurvey, deleteSurvey, getQuestions, createQuestion, updateQuestion, deleteQuestion
+  - `src/features/surveys/hooks/use-surveys.ts` â€” useSurveys, useCreateSurvey, useUpdateSurvey, useDeleteSurvey with TanStack Query + toast notifications
+  - `src/features/surveys/hooks/use-survey.ts` â€” useSurvey (single survey by id)
+  - `src/features/surveys/hooks/use-questions.ts` â€” useQuestions, useCreateQuestion, useUpdateQuestion, useDeleteQuestion
+  - `src/features/surveys/components/survey-status-badge.tsx` â€” Status badge (Draft/Published/Archived)
+  - `src/features/surveys/components/empty-state.tsx` â€” Reusable empty state with optional CTA
+  - `src/features/surveys/components/survey-card.tsx` â€” Survey card with dropdown actions (edit, view, publish, delete)
+  - `src/features/surveys/components/survey-list.tsx` â€” Responsive grid with skeleton loading + empty state
+  - `src/features/surveys/components/survey-header.tsx` â€” Page header with back button, status badge, and action slots
+  - `src/features/surveys/components/survey-form.tsx` â€” react-hook-form + zod validated create/edit form
+  - `src/features/surveys/components/question-card.tsx` â€” Question card with ordering controls, type/required badges, edit/delete
+  - `src/features/surveys/components/question-editor.tsx` â€” Question create/edit form with type Select, required toggle
+  - `src/features/surveys/components/question-toolbar.tsx` â€” Add question toolbar strip
+  - `src/features/surveys/components/survey-editor.tsx` â€” Full editor with add/edit/delete/reorder via dialogs + TanStack Query
+  - `src/features/surveys/pages/survey-list-page.tsx` â€” /surveys route: survey grid, create button, delete + publish actions
+  - `src/features/surveys/pages/survey-create-page.tsx` â€” /surveys/create: creation form, redirects to editor on success
+  - `src/features/surveys/pages/survey-detail-page.tsx` â€” /surveys/:surveyId: overview card, question summary card, management actions
+  - `src/features/surveys/pages/survey-editor-page.tsx` â€” /surveys/:surveyId/edit: two-column layout (editor + info sidebar)
+  - `src/app/router/index.tsx` â€” Added /surveys/create, /surveys/:surveyId, /surveys/:surveyId/edit routes
 - **Unit 9: Landing Page (Marketing Website)**
-  - `src/features/marketing/components/mobile-nav.tsx` — Sheet-based mobile menu with nav links and auth CTAs
-  - `src/features/marketing/components/navbar.tsx` — sticky responsive navbar with logo, nav links, theme toggle, login, Get Started
-  - `src/features/marketing/components/hero-section.tsx` — hero with gradient headline, dual CTAs, hero image, floating stat cards
-  - `src/features/marketing/components/feature-section.tsx` — 4 feature cards (distribution, analytics, intelligence, automation) in 2-col grid
-  - `src/features/marketing/components/workflow-section.tsx` — 5-step workflow (Create → Launch → Track → Analyze → Insights), desktop horizontal + mobile vertical
-  - `src/features/marketing/components/analytics-section.tsx` — AI intelligence section with 4 capabilities, mock metrics grid, mock bar chart
-  - `src/features/marketing/components/cta-section.tsx` — reusable CTA component with mid-page and final variants
-  - `src/features/marketing/components/footer.tsx` — structured footer with branding, nav, legal, social links
-  - `src/features/marketing/pages/landing-page.tsx` — full-page assembly with Navbar, Hero, Features, Workflow, Analytics, CTAs, Footer
-  - `src/app/router/index.tsx` — updated landing page import to `@/features/marketing/pages/landing-page`
+  - `src/features/marketing/components/mobile-nav.tsx` â€” Sheet-based mobile menu with nav links and auth CTAs
+  - `src/features/marketing/components/navbar.tsx` â€” sticky responsive navbar with logo, nav links, theme toggle, login, Get Started
+  - `src/features/marketing/components/hero-section.tsx` â€” hero with gradient headline, dual CTAs, hero image, floating stat cards
+  - `src/features/marketing/components/feature-section.tsx` â€” 4 feature cards (distribution, analytics, intelligence, automation) in 2-col grid
+  - `src/features/marketing/components/workflow-section.tsx` â€” 5-step workflow (Create â†’ Launch â†’ Track â†’ Analyze â†’ Insights), desktop horizontal + mobile vertical
+  - `src/features/marketing/components/analytics-section.tsx` â€” AI intelligence section with 4 capabilities, mock metrics grid, mock bar chart
+  - `src/features/marketing/components/cta-section.tsx` â€” reusable CTA component with mid-page and final variants
+  - `src/features/marketing/components/footer.tsx` â€” structured footer with branding, nav, legal, social links
+  - `src/features/marketing/pages/landing-page.tsx` â€” full-page assembly with Navbar, Hero, Features, Workflow, Analytics, CTAs, Footer
+  - `src/app/router/index.tsx` â€” updated landing page import to `@/features/marketing/pages/landing-page`
 
 - **Unit 8: Survey Data Architecture**
-  - `backend/apps/surveys/models/survey.py` — `Survey` model with owner FK, title, description, status (draft/published/archived), is_public, timestamps, DB indexes
-  - `backend/apps/surveys/models/question.py` — `Question` model with survey FK, question_text, question_type (5 types), is_required, order, JSONField metadata
-  - `backend/apps/surveys/serializers/survey_serializer.py` — validates title, status; nested read-only questions
-  - `backend/apps/surveys/serializers/question_serializer.py` — validates type, text, order
-  - `backend/apps/surveys/permissions.py` — `IsSurveyOwner` custom permission
-  - `backend/apps/surveys/views/survey_views.py` — `SurveyViewSet` (ModelViewSet, owner-scoped queryset, standardized responses)
-  - `backend/apps/surveys/views/question_views.py` — `QuestionViewSet` (PATCH, DELETE flat + POST nested via survey_pk)
-  - `backend/apps/surveys/services.py` — survey + question CRUD service functions
-  - `backend/apps/surveys/utils.py` — `success_response` / `error_response` helpers
-  - `backend/apps/surveys/urls.py` — DRF router: `surveys/`, `questions/`, + `surveys/<id>/questions/`
-  - `backend/config/urls.py` — surveys URLs registered under `/api/v1/`
+  - `backend/apps/surveys/models/survey.py` â€” `Survey` model with owner FK, title, description, status (draft/published/archived), is_public, timestamps, DB indexes
+  - `backend/apps/surveys/models/question.py` â€” `Question` model with survey FK, question_text, question_type (5 types), is_required, order, JSONField metadata
+  - `backend/apps/surveys/serializers/survey_serializer.py` â€” validates title, status; nested read-only questions
+  - `backend/apps/surveys/serializers/question_serializer.py` â€” validates type, text, order
+  - `backend/apps/surveys/permissions.py` â€” `IsSurveyOwner` custom permission
+  - `backend/apps/surveys/views/survey_views.py` â€” `SurveyViewSet` (ModelViewSet, owner-scoped queryset, standardized responses)
+  - `backend/apps/surveys/views/question_views.py` â€” `QuestionViewSet` (PATCH, DELETE flat + POST nested via survey_pk)
+  - `backend/apps/surveys/services.py` â€” survey + question CRUD service functions
+  - `backend/apps/surveys/utils.py` â€” `success_response` / `error_response` helpers
+  - `backend/apps/surveys/urls.py` â€” DRF router: `surveys/`, `questions/`, + `surveys/<id>/questions/`
+  - `backend/config/urls.py` â€” surveys URLs registered under `/api/v1/`
   - Migration `0001_initial.py` created and applied
 
 - **Unit 7: Dashboard UI**
-  - `src/routes/route-config.ts` — centralized route metadata (label, path, icon) for all dashboard modules
-  - `src/components/layout/sidebar-item.tsx` — reusable nav item with active/hover states and left-accent border
-  - `src/components/layout/sidebar.tsx` — updated with `logo-bg.png` branding, main nav + settings footer section
-  - `src/components/layout/user-nav.tsx` — Clerk `<UserButton />` wrapper for authenticated user controls
-  - `src/components/layout/mobile-sidebar.tsx` — Sheet-based responsive drawer, auto-closes on route change
-  - `src/components/layout/dashboard-header.tsx` — header with mobile toggle, page title, search/bell placeholders, theme toggle, user nav
-  - `src/components/layout/page-container.tsx` — standardized page wrapper (max-w-7xl, responsive padding)
-  - `src/app/layouts/dashboard-layout.tsx` — updated: desktop sidebar hidden on mobile, uses `DashboardHeader`
+  - `src/routes/route-config.ts` â€” centralized route metadata (label, path, icon) for all dashboard modules
+  - `src/components/layout/sidebar-item.tsx` â€” reusable nav item with active/hover states and left-accent border
+  - `src/components/layout/sidebar.tsx` â€” updated with `logo-bg.png` branding, main nav + settings footer section
+  - `src/components/layout/user-nav.tsx` â€” Clerk `<UserButton />` wrapper for authenticated user controls
+  - `src/components/layout/mobile-sidebar.tsx` â€” Sheet-based responsive drawer, auto-closes on route change
+  - `src/components/layout/dashboard-header.tsx` â€” header with mobile toggle, page title, search/bell placeholders, theme toggle, user nav
+  - `src/components/layout/page-container.tsx` â€” standardized page wrapper (max-w-7xl, responsive padding)
+  - `src/app/layouts/dashboard-layout.tsx` â€” updated: desktop sidebar hidden on mobile, uses `DashboardHeader`
 
-- **Unit 6 (revised): Authentication — Local JWT (replaces Clerk)**
+- **Unit 6 (revised): Authentication â€” Local JWT (replaces Clerk)**
   - Clerk removed entirely: `@clerk/react` uninstalled, `src/lib/clerk-appearance.ts` deleted, `CLERK_JWKS_URL` no longer needed
-  - `backend/apps/authentication/models.py` — `AppUser` updated: removed `clerk_user_id`, added `password` (PBKDF2 hash) + `is_active`; `set_password`/`check_password` helpers; `is_authenticated` property
-  - `backend/apps/authentication/migrations/0002_update_appuser_local_auth.py` — removes `clerk_user_id`, adds `password` + `is_active`
-  - `backend/apps/authentication/authentication.py` — `JWTAuthentication` (DRF `BaseAuthentication`); validates HS256 tokens with `SECRET_KEY`
-  - `backend/apps/authentication/middleware.py` — `ClerkAuthMiddleware` removed; file is now a no-op comment
-  - `backend/apps/authentication/permissions.py` — `IsAuthenticated` replaces `IsClerkAuthenticated`
-  - `backend/apps/authentication/views.py` — `RegisterView`, `LoginView`, `TokenRefreshView`, `MeView`
-  - `backend/apps/authentication/serializers.py` — `RegisterSerializer`, `LoginSerializer`
-  - `backend/apps/authentication/urls.py` — `auth/register/`, `auth/login/`, `auth/token/refresh/`, `auth/me/`
-  - `backend/config/urls.py` — auth URLs registered under `/api/v1/`
-  - `backend/config/settings/base.py` — `ClerkAuthMiddleware` removed from `MIDDLEWARE`; DRF uses `JWTAuthentication` + `IsAuthenticated`
-  - `backend/requirements/base.txt` — `cryptography` removed (no longer needed)
-  - `backend/apps/surveys/views/survey_views.py` + `question_views.py` — swapped to `IsAuthenticated`
-  - `src/features/auth/context/auth-context.tsx` — `AuthProvider` + `useAuth()` hook; tokens in `localStorage`
-  - `src/features/auth/services/auth-api.ts` — `loginApi`, `registerApi`, `refreshTokenApi`
-  - `src/main.tsx` — `<AuthProvider>` replaces `<ClerkProvider>`
-  - `src/routes/protected-route.tsx` — uses custom `useAuth()`
-  - `src/app/providers/auth-token-provider.tsx` — reads access token from `localStorage` into axios interceptor
-  - `src/features/auth/layouts/authentication-layout.tsx` — uses custom `useAuth()`
-  - `src/features/auth/pages/login-page.tsx` — custom form (react-hook-form + zod)
-  - `src/features/auth/pages/register-page.tsx` — custom form with confirm-password
-  - `src/components/layout/user-nav.tsx` — user initials avatar + dropdown (profile, sign out)
-  - `src/components/layout/navigation.tsx` — auth-aware navbar using `useAuth()` (no Clerk `<Show>`)
+  - `backend/apps/authentication/models.py` â€” `AppUser` updated: removed `clerk_user_id`, added `password` (PBKDF2 hash) + `is_active`; `set_password`/`check_password` helpers; `is_authenticated` property
+  - `backend/apps/authentication/migrations/0002_update_appuser_local_auth.py` â€” removes `clerk_user_id`, adds `password` + `is_active`
+  - `backend/apps/authentication/authentication.py` â€” `JWTAuthentication` (DRF `BaseAuthentication`); validates HS256 tokens with `SECRET_KEY`
+  - `backend/apps/authentication/middleware.py` â€” `ClerkAuthMiddleware` removed; file is now a no-op comment
+  - `backend/apps/authentication/permissions.py` â€” `IsAuthenticated` replaces `IsClerkAuthenticated`
+  - `backend/apps/authentication/views.py` â€” `RegisterView`, `LoginView`, `TokenRefreshView`, `MeView`
+  - `backend/apps/authentication/serializers.py` â€” `RegisterSerializer`, `LoginSerializer`
+  - `backend/apps/authentication/urls.py` â€” `auth/register/`, `auth/login/`, `auth/token/refresh/`, `auth/me/`
+  - `backend/config/urls.py` â€” auth URLs registered under `/api/v1/`
+  - `backend/config/settings/base.py` â€” `ClerkAuthMiddleware` removed from `MIDDLEWARE`; DRF uses `JWTAuthentication` + `IsAuthenticated`
+  - `backend/requirements/base.txt` â€” `cryptography` removed (no longer needed)
+  - `backend/apps/surveys/views/survey_views.py` + `question_views.py` â€” swapped to `IsAuthenticated`
+  - `src/features/auth/context/auth-context.tsx` â€” `AuthProvider` + `useAuth()` hook; tokens in `localStorage`
+  - `src/features/auth/services/auth-api.ts` â€” `loginApi`, `registerApi`, `refreshTokenApi`
+  - `src/main.tsx` â€” `<AuthProvider>` replaces `<ClerkProvider>`
+  - `src/routes/protected-route.tsx` â€” uses custom `useAuth()`
+  - `src/app/providers/auth-token-provider.tsx` â€” reads access token from `localStorage` into axios interceptor
+  - `src/features/auth/layouts/authentication-layout.tsx` â€” uses custom `useAuth()`
+  - `src/features/auth/pages/login-page.tsx` â€” custom form (react-hook-form + zod)
+  - `src/features/auth/pages/register-page.tsx` â€” custom form with confirm-password
+  - `src/components/layout/user-nav.tsx` â€” user initials avatar + dropdown (profile, sign out)
+  - `src/components/layout/navigation.tsx` â€” auth-aware navbar using `useAuth()` (no Clerk `<Show>`)
 
 - **Unit 5: Authentication UI**
   - `react-hook-form`, `zod`, `@hookform/resolvers` installed
-  - `src/components/ui/label.tsx` — Radix Label primitive
-  - `src/features/auth/layouts/authentication-layout.tsx` — split-screen layout (branding left, form right)
-  - `src/features/auth/components/` — auth-card, auth-header, auth-footer, password-input, login-form, signup-form
-  - `src/features/auth/pages/login-page.tsx` — Login/Sign Up tab switcher + LoginForm
-  - `src/features/auth/pages/register-page.tsx` — Login/Sign Up tab switcher + SignupForm
-  - `src/app/router/index.tsx` — `/login` + `/register` under `AuthenticationLayout`
-  - `src/components/layout/navigation.tsx` — session-aware nav (guest: Login+SignUp / auth: Dashboard+avatar)
-  - `src/components/layout/header.tsx` — uses Navigation component
+  - `src/components/ui/label.tsx` â€” Radix Label primitive
+  - `src/features/auth/layouts/authentication-layout.tsx` â€” split-screen layout (branding left, form right)
+  - `src/features/auth/components/` â€” auth-card, auth-header, auth-footer, password-input, login-form, signup-form
+  - `src/features/auth/pages/login-page.tsx` â€” Login/Sign Up tab switcher + LoginForm
+  - `src/features/auth/pages/register-page.tsx` â€” Login/Sign Up tab switcher + SignupForm
+  - `src/app/router/index.tsx` â€” `/login` + `/register` under `AuthenticationLayout`
+  - `src/components/layout/navigation.tsx` â€” session-aware nav (guest: Login+SignUp / auth: Dashboard+avatar)
+  - `src/components/layout/header.tsx` â€” uses Navigation component
 
-- **Unit 3: Frontend ↔ Backend Integration**
+- **Unit 3: Frontend â†” Backend Integration**
   - `axios` + `@tanstack/react-query` installed
   - `.env`, `.env.development`, `.env.production` created with `VITE_API_BASE_URL`
-  - `src/lib/env/index.ts` — centralized environment access
-  - `src/lib/api/config.ts` — base URL + timeout from env
-  - `src/lib/api/client.ts` — Axios instance with 10s timeout + JSON headers
-  - `src/lib/api/interceptors.ts` — response error normalization (401, 403, 5xx, network)
-  - `src/lib/api/endpoints.ts` — endpoint registry (`/health/`, `/auth/*`)
-  - `src/lib/api/types.ts` — `ApiResponse<T>` and `ApiError` types
-  - `src/lib/api/utils.ts` — `getRequest`, `postRequest`, `patchRequest`, `deleteRequest`
-  - `src/app/providers/query-provider.tsx` — `QueryClient` (retry:1, no window-focus refetch)
-  - `src/services/health/index.ts` — `getHealthStatus()` service
-  - `src/hooks/api/use-health-check.ts` — `useHealthCheck()` React Query hook
+  - `src/lib/env/index.ts` â€” centralized environment access
+  - `src/lib/api/config.ts` â€” base URL + timeout from env
+  - `src/lib/api/client.ts` â€” Axios instance with 10s timeout + JSON headers
+  - `src/lib/api/interceptors.ts` â€” response error normalization (401, 403, 5xx, network)
+  - `src/lib/api/endpoints.ts` â€” endpoint registry (`/health/`, `/auth/*`)
+  - `src/lib/api/types.ts` â€” `ApiResponse<T>` and `ApiError` types
+  - `src/lib/api/utils.ts` â€” `getRequest`, `postRequest`, `patchRequest`, `deleteRequest`
+  - `src/app/providers/query-provider.tsx` â€” `QueryClient` (retry:1, no window-focus refetch)
+  - `src/services/health/index.ts` â€” `getHealthStatus()` service
+  - `src/hooks/api/use-health-check.ts` â€” `useHealthCheck()` React Query hook
   - `src/App.tsx` updated: `QueryProvider` wraps the app
-  - `src/features/dashboard/pages/dashboard-page.tsx` — shows live API connection status
+  - `src/features/dashboard/pages/dashboard-page.tsx` â€” shows live API connection status
   - Production build passes (0 TS errors, 440 kB bundle)
 
 - **Unit 2: Backend API Foundation**
@@ -597,19 +670,21 @@ Update this file after every meaningful implementation change.
 
 ## In Progress
 
-- **Unit 31: Gemini AI Infrastructure** — in progress
-  - Implement Gemini API integration, AI abstraction gateway, prompt builder, response parser, execution manager, retry handler, AI logger, async Trigger.dev AI workflows, AIJob/AIExecution/AIPromptTemplate/AIUsageRecord models, Pydantic output schemas, and AI configuration per `context/feature-specs/31-Gemini-AI-Infrastructure.md`.
+- **Unit 35: PDF Report Frontend (35-PDF-Report-A)** — in progress
+  - Implementing full frontend reporting system: PDF export UI, report templates, layouts, configuration, preview, and export workflows per `context/feature-specs/35-PDF-Report-A.md`.
+  - Feature directory: `frontend/src/features/reports/`
+  - Route: `/dashboard/reports`
 
-- **Unit 26: Campaign Scheduling and Automation** — in progress
+- **Unit 26: Campaign Scheduling and Automation** â€” in progress
   - Implement scheduled campaign execution, cancellation, reminder eligibility, reminder workflows, and automation logging per `context/feature-specs/26-Campaign-Scheduling-and-Automation.md`.
 
-- **Unit 27: Engagement Tracking System** — in progress
+- **Unit 27: Engagement Tracking System** â€” in progress
   - Implement email open tracking, link click tracking, survey response tracking, response sessions, drop-off detection, attribution, and raw engagement analytics per `context/feature-specs/27-Engagement-Tracking-System.md`.
   - Added backend engagement app scaffold with tracking tokens, raw events, email opens, link clicks, response sessions, drop-off events, services, tracking endpoints, campaign analytics endpoint, and initial migration.
   - Wired campaign email rendering to generate per-recipient tracking tokens, tracked survey links, and email open pixels.
   - Wired public survey UI to record survey start, question answered, and completion events with session IDs.
   - Added engagement throttling settings and backend/frontend URL env documentation for safe tracking redirects and email pixel URLs.
-  - Verification: `npm.cmd run build` passes; `.env\Scripts\python.exe manage.py check` passes; `.env\Scripts\python.exe manage.py makemigrations engagement --check --dry-run` reports no engagement changes. Full migration dry-run still reports pre-existing migration drift in automation, campaigns, and email_campaigns.
+  - Verification: `npm.cmd run build` passes; `.\venv\Scripts\python.exe manage.py check` passes; `.\venv\Scripts\python.exe manage.py makemigrations engagement --check --dry-run` reports no engagement changes. Full migration dry-run still reports pre-existing migration drift in automation, campaigns, and email_campaigns.
 
 ## Next Up
 
@@ -621,12 +696,12 @@ Update this file after every meaningful implementation change.
 
 ## Architecture Decisions
 
-- **Auth**: Switched from Clerk to self-contained JWT auth (PyJWT HS256) — no external service, works everywhere without environment keys at startup
-- Tailwind v4 (not v3) — uses `@tailwindcss/vite` plugin; CSS-based config in `src/index.css` via `@theme {}` block
-- Tailwind animate plugin loaded via `@plugin "tailwindcss-animate"` (not `@import`) — required for Tailwind v4
-- shadcn/ui CLI (v4.6.0) on Windows puts files in literal `@/` directory — all components written manually with Radix UI imports
-- shadcn "base-nova" style uses React Aria primitives (not installed) — used standard "default" style with Radix UI instead
-- TypeScript 6 deprecated `baseUrl` — removed from tsconfig; paths use `./src/*` relative to tsconfig
+- **Auth**: Switched from Clerk to self-contained JWT auth (PyJWT HS256) â€” no external service, works everywhere without environment keys at startup
+- Tailwind v4 (not v3) â€” uses `@tailwindcss/vite` plugin; CSS-based config in `src/index.css` via `@theme {}` block
+- Tailwind animate plugin loaded via `@plugin "tailwindcss-animate"` (not `@import`) â€” required for Tailwind v4
+- shadcn/ui CLI (v4.6.0) on Windows puts files in literal `@/` directory â€” all components written manually with Radix UI imports
+- shadcn "base-nova" style uses React Aria primitives (not installed) â€” used standard "default" style with Radix UI instead
+- TypeScript 6 deprecated `baseUrl` â€” removed from tsconfig; paths use `./src/*` relative to tsconfig
 - react-router-dom v7 (createBrowserRouter API)
 - next-themes for dark/light mode
 
@@ -635,4 +710,4 @@ Update this file after every meaningful implementation change.
 - Unit 1 complete. Frontend shell running at `localhost:5173` with full design system, routing, and dashboard layout.
 - Unit 5 complete. Authentication UI implemented with split-screen layout, react-hook-form + zod validation, session-aware navigation.
 - Unit 9 complete. Landing page (marketing website) with full section layout, scroll animations, and responsive design.
-- Unit 15 complete and verified. Public survey experience fully functional end-to-end. Two bugs fixed during verification: (1) survey list empty due to DRF LimitOffsetPagination wrapping list response — fixed with `pagination_class = None` on SurveyViewSet; (2) radio button indicator invisible due to lucide Circle SVG fill — fixed with plain `<span>` dot + `data-[state=checked]:border-primary-500`. Branch: `feat/survey-experience-ui`.
+- Unit 15 complete and verified. Public survey experience fully functional end-to-end. Two bugs fixed during verification: (1) survey list empty due to DRF LimitOffsetPagination wrapping list response â€” fixed with `pagination_class = None` on SurveyViewSet; (2) radio button indicator invisible due to lucide Circle SVG fill â€” fixed with plain `<span>` dot + `data-[state=checked]:border-primary-500`. Branch: `feat/survey-experience-ui`.

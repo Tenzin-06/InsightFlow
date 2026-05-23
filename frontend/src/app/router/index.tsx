@@ -27,6 +27,11 @@ const CampaignsPage = lazy(() => import("@/features/email-campaigns/pages/campai
 const CreateCampaignPage = lazy(() => import("@/features/email-campaigns/pages/create-campaign-page"));
 const CampaignDetailPage = lazy(() => import("@/features/email-campaigns/pages/campaign-detail-page"));
 const SettingsPage = lazy(() => import("@/features/dashboard/pages/settings-page"));
+const SimulationPage = lazy(() => import("@/features/simulation/pages/simulation-page"));
+const SimulationPersonasPage = lazy(() => import("@/features/simulation/pages/simulation-personas-page"));
+const SimulationRunsPage = lazy(() => import("@/features/simulation/pages/simulation-runs-page"));
+const SimulationAnalyticsPage = lazy(() => import("@/features/simulation/pages/simulation-analytics-page"));
+const GoogleFormsImportPage = lazy(() => import("@/features/google-forms-import/pages/import-page"));
 
 const PageLoader = () => (
   <div role="status" aria-live="polite" className="flex h-screen items-center justify-center">
@@ -62,6 +67,7 @@ const router = createBrowserRouter([
           { path: "/dashboard", element: <Suspense fallback={<PageLoader />}><DashboardPage /></Suspense> },
           { path: "/surveys", element: <Suspense fallback={<PageLoader />}><SurveyListPage /></Suspense> },
           { path: "/surveys/create", element: <Suspense fallback={<PageLoader />}><SurveyCreatePage /></Suspense> },
+          { path: "/surveys/import/google", element: <Suspense fallback={<PageLoader />}><GoogleFormsImportPage /></Suspense> },
           { path: "/surveys/:surveyId", element: <Suspense fallback={<PageLoader />}><SurveyDetailPage /></Suspense> },
           { path: "/surveys/:surveyId/edit", element: <Suspense fallback={<PageLoader />}><SurveyEditorPage /></Suspense> },
           { path: "/dashboard/audiences", element: <Suspense fallback={<PageLoader />}><AudiencesPage /></Suspense> },
@@ -75,6 +81,10 @@ const router = createBrowserRouter([
           { path: "/dashboard/campaigns", element: <Suspense fallback={<PageLoader />}><CampaignsPage /></Suspense> },
           { path: "/dashboard/campaigns/new", element: <Suspense fallback={<PageLoader />}><CreateCampaignPage /></Suspense> },
           { path: "/dashboard/campaigns/:campaignId", element: <Suspense fallback={<PageLoader />}><CampaignDetailPage /></Suspense> },
+          { path: "/dashboard/simulation", element: <Suspense fallback={<PageLoader />}><SimulationPage /></Suspense> },
+          { path: "/dashboard/simulation/personas", element: <Suspense fallback={<PageLoader />}><SimulationPersonasPage /></Suspense> },
+          { path: "/dashboard/simulation/runs", element: <Suspense fallback={<PageLoader />}><SimulationRunsPage /></Suspense> },
+          { path: "/dashboard/simulation/analytics", element: <Suspense fallback={<PageLoader />}><SimulationAnalyticsPage /></Suspense> },
           { path: "/settings", element: <Suspense fallback={<PageLoader />}><SettingsPage /></Suspense> },
         ],
       },
