@@ -31,6 +31,7 @@ const SimulationPage = lazy(() => import("@/features/simulation/pages/simulation
 const SimulationPersonasPage = lazy(() => import("@/features/simulation/pages/simulation-personas-page"));
 const SimulationRunsPage = lazy(() => import("@/features/simulation/pages/simulation-runs-page"));
 const SimulationAnalyticsPage = lazy(() => import("@/features/simulation/pages/simulation-analytics-page"));
+const ReportsPage = lazy(() => import("@/features/reports/pages/reports-page"));
 
 const PageLoader = () => (
   <div role="status" aria-live="polite" className="flex h-screen items-center justify-center">
@@ -83,6 +84,7 @@ const router = createBrowserRouter([
           { path: "/dashboard/simulation/personas", element: <Suspense fallback={<PageLoader />}><SimulationPersonasPage /></Suspense> },
           { path: "/dashboard/simulation/runs", element: <Suspense fallback={<PageLoader />}><SimulationRunsPage /></Suspense> },
           { path: "/dashboard/simulation/analytics", element: <Suspense fallback={<PageLoader />}><SimulationAnalyticsPage /></Suspense> },
+          { path: "/dashboard/reports", element: <Suspense fallback={<PageLoader />}><ReportsPage /></Suspense> },
           { path: "/settings", element: <Suspense fallback={<PageLoader />}><SettingsPage /></Suspense> },
         ],
       },

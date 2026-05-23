@@ -8,9 +8,38 @@ Update this file after every meaningful implementation change.
 
 ## Current Goal
 
-- Unit 34 - Simulation Mode Frontend
+- Unit 36 — next unit (TBD)
 
 ## Completed
+
+- **Unit 35: PDF Report Frontend (35-PDF-Report-A)** ✅ implemented & verified
+  - `frontend/src/features/reports/types/index.ts` — `ReportSectionKey`, `ReportTemplate`, `ReportConfig`, `ExportStatus`, `ExportRecord`, `ReportPreviewState`, `ReportMetric`, `ReportChartData`, `ReportInsight`
+  - `frontend/src/features/reports/constants/index.ts` — 5 `REPORT_TEMPLATES`, section labels/descriptions, `OPTIONAL_SECTIONS`, `EXPORT_STATUS_LABELS`, `EXPORT_STATUS_PROGRESS`, `DEFAULT_REPORT_CONFIG`, mock exports/metrics/charts/insights, `ZOOM_LEVELS`
+  - `frontend/src/features/reports/services/report-api.ts` — `getRecentExports()`, `getExportById()`
+  - `frontend/src/features/reports/services/export-api.ts` — `initiateExport()`, `pollExportStatus()` (preparing → rendering → processing_charts → finalizing → completed lifecycle)
+  - `frontend/src/features/reports/hooks/use-report-templates.ts` — template selection state
+  - `frontend/src/features/reports/hooks/use-report-preview.ts` — preview visibility, pagination, zoom (5 levels: 0.5–1.5×)
+  - `frontend/src/features/reports/hooks/use-report-export.ts` — interval-based export polling with `statusRef` to avoid stale closures; `startExport`, `resetExport`
+  - `frontend/src/features/reports/components/report-cover.tsx` — professional cover page
+  - `frontend/src/features/reports/components/report-header.tsx` — section header (title | section label)
+  - `frontend/src/features/reports/components/report-footer.tsx` — generated timestamp | page X of Y | branding
+  - `frontend/src/features/reports/components/report-metrics-block.tsx` — 2×4 KPI grid with trend icons
+  - `frontend/src/features/reports/components/report-chart-block.tsx` — recharts BarChart / LineChart / PieChart switcher
+  - `frontend/src/features/reports/components/report-insight-block.tsx` — AI insight panels with teal borders and score badges
+  - `frontend/src/features/reports/components/report-layout.tsx` — `renderSection()` switch for all 8 section keys; `SectionWrapper` adds header/footer
+  - `frontend/src/features/reports/components/report-template-card.tsx` — selectable card with `aria-pressed`
+  - `frontend/src/features/reports/components/report-template-selector.tsx` — responsive 3-column grid of 5 templates
+  - `frontend/src/features/reports/components/report-template-selector-inline.tsx` — compact list variant for config form
+  - `frontend/src/features/reports/components/report-section-selector.tsx` — cover locked; optional sections as checkboxes; canonical order preserved on re-add
+  - `frontend/src/features/reports/components/report-config-form.tsx` — react-hook-form + zod; title/template/sections/charts/ai-insights/org/dates; live `onConfigChange` via `useEffect`
+  - `frontend/src/features/reports/components/report-preview.tsx` — full-screen overlay; toolbar with page nav + zoom; dot-pagination footer
+  - `frontend/src/features/reports/components/export-progress.tsx` — idle → spinner + progress bar + stage dots → download link / error
+  - `frontend/src/features/reports/components/export-actions.tsx` — validation guard; idle/exporting/completed/failed button states
+  - `frontend/src/features/reports/pages/reports-page.tsx` — two-tab workflow (Select Template → Configure & Export) + Recent Exports sidebar
+  - `frontend/src/app/router/index.tsx` — lazy `ReportsPage` + `/dashboard/reports` route
+  - `frontend/src/routes/route-config.ts` — `Reports` nav entry with `FileDown` icon
+  - `frontend/src/lib/api/endpoints.ts` — `reports` endpoint stubs (exports, exportDetail, initiate, status)
+  - Build: `npm run build` passes — 0 TS errors; `dist/assets/reports-page-*.js` emitted at ~49 kB
 
 - **Unit 34: Simulation Mode Frontend (34-Simulation-Mode-B)** completed and verified
   - Added full simulation frontend feature slice under `frontend/src/features/simulation/` with dedicated pages for workspace, personas, runs, and analytics.
@@ -622,10 +651,31 @@ Update this file after every meaningful implementation change.
   - Backend: `apps/ai` Gemini gateway is available; AI analytics app work is pending implementation before it can be registered.
   - Frontend: 5 AI analytics components in `src/components/analytics/ai/`
 
-- **Unit 35: PDF Report Frontend (35-PDF-Report-A)** â€” in progress
-  - Implementing full frontend reporting system: PDF export UI, report templates, layouts, configuration, preview, and export workflows per `context/feature-specs/35-PDF-Report-A.md`.
-  - Feature directory: `frontend/src/features/reports/`
-  - Route: `/dashboard/reports`
+- **Unit 35: PDF Report Frontend (35-PDF-Report-A)** ✅ implemented & verified
+  - `frontend/src/features/reports/types/index.ts` — ReportSectionKey, ReportTemplate, ReportConfig, ExportStatus, ExportRecord, ReportPreviewState, ReportMetric, ReportChartData, ReportInsight
+  - `frontend/src/features/reports/constants/index.ts` — 5 templates, section labels/descriptions, export status maps, mock data, default config
+  - `frontend/src/features/reports/services/report-api.ts` — getRecentExports, getExportById (mock; wire to /api/v1/reports/ when backend ready)
+  - `frontend/src/features/reports/services/export-api.ts` — initiateExport, pollExportStatus (simulated async lifecycle)
+  - `frontend/src/features/reports/hooks/use-report-templates.ts` — template list + selection state
+  - `frontend/src/features/reports/hooks/use-report-preview.ts` — preview open/close, page nav, zoom in/out
+  - `frontend/src/features/reports/hooks/use-report-export.ts` — full export lifecycle with interval polling, status ref, reset
+  - `frontend/src/features/reports/components/report-cover.tsx` — professional cover page
+  - `frontend/src/features/reports/components/report-header.tsx` + `report-footer.tsx` — consistent section framing
+  - `frontend/src/features/reports/components/report-metrics-block.tsx` — KPI grid with trend icons
+  - `frontend/src/features/reports/components/report-chart-block.tsx` — bar/line/pie via recharts
+  - `frontend/src/features/reports/components/report-insight-block.tsx` — AI insight panels with teal accent
+  - `frontend/src/features/reports/components/report-layout.tsx` — section router (cover → summary → metrics → charts → AI → sentiment → questions → conclusions)
+  - `frontend/src/features/reports/components/report-template-card.tsx` + `report-template-selector.tsx` + `report-template-selector-inline.tsx`
+  - `frontend/src/features/reports/components/report-section-selector.tsx` — cover locked, optional sections togglable
+  - `frontend/src/features/reports/components/report-config-form.tsx` — react-hook-form + zod validated
+  - `frontend/src/features/reports/components/report-preview.tsx` — full-screen modal with zoom/page controls and validation banners
+  - `frontend/src/features/reports/components/export-progress.tsx` — live progress bar, stage indicators, download link
+  - `frontend/src/features/reports/components/export-actions.tsx` — Preview/Export/Download/Retry workflow
+  - `frontend/src/features/reports/pages/reports-page.tsx` — /dashboard/reports: template tab + config+export tab + recent exports panel
+  - `frontend/src/app/router/index.tsx` — ReportsPage lazy import + /dashboard/reports route
+  - `frontend/src/routes/route-config.ts` — Reports nav entry (FileDown icon)
+  - `frontend/src/lib/api/endpoints.ts` — reports.exports/exportDetail/initiate/status endpoint stubs
+  - npm run build: passes (0 TS errors)
 
 - **Unit 26: Campaign Scheduling and Automation** â€” in progress
   - Implement scheduled campaign execution, cancellation, reminder eligibility, reminder workflows, and automation logging per `context/feature-specs/26-Campaign-Scheduling-and-Automation.md`.
