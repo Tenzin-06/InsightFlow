@@ -10,7 +10,7 @@ import { usePublicSurvey } from "@/features/public-surveys/hooks/use-public-surv
 import { buildAnswerPayload } from "../utils";
 import { useConversationFlow } from "../hooks/use-conversation-flow";
 import { useConversationalSubmission } from "../hooks/use-conversational-submission";
-import { useQuestionNavigation } from "../hooks/use-question-navigation";
+import { useConversationProgress } from "../hooks/use-conversation-progress";
 
 import { ConversationContainer } from "../components/conversation-container";
 import { ConversationHeader } from "../components/conversation-header";
@@ -70,9 +70,9 @@ function ConversationalSurvey({ survey, surveyId }: ConversationalSurveyProps) {
   const flow = useConversationFlow(survey);
   const { mutate: submit, isPending } = useConversationalSubmission(surveyId);
 
-  const nav = useQuestionNavigation({
-    questions: survey.questions,
-    currentIndex: flow.currentIndex,
+  // Accurate progress tracking using completedQuestions from the store
+  const progress = useConversationProgress({
+    totalQuestions: survey.questions.length,
   });
 
   // Trigger the API submission once all questions are answered
@@ -127,8 +127,9 @@ function ConversationalSurvey({ survey, surveyId }: ConversationalSurveyProps) {
 
       {/* Minimal progress — keeps immersion */}
       <ProgressIndicator
-        current={nav.currentIndex}
-        total={nav.totalCount}
+        displayNumber={progress.displayNumber}
+        total={progress.totalCount}
+        percentage={progress.percentage}
       />
 
       {/* Scrollable conversation history */}
