@@ -8,9 +8,86 @@ Update this file after every meaningful implementation change.
 
 ## Current Goal
 
-- Unit 19: Campaign and Distribution Layer — Complete
+- None.
 
 ## Completed
+
+- **Unit 23: Email Campaign UI** implemented and verified
+  - `frontend/package.json` + `package-lock.json` - added `@tiptap/react` and `@tiptap/starter-kit`
+  - `frontend/src/features/email-campaigns/types/index.ts` - campaign draft, status, schedule, preview, template, variable, validation, and option types
+  - `frontend/src/features/email-campaigns/constants/index.ts` - default campaign draft, personalization variables, template labels, descriptions, and reusable HTML layouts
+  - `frontend/src/features/email-campaigns/utils/*` - template lookup, variable formatting/replacement, survey link preview, audience recipient totals, and audience date formatting helpers
+  - `frontend/src/features/email-campaigns/services/campaign-api.ts` - frontend-only campaign setup data loader using existing survey and audience API services
+  - `frontend/src/features/email-campaigns/hooks/*` - centralized local campaign form state, validation, schedule checks, audience filtering/selection, template signal checks, and preview mode/html generation
+  - `frontend/src/features/email-campaigns/components/*` - campaign header/sidebar/form, audience selector, subject editor, sender settings, TipTap template editor and toolbar, variable menu, schedule panel, preview cards/modal, send actions, status badge, empty/loading states, and reusable email layout
+  - `frontend/src/features/email-campaigns/pages/campaigns-page.tsx` - campaign list route with required empty state and creation CTA
+  - `frontend/src/features/email-campaigns/pages/create-campaign-page.tsx` - full campaign creation workflow: settings, audience selection, sender fields, subject, rich text template editor, schedule controls, preview, and UI-only send actions
+  - `frontend/src/features/email-campaigns/pages/campaign-detail-page.tsx` - reserved campaign detail/edit route shell within Unit 23 scope
+  - `frontend/src/app/router/index.tsx` - added `/dashboard/campaigns`, `/dashboard/campaigns/new`, `/dashboard/campaigns/:id`, and `/dashboard/campaigns/:id/edit`
+  - `frontend/src/routes/route-config.ts` - dashboard campaign navigation now points to `/dashboard/campaigns`
+  - `npm.cmd run build`: passes
+
+- **Unit 21: Audience Management UI** implemented and verified
+  - `frontend/package.json` + `package-lock.json` - added `react-dropzone`, `papaparse`, and `@types/papaparse`
+  - `frontend/src/lib/api/endpoints.ts` - added audience endpoints: list, detail, upload
+  - `frontend/src/routes/route-config.ts` - added Audiences to dashboard navigation
+  - `frontend/src/app/router/index.tsx` - added `/dashboard/audiences`, `/dashboard/audiences/new`, `/dashboard/audiences/:audienceId`, `/dashboard/audiences/:audienceId/edit`
+  - `frontend/src/features/audiences/types/index.ts` - audience, recipient, upload draft/error, payload, and sort types
+  - `frontend/src/features/audiences/constants/index.ts` - pagination, preview, and sort constants
+  - `frontend/src/features/audiences/utils/csv-upload.ts` - CSV parsing, email validation, duplicate detection, metadata summary helper
+  - `frontend/src/features/audiences/services/audience-api.ts` - centralized API layer for list/detail/create/update/upload
+  - `frontend/src/features/audiences/hooks/use-audiences.ts` - list/create/update hooks with query invalidation and toast handling
+  - `frontend/src/features/audiences/hooks/use-audience-detail.ts` - audience detail query hook
+  - `frontend/src/features/audiences/hooks/use-contact-upload.ts` - upload parsing/import workflow hook
+  - `frontend/src/features/audiences/hooks/use-contact-filters.ts` - contact search hook
+  - `frontend/src/features/audiences/components/*` - audience cards/table/header/form/filters/actions, contact table/mobile cards, upload modal/dropzone/preview/errors, empty states
+  - `frontend/src/features/audiences/pages/audiences-page.tsx` - searchable/sortable audience overview with pagination and upload entry point
+  - `frontend/src/features/audiences/pages/audience-detail-page.tsx` - audience metadata, stat cards, upload actions, and responsive contact table
+  - `frontend/src/features/audiences/pages/audience-form-page.tsx` - create/edit audience UI
+  - `frontend/src/app/router/index.tsx` - deployment fix: restored Campaigns import to the committed Unit 23 placeholder path so Unit 21 branch does not depend on uncommitted email-campaign files
+  - `npm.cmd run build`: passes
+
+- **Unit 20: Survey Sharing System** ✅ implemented (backend + frontend)
+  - `backend/apps/surveys/models/survey.py` — added `slug` field (`SlugField`, unique, null=True, db_index=True); `save()` override auto-generates `<slugified-title>-<8-char-uuid>` on first save
+  - `backend/apps/surveys/serializers/survey_serializer.py` — added `"slug"` to `fields` and `read_only_fields`
+  - `backend/apps/surveys/migrations/0002_survey_slug.py` — `AddField` for slug + `RunPython` data migration `populate_slugs` to backfill existing rows
+  - `backend/apps/sharing/__init__.py` — app package
+  - `backend/apps/sharing/apps.py` — `SharingConfig` (`default_auto_field`, `name = "apps.sharing"`)
+  - `backend/apps/sharing/utils.py` — `success_response` / `error_response` helpers
+  - `backend/apps/sharing/permissions.py` — `PublicSharingPermission(AllowAny)`
+  - `backend/apps/sharing/validators.py` — `validate_survey_is_published(survey)` raises NotFound for non-published
+  - `backend/apps/sharing/serializers/__init__.py` — empty
+  - `backend/apps/sharing/serializers/survey_share_serializer.py` — `SurveyShareSerializer` (read-only: title, slug, description, status, is_public)
+  - `backend/apps/sharing/services/__init__.py` — empty
+  - `backend/apps/sharing/services/sharing_validation_service.py` — `get_published_survey_by_slug(slug)`: raises NotFound for missing or non-published surveys
+  - `backend/apps/sharing/views/__init__.py` — empty
+  - `backend/apps/sharing/views/sharing_views.py` — `SurveyShareMetadataView` (APIView, AllowAny, `authentication_classes=[]`); `GET /api/v1/sharing/surveys/<slug>/`
+  - `backend/apps/sharing/urls.py` — `sharing/surveys/<slug:slug>/` → `SurveyShareMetadataView`
+  - `backend/config/settings/base.py` — added `"apps.sharing"` to `LOCAL_APPS`
+  - `backend/config/urls.py` — wired `apps.sharing.urls` under `/api/v1/`
+  - `frontend/.env` + `.env.development` — added `VITE_APP_BASE_URL=http://localhost:5173`
+  - `frontend/.env.production` — added `VITE_APP_BASE_URL=https://app.insightflow.ai`
+  - `frontend/src/features/surveys/types/index.ts` — added `slug?: string | null` to `Survey` type
+  - `frontend/src/lib/env/index.ts` — added `getOptionalEnv` helper + `APP_BASE_URL` export
+  - `frontend/src/lib/api/endpoints.ts` — added `sharing.surveyMeta(slug)` endpoint
+  - `frontend/package.json` — added `qrcode.react ^4.2.0` dependency (run `npm install`)
+  - `frontend/src/features/survey-sharing/types/index.ts` — `ShareMetadata`, `ShareLinkMode`, `QRSize` types
+  - `frontend/src/features/survey-sharing/constants/index.ts` — `APP_BASE_URL`, `QR_SIZES`, `QR_SIZE_LABELS`
+  - `frontend/src/features/survey-sharing/utils/url-builder.ts` — `generateSurveyShareLink`, `generateConversationalShareLink`
+  - `frontend/src/features/survey-sharing/utils/qr-utils.ts` — `downloadQRCodeAsPNG`, `printQRCode`
+  - `frontend/src/features/survey-sharing/utils/share-utils.ts` — `generateShareText`, `canUseNativeShare`, `triggerNativeShare`
+  - `frontend/src/features/survey-sharing/services/sharing-api.ts` — `getSurveyShareMetadata(slug)` (public axios client, no auth)
+  - `frontend/src/features/survey-sharing/hooks/use-share-link.ts` — `useShareLink(slug)` → `{ standardLink, conversationalLink }`
+  - `frontend/src/features/survey-sharing/hooks/use-copy-to-clipboard.ts` — `useCopyToClipboard(resetDelay)` with native clipboard + textarea fallback
+  - `frontend/src/features/survey-sharing/hooks/use-qr-code.ts` — `useQRCode(initialSize)` → `{ size, setSize, pixelSize }`
+  - `frontend/src/features/survey-sharing/components/copy-button.tsx` — animated copy → "Copied!" button with Check icon
+  - `frontend/src/features/survey-sharing/components/share-link-card.tsx` — readonly URL input + CopyButton + external link
+  - `frontend/src/features/survey-sharing/components/qr-code-card.tsx` — QRCodeCanvas with size selector, Download PNG, Print actions
+  - `frontend/src/features/survey-sharing/components/social-share-buttons.tsx` — native Share, Email, Twitter/X links
+  - `frontend/src/features/survey-sharing/components/distribution-helper.tsx` — quick distribution panel with copy + preview buttons
+  - `frontend/src/features/survey-sharing/components/share-preview.tsx` — link preview card (Globe icon, title, description, URL)
+  - `frontend/src/features/survey-sharing/components/share-modal.tsx` — full Dialog with SharePreview, both links, QR code, social sharing
+  - `frontend/src/features/surveys/pages/survey-detail-page.tsx` — integrated `ShareModal` (shown when published && slug set)
 
 - **Unit 19: Campaign and Distribution Layer** ✅ implemented & verified
   - `backend/apps/campaigns/constants.py` — status constants + `VALID_TRANSITIONS` state machine map
@@ -301,7 +378,7 @@ Update this file after every meaningful implementation change.
 
 ## In Progress
 
-- None. Unit 18 complete.
+- None.
 
 ## Next Up
 
