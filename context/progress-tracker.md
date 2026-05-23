@@ -8,7 +8,7 @@ Update this file after every meaningful implementation change.
 
 ## Current Goal
 
-- None.
+- Unit 27 — Engagement Tracking System
 
 ## Completed
 
@@ -476,7 +476,15 @@ Update this file after every meaningful implementation change.
 
 ## In Progress
 
-- None.
+- **Unit 26: Campaign Scheduling and Automation** — in progress
+  - Implement scheduled campaign execution, cancellation, reminder eligibility, reminder workflows, and automation logging per `context/feature-specs/26-Campaign-Scheduling-and-Automation.md`.
+- **Unit 27: Engagement Tracking System** — in progress
+  - Implement email open tracking, link click tracking, survey response tracking, response sessions, drop-off detection, attribution, and raw engagement analytics per `context/feature-specs/27-Engagement-Tracking-System.md`.
+  - Added backend engagement app scaffold with tracking tokens, raw events, email opens, link clicks, response sessions, drop-off events, services, tracking endpoints, campaign analytics endpoint, and initial migration.
+  - Wired campaign email rendering to generate per-recipient tracking tokens, tracked survey links, and email open pixels.
+  - Wired public survey UI to record survey start, question answered, and completion events with session IDs.
+  - Added engagement throttling settings and backend/frontend URL env documentation for safe tracking redirects and email pixel URLs.
+  - Verification: `npm.cmd run build` passes; `.\venv\Scripts\python.exe manage.py check` passes; `.\venv\Scripts\python.exe manage.py makemigrations engagement --check --dry-run` reports no engagement changes. Full migration dry-run still reports pre-existing migration drift in automation, campaigns, and email_campaigns.
 
 ## Next Up
 

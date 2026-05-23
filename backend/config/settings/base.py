@@ -36,6 +36,8 @@ LOCAL_APPS = [
     "apps.campaigns",
     "apps.sharing",
     "apps.email_campaigns",
+    "apps.automation",
+    "apps.engagement",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -104,6 +106,10 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "apps.authentication.permissions.IsAuthenticated",
     ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "120/minute",
+        "engagement": "600/minute",
+    },
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 20,
 }
@@ -113,6 +119,7 @@ RESEND_API_KEY = env("RESEND_API_KEY", default="")
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="noreply@insightflow.ai")
 RESEND_AUDIENCE_DOMAIN = env("RESEND_AUDIENCE_DOMAIN", default="insightflow.ai")
 APP_FRONTEND_URL = env("APP_FRONTEND_URL", default="http://localhost:5173")
+APP_BACKEND_URL = env("APP_BACKEND_URL", default="http://localhost:8000")
 
 # Trigger.dev — background job infrastructure
 # TRIGGER_SECRET_KEY:     API secret from the Trigger.dev dashboard

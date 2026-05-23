@@ -1,0 +1,24 @@
+EVENT_EMAIL_OPEN = "email_open"
+EVENT_LINK_CLICK = "link_click"
+EVENT_SURVEY_START = "survey_start"
+EVENT_QUESTION_ANSWERED = "question_answered"
+EVENT_SURVEY_COMPLETE = "survey_complete"
+EVENT_DROPOFF = "dropoff"
+
+EVENT_TYPE_CHOICES = [
+    (EVENT_EMAIL_OPEN, "Email Open"),
+    (EVENT_LINK_CLICK, "Link Click"),
+    (EVENT_SURVEY_START, "Survey Start"),
+    (EVENT_QUESTION_ANSWERED, "Question Answered"),
+    (EVENT_SURVEY_COMPLETE, "Survey Complete"),
+    (EVENT_DROPOFF, "Drop-Off"),
+]
+
+TRACKABLE_PUBLIC_EVENTS = {
+    EVENT_SURVEY_START,
+    EVENT_QUESTION_ANSWERED,
+    EVENT_SURVEY_COMPLETE,
+}
+
+DEFAULT_DROPOFF_INACTIVITY_MINUTES = 30
+

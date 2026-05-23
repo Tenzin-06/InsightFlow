@@ -91,5 +91,8 @@
       </td>
     </tr>
   </table>
+  {% if tracking_pixel_url %}
+    <img src="{{ tracking_pixel_url }}" width="1" height="1" alt="" style="display:none;border:0;height:1px;width:1px;line-height:1px;" />
+  {% endif %}
 </body>
 </html>

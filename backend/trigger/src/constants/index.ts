@@ -20,6 +20,9 @@ export const TASK_IDS = {
   PROCESS_AUDIENCE_UPLOAD: "process-audience-upload",
   GENERATE_REPORT: "generate-report",
   CLEANUP_JOBS: "cleanup-jobs",
+  EXECUTE_SCHEDULED_CAMPAIGN: "execute-scheduled-campaign",
+  PROCESS_REMINDERS: "process-reminders",
+  EVALUATE_FOLLOWUPS: "evaluate-followups",
 } as const;
 
 export type TaskId = (typeof TASK_IDS)[keyof typeof TASK_IDS];
