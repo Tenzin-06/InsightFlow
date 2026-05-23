@@ -12,6 +12,38 @@ Update this file after every meaningful implementation change.
 
 ## Completed
 
+- **Unit 32: AI Analytics** ✅ implemented & verified
+  - `backend/apps/ai/__init__.py`
+  - `backend/apps/ai/services/__init__.py`
+  - `backend/apps/ai/services/gemini_service.py` — Gemini gateway helpers: `call_gemini()`, `is_gemini_configured()`
+  - `backend/apps/ai/services/prompt_builder.py` — AI analytics prompt builders
+  - `backend/apps/ai/services/ai_response_parser.py` — JSON parsing helpers: `parse_json_response()`, `safe_parse_json()`
+  - `backend/apps/ai_analytics/__init__.py` + `apps.py` — Django app scaffold
+  - `backend/apps/ai_analytics/constants/__init__.py`
+  - `backend/apps/ai_analytics/models/ai_summary.py`, `ai_sentiment.py`, `ai_quality_score.py`, `ai_question_insight.py`, `models/__init__.py`
+  - `backend/apps/ai_analytics/services/ai_analytics_cache.py`, `summarization_service.py`, `sentiment_service.py`, `quality_scoring_service.py`, `question_analysis_service.py`, `insight_generation_service.py`, `ai_dashboard_service.py`, `services/__init__.py`
+  - `backend/apps/ai_analytics/schemas/__init__.py` — Pydantic schemas
+  - `backend/apps/ai_analytics/validators/__init__.py`, `serializers/__init__.py`, `utils/__init__.py`
+  - `backend/apps/ai_analytics/views/ai_analytics_views.py`, `views/__init__.py` — AI analytics API views
+  - `backend/apps/ai_analytics/urls.py`
+  - `backend/apps/ai_analytics/migrations/0001_initial.py`, `migrations/__init__.py`
+  - `backend/config/settings/base.py` — added `apps.ai_analytics` plus Gemini/AI settings
+  - `backend/config/urls.py` — registered AI analytics URLs
+  - `backend/requirements/base.txt` — added `numpy`, `textblob`, `google-generativeai`, `pydantic`, `tenacity`
+  - `backend/.env` — added Gemini/AI env stubs
+  - `backend/trigger/src/tasks/summarize_responses.ts` — Trigger.dev summarize workflow
+  - `backend/trigger/src/tasks/analyze_sentiment.ts` — Trigger.dev sentiment workflow
+  - `backend/trigger/src/tasks/generate_insights.ts` — Trigger.dev insights workflow
+  - `backend/trigger/src/constants/index.ts` — added `SUMMARIZE_RESPONSES`, `ANALYZE_SENTIMENT`, `GENERATE_INSIGHTS`
+  - `backend/trigger/src/index.ts` — registered all 3 AI analytics tasks
+  - `frontend/src/components/analytics/ai/ai-summary-card.tsx`
+  - `frontend/src/components/analytics/ai/sentiment-widget.tsx`
+  - `frontend/src/components/analytics/ai/quality-score-widget.tsx`
+  - `frontend/src/components/analytics/ai/ai-insight-panel.tsx`
+  - `frontend/src/components/analytics/ai/question-insight-list.tsx`
+  - `frontend/src/lib/api/endpoints.ts` — added `aiAnalytics` endpoint registry
+  - Verification: `npm.cmd run typecheck` in `backend/trigger` passes; `npm.cmd run build` in `frontend` passes; `venv\Scripts\python.exe manage.py check` passes with 0 issues
+
 - **Unit 28: Engagement Optimization System** ✅ implemented & verified
   - `backend/apps/engagement_optimization/__init__.py` + `apps.py` — new Django app scaffold (`EngagementOptimizationConfig`)
   - `backend/apps/engagement_optimization/constants.py` — trigger types (`non_response`, `dropoff_detected`), segment types (5), opt event types (3), execution statuses (5), reminder frequency defaults, Trigger.dev task ID constants
@@ -564,11 +596,6 @@ Update this file after every meaningful implementation change.
   - Production build passes, dev server runs on localhost:5173
 
 ## In Progress
-
-- **Unit 32: AI Analytics** 🔄
-  - AI-powered analytics layer: response summarization, sentiment analysis, quality scoring, question-level insights, AI-enhanced dashboard integration
-  - Backend: `apps/ai` Gemini gateway + `apps/ai_analytics` Django app (models, services, views, URLs)
-  - Frontend: 5 AI analytics components in `src/components/analytics/ai/`
 
 - **Unit 31: Gemini AI Infrastructure** — in progress
   - Implement Gemini API integration, AI abstraction gateway, prompt builder, response parser, execution manager, retry handler, AI logger, async Trigger.dev AI workflows, AIJob/AIExecution/AIPromptTemplate/AIUsageRecord models, Pydantic output schemas, and AI configuration per `context/feature-specs/31-Gemini-AI-Infrastructure.md`.

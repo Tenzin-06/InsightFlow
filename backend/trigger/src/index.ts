@@ -18,3 +18,6 @@ export { processNonrespondentsTask } from "./tasks/process_nonrespondents.js";
 export { evaluateOptRulesTask } from "./tasks/evaluate_opt_rules.js";
 export { triggerFollowupsTask } from "./tasks/trigger_followups.js";
 export { generateSegmentsTask } from "./tasks/generate_segments.js";
+export { summarizeResponsesTask } from "./tasks/summarize_responses.js";
+export { analyzeSentimentTask } from "./tasks/analyze_sentiment.js";
+export { generateInsightsTask } from "./tasks/generate_insights.js";

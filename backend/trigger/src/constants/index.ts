@@ -28,6 +28,9 @@ export const TASK_IDS = {
   EVALUATE_OPT_RULES: "evaluate-opt-rules",
   TRIGGER_FOLLOWUPS: "trigger-followups",
   GENERATE_SEGMENTS: "generate-segments",
+  SUMMARIZE_RESPONSES: "summarize-responses",
+  ANALYZE_SENTIMENT: "analyze-sentiment",
+  GENERATE_INSIGHTS: "generate-insights",
 } as const;
 
 export type TaskId = (typeof TASK_IDS)[keyof typeof TASK_IDS];
