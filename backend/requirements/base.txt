@@ -10,3 +10,4 @@ PyJWT>=2.8.0
 resend>=2.0,<3.0
 html2text>=2024.2.26
 requests>=2.31.0,<3.0
+python-dateutil>=2.9.0,<3.0

@@ -10,3 +10,6 @@ export { sendTestEmailTask } from "./tasks/send_test_email.js";
 export { processAudienceUploadTask } from "./tasks/process_audience_upload.js";
 export { generateReportTask } from "./tasks/generate_report.js";
 export { cleanupJobsTask } from "./tasks/cleanup_jobs.js";
+export { executeScheduledCampaignTask } from "./tasks/execute_scheduled_campaign.js";
+export { processRemindersTask } from "./tasks/process_reminders.js";
+export { evaluateFollowupsTask } from "./tasks/evaluate_followups.js";

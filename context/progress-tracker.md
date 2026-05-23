@@ -8,7 +8,7 @@ Update this file after every meaningful implementation change.
 
 ## Current Goal
 
-- None.
+- Unit 26 — Campaign Scheduling and Automation
 
 ## Completed
 
@@ -504,7 +504,8 @@ Update this file after every meaningful implementation change.
 
 ## In Progress
 
-- None.
+- **Unit 26: Campaign Scheduling and Automation** — in progress
+  - Implement scheduled campaign execution, cancellation, reminder eligibility, reminder workflows, and automation logging per `context/feature-specs/26-Campaign-Scheduling-and-Automation.md`.
 
 ## Next Up
 
