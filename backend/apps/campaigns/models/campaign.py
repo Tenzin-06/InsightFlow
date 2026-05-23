@@ -1,12 +1,23 @@
 from django.db import models
 from apps.authentication.models import AppUser
 from apps.surveys.models.survey import Survey
-from apps.campaigns.constants import CAMPAIGN_STATUS_CHOICES, CAMPAIGN_STATUS_DRAFT
+from apps.campaigns.constants import (
+    CAMPAIGN_STATUS_CHOICES,
+    CAMPAIGN_STATUS_DRAFT,
+    TEMPLATE_CHOICES,
+    TEMPLATE_SURVEY_INVITATION,
+)
 
 
 class Campaign(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
+    subject = models.CharField(max_length=500, blank=True)
+    template_name = models.CharField(
+        max_length=50,
+        choices=TEMPLATE_CHOICES,
+        default=TEMPLATE_SURVEY_INVITATION,
+    )
     survey = models.ForeignKey(
         Survey,
         related_name="campaigns",

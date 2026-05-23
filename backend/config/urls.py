@@ -9,6 +9,7 @@ api_v1_urlpatterns = [
     path("", include("apps.public_surveys.urls")),
     path("", include("apps.campaigns.urls")),
     path("", include("apps.sharing.urls")),
+    path("", include("apps.email_campaigns.urls")),
 ]
 
 urlpatterns = [
