@@ -474,7 +474,7 @@ Update this file after every meaningful implementation change.
 
 ## In Progress
 
-- None.
+- **Unit 30: Analytics Metrics Engine** — Backend Django analytics metrics engine. Services: aggregation, metrics, engagement, campaign, survey, dashboard, cache. Models: AggregatedMetric, AnalyticsSnapshot. Endpoints: dashboard, survey detail, campaign detail, engagement. Permission: IsAnalyticsOwner.
 
 ## Next Up
 
