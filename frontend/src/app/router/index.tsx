@@ -20,7 +20,7 @@ const AudiencesPage = lazy(() => import("@/features/audiences/pages/audiences-pa
 const AudienceDetailPage = lazy(() => import("@/features/audiences/pages/audience-detail-page"));
 const AudienceFormPage = lazy(() => import("@/features/audiences/pages/audience-form-page"));
 const AnalyticsPage = lazy(() => import("@/features/analytics/pages/analytics-page"));
-const CampaignsPage = lazy(() => import("@/features/campaigns/pages/campaigns-page"));
+const CampaignsPage = lazy(() => import("@/features/email-campaigns/pages/campaigns-page"));
 const SettingsPage = lazy(() => import("@/features/dashboard/pages/settings-page"));
 
 const PageLoader = () => (
