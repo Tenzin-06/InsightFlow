@@ -42,6 +42,10 @@ export type AnswerPayload = {
 
 export type SubmissionPayload = {
   answers: AnswerPayload[];
+  metadata?: {
+    engagement_session_id?: string;
+    [key: string]: unknown;
+  };
 };
 
 // ---------------------------------------------------------------------------
