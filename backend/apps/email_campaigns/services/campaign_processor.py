@@ -34,6 +34,7 @@ from apps.email_campaigns.services.tracking_service import record_send_event
 from apps.email_campaigns.utils.recipient_utils import collect_recipients
 from apps.email_campaigns.utils.personalization_utils import build_email_context
 from apps.email_campaigns.utils.template_utils import get_survey_link, resolve_template_name
+from apps.engagement.services.attribution_service import build_tracking_urls, create_tracking_token
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
@@ -92,11 +93,17 @@ def process_campaign(campaign_id: int) -> dict:
     failed_count = 0
 
     for recipient in recipients:
+        tracking_token = create_tracking_token(campaign, recipient, survey_link)
+        tracking_urls = build_tracking_urls(tracking_token)
         context = build_email_context(
             recipient_email=recipient.email,
             first_name=recipient.first_name,
-            survey_link=survey_link,
+            survey_link=tracking_urls["click_url"],
             campaign_name=campaign.title,
+            extra={
+                "tracking_pixel_url": tracking_urls["open_url"],
+                "tracking_token": str(tracking_token.token),
+            },
         )
 
         # Create delivery log entry (pending)

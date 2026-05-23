@@ -1,0 +1,23 @@
+{
+  "name": "insightflow-trigger",
+  "version": "1.0.0",
+  "description": "InsightFlow background job workers powered by Trigger.dev",
+  "private": true,
+  "scripts": {
+    "dev": "npx trigger.dev@latest dev",
+    "deploy": "npx trigger.dev@latest deploy",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@trigger.dev/sdk": "4.4.6",
+    "zod": "^3.22.0",
+    "dotenv": "^16.4.0",
+    "pino": "^8.21.0",
+    "pino-pretty": "^11.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "ts-node": "^10.9.0",
+    "@types/node": "^20.0.0"
+  }
+}

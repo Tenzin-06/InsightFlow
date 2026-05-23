@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useForm, FormProvider } from "react-hook-form";
 import { toast } from "sonner";
 
 import { usePublicSurvey } from "../hooks/use-public-survey";
 import { useSurveySubmission } from "../hooks/use-survey-submission";
+import { getEngagementSessionId, trackEngagementEvent } from "../services/engagement-tracker";
 import { buildAnswerPayload, isAnswered } from "../utils";
 
 import { SurveyContainer } from "../components/survey-container";
@@ -55,6 +56,29 @@ export default function PublicSurveyPage() {
 
   const { handleSubmit, setError, watch } = methods;
   const formValues = watch() as Record<string, AnswerValue>;
+  const startedTrackedRef = useRef(false);
+  const answeredTrackedRef = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (!survey || startedTrackedRef.current) return;
+    startedTrackedRef.current = true;
+    void trackEngagementEvent({ eventType: "survey_start", survey });
+  }, [survey]);
+
+  useEffect(() => {
+    if (!survey) return;
+    survey.questions.forEach((question) => {
+      if (answeredTrackedRef.current.has(question.id)) return;
+      if (!isAnswered(formValues[question.id])) return;
+      answeredTrackedRef.current.add(question.id);
+      void trackEngagementEvent({
+        eventType: "question_answered",
+        survey,
+        formValues,
+        questionId: question.id,
+      });
+    });
+  }, [formValues, survey]);
 
   // ---------------------------------------------------------------------------
   // Early returns: loading / error / completion
@@ -106,10 +130,22 @@ export default function PublicSurveyPage() {
 
     const answers = buildAnswerPayload(survey.questions, values);
 
+    const engagementSessionId = getEngagementSessionId(survey.id);
+
     submitSurvey(
-      { answers },
+      {
+        answers,
+        metadata: {
+          engagement_session_id: engagementSessionId,
+        },
+      },
       {
         onSuccess: () => {
+          void trackEngagementEvent({
+            eventType: "survey_complete",
+            survey,
+            formValues: values,
+          });
           setIsSubmitted(true);
           window.scrollTo({ top: 0, behavior: "smooth" });
         },

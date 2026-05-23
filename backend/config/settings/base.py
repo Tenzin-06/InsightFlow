@@ -1,4 +1,4 @@
-import environ
+﻿import environ
 from pathlib import Path
 
 env = environ.Env()
@@ -36,6 +36,10 @@ LOCAL_APPS = [
     "apps.campaigns",
     "apps.sharing",
     "apps.email_campaigns",
+    "apps.automation",
+    "apps.engagement",
+    "apps.engagement_optimization",
+    "apps.ai_analytics",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -142,6 +146,10 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "apps.authentication.permissions.IsAuthenticated",
     ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "120/minute",
+        "engagement": "600/minute",
+    },
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 20,
 }
@@ -151,6 +159,20 @@ RESEND_API_KEY = env("RESEND_API_KEY", default="")
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="noreply@insightflow.ai")
 RESEND_AUDIENCE_DOMAIN = env("RESEND_AUDIENCE_DOMAIN", default="insightflow.ai")
 APP_FRONTEND_URL = env("APP_FRONTEND_URL", default="http://localhost:5173")
+APP_BACKEND_URL = env("APP_BACKEND_URL", default="http://localhost:8000")
+
+# ── Gemini AI configuration ───────────────────────────────────────────────────
+GEMINI_API_KEY = env("GEMINI_API_KEY", default="")
+GEMINI_MODEL = env("GEMINI_MODEL", default="gemini-1.5-flash")
+AI_TIMEOUT_SECONDS = int(env("AI_TIMEOUT_SECONDS", default="30"))
+AI_MAX_RETRIES = int(env("AI_MAX_RETRIES", default="3"))
+AI_ENABLE_LOGGING = env.bool("AI_ENABLE_LOGGING", default=True)
+
+# Trigger.dev -- background job infrastructure
+TRIGGER_SECRET_KEY = env("TRIGGER_SECRET_KEY", default="")
+TRIGGER_PROJECT_ID = env("TRIGGER_PROJECT_ID", default="")
+TRIGGER_API_URL = env("TRIGGER_API_URL", default="https://api.trigger.dev")
+TRIGGER_INTERNAL_SECRET = env("TRIGGER_INTERNAL_SECRET", default="")
 
 LOGGING = {
     "version": 1,
@@ -180,6 +202,11 @@ LOGGING = {
         "django.db.backends": {
             "handlers": ["console"],
             "level": "WARNING",
+            "propagate": False,
+        },
+        "engagement_optimization": {
+            "handlers": ["console"],
+            "level": "INFO",
             "propagate": False,
         },
     },

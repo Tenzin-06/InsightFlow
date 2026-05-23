@@ -1,3 +1,5 @@
+import logging
+
 from rest_framework.views import APIView
 from rest_framework import status
 
@@ -5,9 +7,12 @@ from apps.surveys.models.survey import Survey, SURVEY_STATUS_PUBLISHED
 from apps.responses.serializers.submission_serializer import SubmissionSerializer
 from apps.responses.services.submission_service import submit_survey_response
 from apps.responses.exceptions import SubmissionValidationError
+from apps.engagement.services.tracking_service import record_submission_completion
 from apps.public_surveys.permissions import PublicSurveyPermission
 from apps.public_surveys.serializers.public_survey_serializer import PublicSurveySerializer
 from apps.public_surveys.utils import success_response, error_response
+
+logger = logging.getLogger(__name__)
 
 
 class PublicSurveyDetailView(APIView):
@@ -116,6 +121,15 @@ class PublicSurveySubmitView(APIView):
                 exc.message,
                 status=status.HTTP_422_UNPROCESSABLE_ENTITY,
             )
+
+        try:
+            record_submission_completion(
+                survey,
+                metadata.get("engagement_session_id"),
+                request=request,
+            )
+        except Exception as exc:
+            logger.warning("Completion tracking failed for survey %s: %s", survey.pk, exc)
 
         return success_response(
             {"response_id": response.id},

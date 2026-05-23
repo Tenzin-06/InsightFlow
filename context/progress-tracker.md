@@ -8,9 +8,71 @@ Update this file after every meaningful implementation change.
 
 ## Current Goal
 
-- None.
+- Unit 27 — Engagement Tracking System
 
 ## Completed
+
+- **Unit 28: Engagement Optimization System** ✅ implemented & verified
+  - `backend/apps/engagement_optimization/__init__.py` + `apps.py` — new Django app scaffold (`EngagementOptimizationConfig`)
+  - `backend/apps/engagement_optimization/constants.py` — trigger types (`non_response`, `dropoff_detected`), segment types (5), opt event types (3), execution statuses (5), reminder frequency defaults, Trigger.dev task ID constants
+  - `backend/apps/engagement_optimization/utils.py` — `success_response` / `error_response` helpers
+  - `backend/apps/engagement_optimization/permissions.py` — `IsCampaignOwner` object-level permission
+  - `backend/apps/engagement_optimization/validators.py` — `validate_trigger_type`, `validate_delay_days`, `validate_reminder_limit`
+  - `backend/apps/engagement_optimization/models/optimization_rule.py` — `OptimizationRule`: owner FK, campaign FK (nullable), rule_name, trigger_type, delay_days, reminder_limit, is_active; 4 DB indexes
+  - `backend/apps/engagement_optimization/models/optimization_event.py` — `OptimizationEvent`: campaign FK, optimization_rule FK (nullable), recipient_email, event_type, triggered_at, outcome; 4 DB indexes
+  - `backend/apps/engagement_optimization/models/engagement_segment.py` — `EngagementSegment`: campaign FK, recipient_email, segment_type, previous_segment, assigned_at; UniqueConstraint(campaign+recipient_email); 4 DB indexes
+  - `backend/apps/engagement_optimization/models/followup_execution.py` — `FollowupExecution`: campaign FK, optimization_rule FK (nullable), recipient_email, status, executed_at, error_message; 4 DB indexes
+  - `backend/apps/engagement_optimization/migrations/0001_initial.py` — creates all 4 tables with indexes and constraint; depends on authentication+campaigns
+  - `backend/apps/engagement_optimization/services/optimization_logger.py` — structured logger: `log_rule_evaluated`, `log_reminder_triggered`, `log_action_skipped`, `log_optimization_failure`, `log_segment_updated`
+  - `backend/apps/engagement_optimization/services/targeting_service.py` — `NonRespondent` dataclass; `get_nonrespondents()`: cross-references DeliveryLog + Response to identify non-completers
+  - `backend/apps/engagement_optimization/services/engagement_evaluator.py` — `has_opened_email`, `has_clicked_link`, `has_started_survey`, `has_completed_survey`, `has_dropped_off`; `count_reminders_sent`, `is_reminder_eligible` (returns `(bool, reason)` with limit + gap enforcement)
+  - `backend/apps/engagement_optimization/services/segmentation_service.py` — `_resolve_segment` (deterministic 5-tier logic); `assign_segment` (upsert + transition logging); `generate_segments_for_campaign` (batch)
+  - `backend/apps/engagement_optimization/services/reminder_orchestrator.py` — `orchestrate_reminder`: eligibility gate → create OptimizationEvent + FollowupExecution; returns `{status, reason}`; prevents duplicate outreach
+  - `backend/apps/engagement_optimization/services/optimization_engine.py` — `run_optimization_for_rule` (evaluates one rule per trigger type); `run_optimization_for_campaign` (refresh segments → evaluate all active rules → return full summary)
+  - `backend/apps/engagement_optimization/serializers/optimization_serializer.py` — `OptimizationRuleSerializer`, `OptimizationEventSerializer`, `EngagementSegmentSerializer`, `FollowupExecutionSerializer`, `OptimizationRunSerializer`
+  - `backend/apps/engagement_optimization/views/optimization_views.py` — `OptimizationRuleListCreateView` (`GET/POST /optimization/rules/`), `OptimizationEventListView` (`GET /optimization/events/?campaign_id&limit&offset`), `OptimizationRunView` (`POST /optimization/run/`)
+  - `backend/apps/engagement_optimization/views/internal_views.py` — `InternalProcessNonrespondentsView`, `InternalEvaluateOptRulesView`, `InternalTriggerFollowupsView`, `InternalGenerateSegmentsView`; all use `InternalSecretPermission`
+  - `backend/apps/engagement_optimization/urls.py` — 3 public routes + 4 internal routes
+  - `backend/config/settings/base.py` — added `apps.engagement_optimization` to `LOCAL_APPS`
+  - `backend/config/urls.py` — wired `apps.engagement_optimization.urls` under `/api/v1/`
+  - `backend/trigger/src/schemas/optimization.schema.ts` — Zod schemas: `ProcessNonrespondentsPayloadSchema`, `EvaluateOptRulesPayloadSchema`, `TriggerFollowupsPayloadSchema`, `GenerateSegmentsPayloadSchema`
+  - `backend/trigger/src/tasks/process_nonrespondents.ts` — `processNonrespondentsTask` (`id: process-nonrespondents`)
+  - `backend/trigger/src/tasks/evaluate_opt_rules.ts` — `evaluateOptRulesTask` (`id: evaluate-opt-rules`)
+  - `backend/trigger/src/tasks/trigger_followups.ts` — `triggerFollowupsTask` (`id: trigger-followups`)
+  - `backend/trigger/src/tasks/generate_segments.ts` — `generateSegmentsTask` (`id: generate-segments`)
+  - `backend/trigger/src/constants/index.ts` — added 4 new `TASK_IDS` entries
+  - `backend/trigger/src/index.ts` — registered all 4 new tasks
+  - `django-admin check`: 0 issues; `makemigrations --check --dry-run`: no changes; `npm run typecheck`: 0 errors
+
+- **Unit 25: Background Job Infrastructure** ✅ implemented & verified
+  - `backend/trigger/package.json` — Node.js worker project; @trigger.dev/sdk, zod, dotenv, pino, pino-pretty; `dev`/`deploy`/`typecheck` scripts
+  - `backend/trigger/tsconfig.json` — TypeScript config (ES2022, NodeNext, strict)
+  - `backend/trigger/trigger.config.ts` — Trigger.dev project config; 3-attempt exponential backoff default; `./src/tasks` task directory
+  - `backend/trigger/.env` — environment variable template (TRIGGER_SECRET_KEY, TRIGGER_PROJECT_ID, TRIGGER_API_URL, DJANGO_API_URL, TRIGGER_INTERNAL_SECRET)
+  - `backend/trigger/src/constants/index.ts` — `JOB_STATUS` and `TASK_IDS` constants
+  - `backend/trigger/src/schemas/campaign.schema.ts` — `SendCampaignPayloadSchema` (Zod) + `SendTestEmailPayloadSchema`
+  - `backend/trigger/src/schemas/upload.schema.ts` — `ProcessUploadPayloadSchema` (Zod)
+  - `backend/trigger/src/utils/logging_utils.ts` — pino-based structured logger; `logTaskStart`, `logTaskComplete`, `logTaskRetry`, `logTaskError`, `logProviderResponse`
+  - `backend/trigger/src/utils/retry_utils.ts` — `DEFAULT_RETRY_CONFIG`, `NETWORK_RETRY_CONFIG`, `UPLOAD_RETRY_CONFIG`; `isRetryableError()` (permanent vs transient classification); `withRetryGuard()`
+  - `backend/trigger/src/utils/trigger_client.ts` — `callDjangoApi()` — authenticates with `X-Trigger-Internal-Secret` header; fetches Django internal endpoints from workers
+  - `backend/trigger/src/tasks/send_campaign.ts` — `sendCampaignTask` (`id: send-campaign`); Zod payload validation → `AbortTaskRunError` on invalid input; calls `/api/v1/internal/campaigns/:id/process/`; permanent-vs-transient retry guard; `onFailure` logging
+  - `backend/trigger/src/tasks/send_test_email.ts` — `sendTestEmailTask` (`id: send-test-email`); same retry pattern; calls `/api/v1/internal/campaigns/:id/test-process/`
+  - `backend/trigger/src/tasks/process_audience_upload.ts` — `processAudienceUploadTask` (`id: process-audience-upload`); UPLOAD_RETRY_CONFIG (4 attempts); calls `/api/v1/internal/audiences/:id/process-upload/`
+  - `backend/trigger/src/tasks/generate_report.ts` — `generateReportTask` (`id: generate-report`); calls `/api/v1/internal/surveys/:id/generate-report/`
+  - `backend/trigger/src/tasks/cleanup_jobs.ts` — `cleanupJobsTask` (`id: cleanup-jobs`); calls `/api/v1/internal/jobs/cleanup/`
+  - Trigger.dev task `onFailure` hooks updated to the v4 single-params signature so `npm run typecheck` passes
+  - `backend/trigger/src/index.ts` — task registry re-exporting all 5 tasks
+  - `backend/apps/email_campaigns/models/background_job.py` — `BackgroundJob` model: task_id, trigger_job_id, status (queued/running/completed/failed/retrying), payload (JSONField), result (JSONField), error_message, timestamps; `mark_running()`, `mark_completed()`, `mark_failed()` helpers; 4 DB indexes
+  - `backend/apps/email_campaigns/models/__init__.py` — re-exports `BackgroundJob`
+  - `backend/apps/email_campaigns/migrations/0002_background_job.py` — migration applied OK
+  - `backend/apps/email_campaigns/services/queue_service.py` — `enqueue_campaign_send()` + `enqueue_test_email()`: create BackgroundJob (status=queued) → call Trigger.dev REST API → return job_id; graceful fallback to synchronous execution when `TRIGGER_SECRET_KEY` not set (dev mode); `get_job_status()` helper
+  - `backend/apps/email_campaigns/views/send_views.py` — `CampaignSendView` + `CampaignTestSendView` now return HTTP 202 with `{ success: true, data: { job_id: "..." } }` immediately
+  - `backend/apps/email_campaigns/views/internal_views.py` — `InternalCampaignProcessView`, `InternalCampaignTestProcessView`, `InternalJobCleanupView`; `NoAuthentication` bypasses JWT; `InternalSecretPermission` validates `X-Trigger-Internal-Secret` header; updates BackgroundJob status on completion
+  - `backend/apps/email_campaigns/urls.py` — added 3 internal routes: `internal/campaigns/:pk/process/`, `internal/campaigns/:pk/test-process/`, `internal/jobs/cleanup/`
+  - `backend/config/settings/base.py` — added `TRIGGER_SECRET_KEY`, `TRIGGER_PROJECT_ID`, `TRIGGER_API_URL`, `TRIGGER_INTERNAL_SECRET` settings
+  - `backend/.env` — added Trigger.dev env var stubs
+  - `backend/requirements/base.txt` — added `requests>=2.31.0`
+  - `django-admin check`: 0 issues; migrations: applied OK; all imports verified
 
 - **Unit 22: Audience Management Functionality** ✅ implemented & verified
   - `backend/apps/campaigns/models/recipient.py` — added `UniqueConstraint(["audience", "email"], "unique_recipient_per_audience")` + `Index(["audience"])` 
@@ -507,6 +569,20 @@ Update this file after every meaningful implementation change.
   - AI-powered analytics layer: response summarization, sentiment analysis, quality scoring, question-level insights, AI-enhanced dashboard integration
   - Backend: `apps/ai` Gemini gateway + `apps/ai_analytics` Django app (models, services, views, URLs)
   - Frontend: 5 AI analytics components in `src/components/analytics/ai/`
+
+- **Unit 31: Gemini AI Infrastructure** — in progress
+  - Implement Gemini API integration, AI abstraction gateway, prompt builder, response parser, execution manager, retry handler, AI logger, async Trigger.dev AI workflows, AIJob/AIExecution/AIPromptTemplate/AIUsageRecord models, Pydantic output schemas, and AI configuration per `context/feature-specs/31-Gemini-AI-Infrastructure.md`.
+
+- **Unit 26: Campaign Scheduling and Automation** — in progress
+  - Implement scheduled campaign execution, cancellation, reminder eligibility, reminder workflows, and automation logging per `context/feature-specs/26-Campaign-Scheduling-and-Automation.md`.
+
+- **Unit 27: Engagement Tracking System** — in progress
+  - Implement email open tracking, link click tracking, survey response tracking, response sessions, drop-off detection, attribution, and raw engagement analytics per `context/feature-specs/27-Engagement-Tracking-System.md`.
+  - Added backend engagement app scaffold with tracking tokens, raw events, email opens, link clicks, response sessions, drop-off events, services, tracking endpoints, campaign analytics endpoint, and initial migration.
+  - Wired campaign email rendering to generate per-recipient tracking tokens, tracked survey links, and email open pixels.
+  - Wired public survey UI to record survey start, question answered, and completion events with session IDs.
+  - Added engagement throttling settings and backend/frontend URL env documentation for safe tracking redirects and email pixel URLs.
+  - Verification: `npm.cmd run build` passes; `.env\Scripts\python.exe manage.py check` passes; `.env\Scripts\python.exe manage.py makemigrations engagement --check --dry-run` reports no engagement changes. Full migration dry-run still reports pre-existing migration drift in automation, campaigns, and email_campaigns.
 
 ## Next Up
 

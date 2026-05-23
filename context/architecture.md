@@ -45,6 +45,7 @@ Modular monolithic Django application.
 - `/apps/responses` → response collection and storage
 - `/apps/distribution` → email campaigns, link generation, QR codes
 - `/apps/analytics` → metrics computation and reporting logic
+- `/apps/engagement` → email opens, link clicks, survey sessions, drop-off events, and raw engagement event persistence
 - `/apps/ai` → AI orchestration layer (Gemini API integration)
 - `/apps/simulation` → synthetic response generation (controlled mode)
 - `/apps/auth` → user/workspace access control (Clerk integration layer)
@@ -75,6 +76,7 @@ Stores structured application data:
 - Responses
 - Campaigns
 - Engagement tracking (opens, clicks, completions)
+- Engagement events, tracking tokens, response sessions, and drop-off events
 - AI analysis results
 - Simulation runs and synthetic responses metadata
 
@@ -241,7 +243,12 @@ These are non-negotiable rules the system must never violate:
    - Every email/link click must map to a valid campaign and survey ID.
    - No orphan tracking events allowed.
 
-8. **Strict MVP Scope Enforcement**
+8. **Engagement Attribution Integrity**
+   - Public tracking tokens must map internally to campaign, survey, and recipient records.
+   - Tracking redirects must only point to approved survey destinations.
+   - Survey completion events should be deduplicated per response session.
+
+9. **Strict MVP Scope Enforcement**
    - No CRM, marketplace, or social distribution features exist in backend logic or schema.
 
 ---

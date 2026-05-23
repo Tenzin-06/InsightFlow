@@ -2,3 +2,16 @@
 .claude/worktrees/
 .agents/
 skills-lock.json
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Generated tool/runtime state
+.trigger/
+**/.trigger/
+
+# Local environment files
+.env
+.env.*
+!.env.example
