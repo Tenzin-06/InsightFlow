@@ -15,7 +15,8 @@ api_v1_urlpatterns = [
     path("", include("apps.automation.urls")),
     path("", include("apps.engagement.urls")),
     path("", include("apps.engagement_optimization.urls")),
-    path("", include("apps.ai_analytics.urls")),
+    path("", include("apps.ai.urls")),
+    path("", include("apps.simulation.urls")),
 ]
 
 urlpatterns = [

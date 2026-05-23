@@ -29,4 +29,12 @@ export const API_ENDPOINTS = {
     questions: (surveyId: number) =>
       `/api/v1/ai-analytics/questions/${surveyId}/`,
   },
+  simulation: {
+    health: "/simulation/health/",
+    runs: "/simulation/runs/",
+    runDetail: (id: string) => `/simulation/runs/${id}/`,
+    results: (id: string) => `/simulation/results/${id}/`,
+    personas: "/simulation/personas/",
+    personaDetail: (id: string) => `/simulation/personas/${id}/`,
+  },
 };
