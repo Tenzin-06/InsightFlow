@@ -12,4 +12,7 @@ export const API_ENDPOINTS = {
   questions: {
     detail: (id: string) => `/questions/${id}/`,
   },
+  sharing: {
+    surveyMeta: (slug: string) => `/sharing/surveys/${slug}/`,
+  },
 };

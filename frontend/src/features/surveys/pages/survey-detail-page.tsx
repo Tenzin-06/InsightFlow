@@ -7,6 +7,7 @@ import { SurveyHeader } from "@/features/surveys/components/survey-header";
 import { useSurvey } from "@/features/surveys/hooks/use-survey";
 import { useUpdateSurvey, useDeleteSurvey } from "@/features/surveys/hooks/use-surveys";
 import { useQuestions } from "@/features/surveys/hooks/use-questions";
+import { ShareModal } from "@/features/survey-sharing/components/share-modal";
 
 const questionTypeLabels: Record<string, string> = {
   short_text: "Short Text",
@@ -79,6 +80,14 @@ export default function SurveyDetailPage() {
           backTo="/surveys"
           actions={
             <>
+              {survey.status === "published" && survey.slug && (
+                <ShareModal
+                  surveyId={survey.id}
+                  surveyTitle={survey.title}
+                  surveyDescription={survey.description}
+                  slug={survey.slug}
+                />
+              )}
               <Button
                 variant="outline"
                 size="sm"

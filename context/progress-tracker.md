@@ -8,9 +8,51 @@ Update this file after every meaningful implementation change.
 
 ## Current Goal
 
-- Unit 19: Campaign and Distribution Layer — Complete
+- None.
 
 ## Completed
+
+- **Unit 20: Survey Sharing System** ✅ implemented (backend + frontend)
+  - `backend/apps/surveys/models/survey.py` — added `slug` field (`SlugField`, unique, null=True, db_index=True); `save()` override auto-generates `<slugified-title>-<8-char-uuid>` on first save
+  - `backend/apps/surveys/serializers/survey_serializer.py` — added `"slug"` to `fields` and `read_only_fields`
+  - `backend/apps/surveys/migrations/0002_survey_slug.py` — `AddField` for slug + `RunPython` data migration `populate_slugs` to backfill existing rows
+  - `backend/apps/sharing/__init__.py` — app package
+  - `backend/apps/sharing/apps.py` — `SharingConfig` (`default_auto_field`, `name = "apps.sharing"`)
+  - `backend/apps/sharing/utils.py` — `success_response` / `error_response` helpers
+  - `backend/apps/sharing/permissions.py` — `PublicSharingPermission(AllowAny)`
+  - `backend/apps/sharing/validators.py` — `validate_survey_is_published(survey)` raises NotFound for non-published
+  - `backend/apps/sharing/serializers/__init__.py` — empty
+  - `backend/apps/sharing/serializers/survey_share_serializer.py` — `SurveyShareSerializer` (read-only: title, slug, description, status, is_public)
+  - `backend/apps/sharing/services/__init__.py` — empty
+  - `backend/apps/sharing/services/sharing_validation_service.py` — `get_published_survey_by_slug(slug)`: raises NotFound for missing or non-published surveys
+  - `backend/apps/sharing/views/__init__.py` — empty
+  - `backend/apps/sharing/views/sharing_views.py` — `SurveyShareMetadataView` (APIView, AllowAny, `authentication_classes=[]`); `GET /api/v1/sharing/surveys/<slug>/`
+  - `backend/apps/sharing/urls.py` — `sharing/surveys/<slug:slug>/` → `SurveyShareMetadataView`
+  - `backend/config/settings/base.py` — added `"apps.sharing"` to `LOCAL_APPS`
+  - `backend/config/urls.py` — wired `apps.sharing.urls` under `/api/v1/`
+  - `frontend/.env` + `.env.development` — added `VITE_APP_BASE_URL=http://localhost:5173`
+  - `frontend/.env.production` — added `VITE_APP_BASE_URL=https://app.insightflow.ai`
+  - `frontend/src/features/surveys/types/index.ts` — added `slug?: string | null` to `Survey` type
+  - `frontend/src/lib/env/index.ts` — added `getOptionalEnv` helper + `APP_BASE_URL` export
+  - `frontend/src/lib/api/endpoints.ts` — added `sharing.surveyMeta(slug)` endpoint
+  - `frontend/package.json` — added `qrcode.react ^4.2.0` dependency (run `npm install`)
+  - `frontend/src/features/survey-sharing/types/index.ts` — `ShareMetadata`, `ShareLinkMode`, `QRSize` types
+  - `frontend/src/features/survey-sharing/constants/index.ts` — `APP_BASE_URL`, `QR_SIZES`, `QR_SIZE_LABELS`
+  - `frontend/src/features/survey-sharing/utils/url-builder.ts` — `generateSurveyShareLink`, `generateConversationalShareLink`
+  - `frontend/src/features/survey-sharing/utils/qr-utils.ts` — `downloadQRCodeAsPNG`, `printQRCode`
+  - `frontend/src/features/survey-sharing/utils/share-utils.ts` — `generateShareText`, `canUseNativeShare`, `triggerNativeShare`
+  - `frontend/src/features/survey-sharing/services/sharing-api.ts` — `getSurveyShareMetadata(slug)` (public axios client, no auth)
+  - `frontend/src/features/survey-sharing/hooks/use-share-link.ts` — `useShareLink(slug)` → `{ standardLink, conversationalLink }`
+  - `frontend/src/features/survey-sharing/hooks/use-copy-to-clipboard.ts` — `useCopyToClipboard(resetDelay)` with native clipboard + textarea fallback
+  - `frontend/src/features/survey-sharing/hooks/use-qr-code.ts` — `useQRCode(initialSize)` → `{ size, setSize, pixelSize }`
+  - `frontend/src/features/survey-sharing/components/copy-button.tsx` — animated copy → "Copied!" button with Check icon
+  - `frontend/src/features/survey-sharing/components/share-link-card.tsx` — readonly URL input + CopyButton + external link
+  - `frontend/src/features/survey-sharing/components/qr-code-card.tsx` — QRCodeCanvas with size selector, Download PNG, Print actions
+  - `frontend/src/features/survey-sharing/components/social-share-buttons.tsx` — native Share, Email, Twitter/X links
+  - `frontend/src/features/survey-sharing/components/distribution-helper.tsx` — quick distribution panel with copy + preview buttons
+  - `frontend/src/features/survey-sharing/components/share-preview.tsx` — link preview card (Globe icon, title, description, URL)
+  - `frontend/src/features/survey-sharing/components/share-modal.tsx` — full Dialog with SharePreview, both links, QR code, social sharing
+  - `frontend/src/features/surveys/pages/survey-detail-page.tsx` — integrated `ShareModal` (shown when published && slug set)
 
 - **Unit 19: Campaign and Distribution Layer** ✅ implemented & verified
   - `backend/apps/campaigns/constants.py` — status constants + `VALID_TRANSITIONS` state machine map
@@ -301,7 +343,7 @@ Update this file after every meaningful implementation change.
 
 ## In Progress
 
-- None. Unit 18 complete.
+- None.
 
 ## Next Up
 

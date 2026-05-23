@@ -26,6 +26,7 @@ export type Survey = {
   title: string;
   description: string;
   status: SurveyStatus;
+  slug?: string | null;
   is_public: boolean;
   owner: string;
   question_count: number;

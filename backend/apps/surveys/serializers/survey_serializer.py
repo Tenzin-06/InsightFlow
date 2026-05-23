@@ -17,12 +17,13 @@ class SurveySerializer(serializers.ModelSerializer):
             "title",
             "description",
             "status",
+            "slug",
             "is_public",
             "created_at",
             "updated_at",
             "questions",
         ]
-        read_only_fields = ["id", "owner", "created_at", "updated_at"]
+        read_only_fields = ["id", "owner", "slug", "created_at", "updated_at"]
 
     def validate_title(self, value):
         if not value or not value.strip():
