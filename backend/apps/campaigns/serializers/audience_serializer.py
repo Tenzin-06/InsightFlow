@@ -1,9 +1,11 @@
 from rest_framework import serializers
 from apps.campaigns.models.audience import Audience
+from apps.campaigns.serializers.recipient_serializer import RecipientSerializer
 
 
 class AudienceSerializer(serializers.ModelSerializer):
     recipient_count = serializers.SerializerMethodField()
+    recipients = RecipientSerializer(many=True, read_only=True)
 
     class Meta:
         model = Audience
@@ -14,11 +16,15 @@ class AudienceSerializer(serializers.ModelSerializer):
             "owner",
             "metadata",
             "recipient_count",
+            "recipients",
             "created_at",
         ]
-        read_only_fields = ["id", "owner", "created_at"]
+        read_only_fields = ["id", "owner", "created_at", "recipients"]
 
     def get_recipient_count(self, obj):
+        # Use cached queryset if prefetched, otherwise count directly.
+        if hasattr(obj, "_prefetched_objects_cache") and "recipients" in obj._prefetched_objects_cache:
+            return len(obj._prefetched_objects_cache["recipients"])
         return obj.recipients.count()
 
     def validate_name(self, value):

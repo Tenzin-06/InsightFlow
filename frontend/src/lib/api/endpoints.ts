@@ -19,5 +19,6 @@ export const API_ENDPOINTS = {
     list: "/audiences/",
     detail: (id: string) => `/audiences/${id}/`,
     upload: (id: string) => `/audiences/${id}/upload/`,
+    recipients: (id: string) => `/audiences/${id}/recipients/`,
   },
 };

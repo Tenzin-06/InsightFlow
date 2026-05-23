@@ -57,4 +57,19 @@ export type UploadContactsPayload = {
   }>;
 };
 
+/** Summary returned by the backend upload endpoint. */
+export type UploadSummary = {
+  uploaded: number;
+  duplicates: number;
+  invalid: number;
+};
+
+/** Paginated recipients response from /audiences/:id/recipients/ */
+export type AudienceRecipientPage = {
+  count: number;
+  limit: number;
+  offset: number;
+  results: Recipient[];
+};
+
 export type AudienceSortKey = "created_desc" | "created_asc" | "contacts_desc" | "contacts_asc";

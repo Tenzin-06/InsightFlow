@@ -17,6 +17,13 @@ class Recipient(models.Model):
         db_table = "recipients"
         indexes = [
             models.Index(fields=["email"]),
+            models.Index(fields=["audience"]),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["audience", "email"],
+                name="unique_recipient_per_audience",
+            )
         ]
         ordering = ["-created_at"]
 

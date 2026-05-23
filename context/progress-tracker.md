@@ -378,7 +378,7 @@ Update this file after every meaningful implementation change.
 
 ## In Progress
 
-- None.
+- **Unit 22: Audience Management Functionality** — backend upload/validation services, recipients endpoint, UniqueConstraint migration, frontend spec hooks/services/utils/state layer
 
 ## Next Up
 
