@@ -70,6 +70,34 @@ Update this file after every meaningful implementation change.
   - `frontend/src/features/audiences/pages/audience-detail-page.tsx` — uses `useAudienceContacts` (dedicated endpoint) + `useDeleteAudience` with confirmation dialog; stat cards show live loaded-contact count
   - `npm.cmd run build`: passes (0 TS errors)
 
+- **Unit 29: Analytics Dashboard UI** ✅ implemented & verified
+  - `npm install recharts` — chart rendering library
+  - `frontend/src/features/analytics/types/index.ts` — `MetricCardData`, `TrendDirection`, `TimeSeriesPoint`, `CategoryPoint`, `FunnelStep`, `SurveyAnalyticsSummary`, `CampaignAnalyticsSummary`, `EngagementSummary`, `DashboardOverview` types
+  - `frontend/src/features/analytics/constants/index.ts` — `CHART_COLORS`, `PIE_COLORS`, `MOCK_DASHBOARD_OVERVIEW`, `MOCK_SURVEY_ANALYTICS`, `MOCK_CAMPAIGN_ANALYTICS`, `MOCK_ENGAGEMENT` mock data
+  - `frontend/src/features/analytics/components/charts/line-chart.tsx` — `AnalyticsLineChart` (dual-series, dashed secondary, legend)
+  - `frontend/src/features/analytics/components/charts/bar-chart.tsx` — `AnalyticsBarChart` (Cell per-item colours, radius caps)
+  - `frontend/src/features/analytics/components/charts/pie-chart.tsx` — `AnalyticsPieChart` (donut, legend)
+  - `frontend/src/features/analytics/components/charts/funnel-chart.tsx` — `AnalyticsFunnelChart` (custom accessible horizontal-bar funnel, no Recharts Funnel)
+  - `frontend/src/features/analytics/components/charts/trend-chart.tsx` — `AnalyticsTrendChart` (area chart with gradient fill)
+  - `frontend/src/features/analytics/components/metrics/metric-card.tsx` — `MetricCard` with value, trend icon, change badge, optional icon
+  - `frontend/src/features/analytics/components/metrics/stat-grid.tsx` — `StatGrid` responsive 1→2→4-col KPI grid
+  - `frontend/src/features/analytics/components/metrics/percentage-card.tsx` — `PercentageCard` with animated progress bar
+  - `frontend/src/features/analytics/components/layouts/analytics-shell.tsx` — `AnalyticsShell` page outer container
+  - `frontend/src/features/analytics/components/layouts/analytics-grid.tsx` — `AnalyticsGrid` responsive chart grid (1/2/3 cols)
+  - `frontend/src/features/analytics/components/layouts/dashboard-header.tsx` — `AnalyticsDashboardHeader` with title, description, date-range placeholder
+  - `frontend/src/features/analytics/components/widgets/analytics-card.tsx` — `AnalyticsCard` standard widget card (header/content/footer + action slot)
+  - `frontend/src/features/analytics/components/states/analytics-skeleton.tsx` — `AnalyticsSkeleton` + `ChartCardSkeleton` loading states
+  - `frontend/src/features/analytics/components/states/empty-analytics-state.tsx` — `EmptyAnalyticsState`
+  - `frontend/src/features/analytics/components/states/error-analytics-state.tsx` — `ErrorAnalyticsState` with retry button
+  - `frontend/src/features/analytics/pages/analytics-page.tsx` — main overview: KPIs, response trend, top surveys bar chart, click-rate spotlight, quick insights panel
+  - `frontend/src/features/analytics/pages/survey-analytics-page.tsx` — survey detail: KPIs, response trend, completion funnel, question engagement bar chart; route `/dashboard/analytics/surveys/:surveyId`
+  - `frontend/src/features/analytics/pages/campaign-analytics-page.tsx` — campaign detail: KPIs, 3 percentage cards, open/click line trend, reminder bar chart; route `/dashboard/analytics/campaigns/:campaignId`
+  - `frontend/src/features/analytics/pages/engagement-analytics-page.tsx` — engagement funnel, drop-off bar chart, interaction timeline trend, audience segment donut; route `/dashboard/analytics/engagement`
+  - `frontend/src/app/router/index.tsx` — added `SurveyAnalyticsPage`, `CampaignAnalyticsPage`, `EngagementAnalyticsPage` lazy imports + 3 new routes
+  - `frontend/src/routes/route-config.ts` — added `children` to `RouteConfig` type; wired Analytics sub-nav (Overview, Surveys, Campaigns, Engagement)
+  - `frontend/src/components/layout/sidebar-item.tsx` — collapsible nav group: auto-expands on active child route, chevron toggle, indented child links
+  - `npm run build`: passes (0 TS errors)
+
 - **Unit 24: Email Distribution System** ✅ implemented & verified
   - `backend/requirements/base.txt` — added `resend>=2.0`, `html2text>=2024.2.26`
   - `backend/.env` + `config/settings/base.py` — added `RESEND_API_KEY`, `DEFAULT_FROM_EMAIL`, `RESEND_AUDIENCE_DOMAIN`, `APP_FRONTEND_URL` settings
