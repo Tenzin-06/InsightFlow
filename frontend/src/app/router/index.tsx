@@ -16,8 +16,13 @@ const SurveyListPage = lazy(() => import("@/features/surveys/pages/survey-list-p
 const SurveyCreatePage = lazy(() => import("@/features/surveys/pages/survey-create-page"));
 const SurveyDetailPage = lazy(() => import("@/features/surveys/pages/survey-detail-page"));
 const SurveyEditorPage = lazy(() => import("@/features/surveys/pages/survey-editor-page"));
+const AudiencesPage = lazy(() => import("@/features/audiences/pages/audiences-page"));
+const AudienceDetailPage = lazy(() => import("@/features/audiences/pages/audience-detail-page"));
+const AudienceFormPage = lazy(() => import("@/features/audiences/pages/audience-form-page"));
 const AnalyticsPage = lazy(() => import("@/features/analytics/pages/analytics-page"));
-const CampaignsPage = lazy(() => import("@/features/campaigns/pages/campaigns-page"));
+const CampaignsPage = lazy(() => import("@/features/email-campaigns/pages/campaigns-page"));
+const CreateCampaignPage = lazy(() => import("@/features/email-campaigns/pages/create-campaign-page"));
+const CampaignDetailPage = lazy(() => import("@/features/email-campaigns/pages/campaign-detail-page"));
 const SettingsPage = lazy(() => import("@/features/dashboard/pages/settings-page"));
 
 const PageLoader = () => (
@@ -56,7 +61,15 @@ const router = createBrowserRouter([
           { path: "/surveys/create", element: <Suspense fallback={<PageLoader />}><SurveyCreatePage /></Suspense> },
           { path: "/surveys/:surveyId", element: <Suspense fallback={<PageLoader />}><SurveyDetailPage /></Suspense> },
           { path: "/surveys/:surveyId/edit", element: <Suspense fallback={<PageLoader />}><SurveyEditorPage /></Suspense> },
+          { path: "/dashboard/audiences", element: <Suspense fallback={<PageLoader />}><AudiencesPage /></Suspense> },
+          { path: "/dashboard/audiences/new", element: <Suspense fallback={<PageLoader />}><AudienceFormPage mode="create" /></Suspense> },
+          { path: "/dashboard/audiences/:audienceId", element: <Suspense fallback={<PageLoader />}><AudienceDetailPage /></Suspense> },
+          { path: "/dashboard/audiences/:audienceId/edit", element: <Suspense fallback={<PageLoader />}><AudienceFormPage mode="edit" /></Suspense> },
           { path: "/analytics", element: <Suspense fallback={<PageLoader />}><AnalyticsPage /></Suspense> },
+          { path: "/dashboard/campaigns", element: <Suspense fallback={<PageLoader />}><CampaignsPage /></Suspense> },
+          { path: "/dashboard/campaigns/new", element: <Suspense fallback={<PageLoader />}><CreateCampaignPage /></Suspense> },
+          { path: "/dashboard/campaigns/:id", element: <Suspense fallback={<PageLoader />}><CampaignDetailPage /></Suspense> },
+          { path: "/dashboard/campaigns/:id/edit", element: <Suspense fallback={<PageLoader />}><CreateCampaignPage /></Suspense> },
           { path: "/campaigns", element: <Suspense fallback={<PageLoader />}><CampaignsPage /></Suspense> },
           { path: "/settings", element: <Suspense fallback={<PageLoader />}><SettingsPage /></Suspense> },
         ],

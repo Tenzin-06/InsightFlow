@@ -1,4 +1,4 @@
-import { LayoutDashboard, ClipboardList, BarChart3, Send, Settings } from "lucide-react";
+import { LayoutDashboard, ClipboardList, BarChart3, Send, Settings, Users } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 export type RouteConfig = {
@@ -10,8 +10,9 @@ export type RouteConfig = {
 export const mainNavRoutes: RouteConfig[] = [
   { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
   { label: "Surveys", path: "/surveys", icon: ClipboardList },
+  { label: "Audiences", path: "/dashboard/audiences", icon: Users },
   { label: "Analytics", path: "/analytics", icon: BarChart3 },
-  { label: "Campaigns", path: "/campaigns", icon: Send },
+  { label: "Campaigns", path: "/dashboard/campaigns", icon: Send },
 ];
 
 export const settingsRoute: RouteConfig = {
