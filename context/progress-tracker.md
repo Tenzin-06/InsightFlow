@@ -12,6 +12,36 @@ Update this file after every meaningful implementation change.
 
 ## Completed
 
+- **Unit 25: Background Job Infrastructure** ✅ implemented & verified
+  - `backend/trigger/package.json` — Node.js worker project; @trigger.dev/sdk, zod, dotenv, pino, pino-pretty; `dev`/`deploy`/`typecheck` scripts
+  - `backend/trigger/tsconfig.json` — TypeScript config (ES2022, NodeNext, strict)
+  - `backend/trigger/trigger.config.ts` — Trigger.dev project config; 3-attempt exponential backoff default; `./src/tasks` task directory
+  - `backend/trigger/.env` — environment variable template (TRIGGER_SECRET_KEY, TRIGGER_PROJECT_ID, TRIGGER_API_URL, DJANGO_API_URL, TRIGGER_INTERNAL_SECRET)
+  - `backend/trigger/src/constants/index.ts` — `JOB_STATUS` and `TASK_IDS` constants
+  - `backend/trigger/src/schemas/campaign.schema.ts` — `SendCampaignPayloadSchema` (Zod) + `SendTestEmailPayloadSchema`
+  - `backend/trigger/src/schemas/upload.schema.ts` — `ProcessUploadPayloadSchema` (Zod)
+  - `backend/trigger/src/utils/logging_utils.ts` — pino-based structured logger; `logTaskStart`, `logTaskComplete`, `logTaskRetry`, `logTaskError`, `logProviderResponse`
+  - `backend/trigger/src/utils/retry_utils.ts` — `DEFAULT_RETRY_CONFIG`, `NETWORK_RETRY_CONFIG`, `UPLOAD_RETRY_CONFIG`; `isRetryableError()` (permanent vs transient classification); `withRetryGuard()`
+  - `backend/trigger/src/utils/trigger_client.ts` — `callDjangoApi()` — authenticates with `X-Trigger-Internal-Secret` header; fetches Django internal endpoints from workers
+  - `backend/trigger/src/tasks/send_campaign.ts` — `sendCampaignTask` (`id: send-campaign`); Zod payload validation → `AbortTaskRunError` on invalid input; calls `/api/v1/internal/campaigns/:id/process/`; permanent-vs-transient retry guard; `onFailure` logging
+  - `backend/trigger/src/tasks/send_test_email.ts` — `sendTestEmailTask` (`id: send-test-email`); same retry pattern; calls `/api/v1/internal/campaigns/:id/test-process/`
+  - `backend/trigger/src/tasks/process_audience_upload.ts` — `processAudienceUploadTask` (`id: process-audience-upload`); UPLOAD_RETRY_CONFIG (4 attempts); calls `/api/v1/internal/audiences/:id/process-upload/`
+  - `backend/trigger/src/tasks/generate_report.ts` — `generateReportTask` (`id: generate-report`); calls `/api/v1/internal/surveys/:id/generate-report/`
+  - `backend/trigger/src/tasks/cleanup_jobs.ts` — `cleanupJobsTask` (`id: cleanup-jobs`); calls `/api/v1/internal/jobs/cleanup/`
+  - Trigger.dev task `onFailure` hooks updated to the v4 single-params signature so `npm run typecheck` passes
+  - `backend/trigger/src/index.ts` — task registry re-exporting all 5 tasks
+  - `backend/apps/email_campaigns/models/background_job.py` — `BackgroundJob` model: task_id, trigger_job_id, status (queued/running/completed/failed/retrying), payload (JSONField), result (JSONField), error_message, timestamps; `mark_running()`, `mark_completed()`, `mark_failed()` helpers; 4 DB indexes
+  - `backend/apps/email_campaigns/models/__init__.py` — re-exports `BackgroundJob`
+  - `backend/apps/email_campaigns/migrations/0002_background_job.py` — migration applied OK
+  - `backend/apps/email_campaigns/services/queue_service.py` — `enqueue_campaign_send()` + `enqueue_test_email()`: create BackgroundJob (status=queued) → call Trigger.dev REST API → return job_id; graceful fallback to synchronous execution when `TRIGGER_SECRET_KEY` not set (dev mode); `get_job_status()` helper
+  - `backend/apps/email_campaigns/views/send_views.py` — `CampaignSendView` + `CampaignTestSendView` now return HTTP 202 with `{ success: true, data: { job_id: "..." } }` immediately
+  - `backend/apps/email_campaigns/views/internal_views.py` — `InternalCampaignProcessView`, `InternalCampaignTestProcessView`, `InternalJobCleanupView`; `NoAuthentication` bypasses JWT; `InternalSecretPermission` validates `X-Trigger-Internal-Secret` header; updates BackgroundJob status on completion
+  - `backend/apps/email_campaigns/urls.py` — added 3 internal routes: `internal/campaigns/:pk/process/`, `internal/campaigns/:pk/test-process/`, `internal/jobs/cleanup/`
+  - `backend/config/settings/base.py` — added `TRIGGER_SECRET_KEY`, `TRIGGER_PROJECT_ID`, `TRIGGER_API_URL`, `TRIGGER_INTERNAL_SECRET` settings
+  - `backend/.env` — added Trigger.dev env var stubs
+  - `backend/requirements/base.txt` — added `requests>=2.31.0`
+  - `django-admin check`: 0 issues; migrations: applied OK; all imports verified
+
 - **Unit 22: Audience Management Functionality** ✅ implemented & verified
   - `backend/apps/campaigns/models/recipient.py` — added `UniqueConstraint(["audience", "email"], "unique_recipient_per_audience")` + `Index(["audience"])` 
   - `backend/apps/campaigns/migrations/0002_recipient_unique_constraint.py` — migration applied (`campaigns.0002... OK`)
