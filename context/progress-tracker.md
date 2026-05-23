@@ -8,9 +8,38 @@ Update this file after every meaningful implementation change.
 
 ## Current Goal
 
-- Unit 12 - Google Forms Import UI
+- Unit 36 - PDF Report Backend
 
 ## Completed
+
+- **Unit 35: PDF Report Frontend (35-PDF-Report-A)** ✅ implemented & verified
+  - `frontend/src/features/reports/types/index.ts` — `ReportSectionKey`, `ReportTemplate`, `ReportConfig`, `ExportStatus`, `ExportRecord`, `ReportPreviewState`, `ReportMetric`, `ReportChartData`, `ReportInsight`
+  - `frontend/src/features/reports/constants/index.ts` — 5 `REPORT_TEMPLATES`, section labels/descriptions, `OPTIONAL_SECTIONS`, `EXPORT_STATUS_LABELS`, `EXPORT_STATUS_PROGRESS`, `DEFAULT_REPORT_CONFIG`, mock exports/metrics/charts/insights, `ZOOM_LEVELS`
+  - `frontend/src/features/reports/services/report-api.ts` — `getRecentExports()`, `getExportById()`
+  - `frontend/src/features/reports/services/export-api.ts` — `initiateExport()`, `pollExportStatus()` (preparing → rendering → processing_charts → finalizing → completed lifecycle)
+  - `frontend/src/features/reports/hooks/use-report-templates.ts` — template selection state
+  - `frontend/src/features/reports/hooks/use-report-preview.ts` — preview visibility, pagination, zoom (5 levels: 0.5–1.5×)
+  - `frontend/src/features/reports/hooks/use-report-export.ts` — interval-based export polling with `statusRef` to avoid stale closures; `startExport`, `resetExport`
+  - `frontend/src/features/reports/components/report-cover.tsx` — professional cover page
+  - `frontend/src/features/reports/components/report-header.tsx` — section header (title | section label)
+  - `frontend/src/features/reports/components/report-footer.tsx` — generated timestamp | page X of Y | branding
+  - `frontend/src/features/reports/components/report-metrics-block.tsx` — 2×4 KPI grid with trend icons
+  - `frontend/src/features/reports/components/report-chart-block.tsx` — recharts BarChart / LineChart / PieChart switcher
+  - `frontend/src/features/reports/components/report-insight-block.tsx` — AI insight panels with teal borders and score badges
+  - `frontend/src/features/reports/components/report-layout.tsx` — `renderSection()` switch for all 8 section keys; `SectionWrapper` adds header/footer
+  - `frontend/src/features/reports/components/report-template-card.tsx` — selectable card with `aria-pressed`
+  - `frontend/src/features/reports/components/report-template-selector.tsx` — responsive 3-column grid of 5 templates
+  - `frontend/src/features/reports/components/report-template-selector-inline.tsx` — compact list variant for config form
+  - `frontend/src/features/reports/components/report-section-selector.tsx` — cover locked; optional sections as checkboxes; canonical order preserved on re-add
+  - `frontend/src/features/reports/components/report-config-form.tsx` — react-hook-form + zod; title/template/sections/charts/ai-insights/org/dates; live `onConfigChange` via `useEffect`
+  - `frontend/src/features/reports/components/report-preview.tsx` — full-screen overlay; toolbar with page nav + zoom; dot-pagination footer
+  - `frontend/src/features/reports/components/export-progress.tsx` — idle → spinner + progress bar + stage dots → download link / error
+  - `frontend/src/features/reports/components/export-actions.tsx` — validation guard; idle/exporting/completed/failed button states
+  - `frontend/src/features/reports/pages/reports-page.tsx` — two-tab workflow (Select Template → Configure & Export) + Recent Exports sidebar
+  - `frontend/src/app/router/index.tsx` — lazy `ReportsPage` + `/dashboard/reports` route
+  - `frontend/src/routes/route-config.ts` — `Reports` nav entry with `FileDown` icon
+  - `frontend/src/lib/api/endpoints.ts` — `reports` endpoint stubs (exports, exportDetail, initiate, status)
+  - Build: `npm run build` passes — 0 TS errors; `dist/assets/reports-page-*.js` emitted at ~49 kB
 
 - **Unit 36: PDF Report Backend (36-PDF-Report-B)** ✅ implemented & verified
   - `backend/apps/reports/` — new Django report generation app with export model, serializers, views, URLs, service layer, tasks shim, utilities, migrations, and print-safe templates.
@@ -684,11 +713,6 @@ Update this file after every meaningful implementation change.
   - Production build passes, dev server runs on localhost:5173
 
 ## In Progress
-
-- **Unit 35: PDF Report Frontend (35-PDF-Report-A)** — in progress
-  - Implementing full frontend reporting system: PDF export UI, report templates, layouts, configuration, preview, and export workflows per `context/feature-specs/35-PDF-Report-A.md`.
-  - Feature directory: `frontend/src/features/reports/`
-  - Route: `/dashboard/reports`
 
 - **Unit 26: Campaign Scheduling and Automation** â€” in progress
   - Implement scheduled campaign execution, cancellation, reminder eligibility, reminder workflows, and automation logging per `context/feature-specs/26-Campaign-Scheduling-and-Automation.md`.

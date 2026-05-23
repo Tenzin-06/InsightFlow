@@ -1,0 +1,91 @@
+import { X, ZoomIn, ZoomOut, ChevronLeft, ChevronRight } from "lucide-react";
+import { ReportLayout } from "./report-layout";
+import { ZOOM_LEVELS } from "../constants";
+import type { ReportConfig, ReportPreviewState } from "../types";
+
+type ReportPreviewProps = {
+  config: ReportConfig;
+  preview: ReportPreviewState;
+  onClose: () => void;
+  onNextPage: () => void;
+  onPrevPage: () => void;
+  onZoomIn: () => void;
+  onZoomOut: () => void;
+};
+
+export function ReportPreview({ config, preview, onClose, onNextPage, onPrevPage, onZoomIn, onZoomOut }: ReportPreviewProps) {
+  const { currentPage, totalPages, zoom } = preview;
+  const zoomPercent = Math.round(zoom * 100);
+  const canZoomIn = zoom < ZOOM_LEVELS[ZOOM_LEVELS.length - 1];
+  const canZoomOut = zoom > ZOOM_LEVELS[0];
+
+  const sectionForPage = config.sections[currentPage - 1];
+  const pageConfig: ReportConfig = { ...config, sections: sectionForPage ? [sectionForPage] : config.sections };
+
+  return (
+    <div role="dialog" aria-modal="true" aria-label="Report preview" className="fixed inset-0 z-50 flex flex-col bg-bg-primary/95 backdrop-blur-sm">
+      {/* Toolbar */}
+      <div className="flex shrink-0 items-center justify-between border-b border-border-default bg-white px-5 py-3 shadow-sm dark:bg-card">
+        <div>
+          <p className="text-sm font-semibold text-text-primary">Preview — {config.title || "Untitled Report"}</p>
+          <p className="text-xs text-text-muted">Section {currentPage} of {totalPages}</p>
+        </div>
+        <div className="flex items-center gap-1" role="group" aria-label="Page navigation">
+          <button onClick={onPrevPage} disabled={currentPage <= 1} aria-label="Previous section" className="flex h-8 w-8 items-center justify-center rounded-lg text-text-secondary transition hover:bg-bg-muted disabled:cursor-not-allowed disabled:opacity-40">
+            <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+          </button>
+          <span className="min-w-[80px] text-center text-xs font-medium text-text-secondary">{currentPage} / {totalPages}</span>
+          <button onClick={onNextPage} disabled={currentPage >= totalPages} aria-label="Next section" className="flex h-8 w-8 items-center justify-center rounded-lg text-text-secondary transition hover:bg-bg-muted disabled:cursor-not-allowed disabled:opacity-40">
+            <ChevronRight className="h-4 w-4" aria-hidden="true" />
+          </button>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 rounded-lg border border-border-default bg-bg-muted px-2 py-1">
+            <button onClick={onZoomOut} disabled={!canZoomOut} aria-label="Zoom out" className="flex h-6 w-6 items-center justify-center rounded text-text-secondary transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 dark:hover:bg-card">
+              <ZoomOut className="h-3.5 w-3.5" aria-hidden="true" />
+            </button>
+            <span className="min-w-[36px] text-center text-xs font-medium text-text-secondary">{zoomPercent}%</span>
+            <button onClick={onZoomIn} disabled={!canZoomIn} aria-label="Zoom in" className="flex h-6 w-6 items-center justify-center rounded text-text-secondary transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 dark:hover:bg-card">
+              <ZoomIn className="h-3.5 w-3.5" aria-hidden="true" />
+            </button>
+          </div>
+          <button onClick={onClose} aria-label="Close preview" className="flex h-8 w-8 items-center justify-center rounded-lg text-text-secondary transition hover:bg-bg-muted">
+            <X className="h-4 w-4" aria-hidden="true" />
+          </button>
+        </div>
+      </div>
+
+      {/* Canvas */}
+      <div className="flex-1 overflow-auto p-8">
+        {!config.title.trim() && (
+          <div role="alert" className="mx-auto mb-4 max-w-3xl rounded-lg border border-warning bg-warning/10 px-4 py-2.5 text-xs font-medium text-warning">
+            ⚠ Report title is missing. Add a title before exporting.
+          </div>
+        )}
+        {config.sections.length === 0 && (
+          <div role="alert" className="mx-auto mb-4 max-w-3xl rounded-lg border border-danger bg-danger/10 px-4 py-2.5 text-xs font-medium text-danger">
+            ✕ No sections selected. Choose at least one section.
+          </div>
+        )}
+        <div className="mx-auto max-w-3xl origin-top transition-transform" style={{ transform: `scale(${zoom})` }}>
+          <ReportLayout config={pageConfig} totalPages={totalPages} />
+        </div>
+      </div>
+
+      {/* Footer nav */}
+      <div className="flex shrink-0 items-center justify-center gap-3 border-t border-border-default bg-white px-5 py-3 dark:bg-card">
+        <button onClick={onPrevPage} disabled={currentPage <= 1} className="rounded-lg border border-border-default px-4 py-2 text-xs font-medium text-text-secondary transition hover:bg-bg-muted disabled:cursor-not-allowed disabled:opacity-40">
+          ← Previous
+        </button>
+        <div className="flex gap-1.5" role="group" aria-label="Section indicators">
+          {config.sections.map((_, i) => (
+            <div key={i} aria-current={i + 1 === currentPage ? "page" : undefined} className={["h-1.5 rounded-full transition-all", i + 1 === currentPage ? "w-4 bg-primary-500" : "w-1.5 bg-border-strong"].join(" ")} />
+          ))}
+        </div>
+        <button onClick={onNextPage} disabled={currentPage >= totalPages} className="rounded-lg border border-border-default px-4 py-2 text-xs font-medium text-text-secondary transition hover:bg-bg-muted disabled:cursor-not-allowed disabled:opacity-40">
+          Next →
+        </button>
+      </div>
+    </div>
+  );
+}
