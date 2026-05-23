@@ -1,4 +1,4 @@
-import environ
+﻿import environ
 from pathlib import Path
 
 env = environ.Env()
@@ -38,6 +38,7 @@ LOCAL_APPS = [
     "apps.email_campaigns",
     "apps.automation",
     "apps.engagement",
+    "apps.engagement_optimization",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -121,12 +122,7 @@ RESEND_AUDIENCE_DOMAIN = env("RESEND_AUDIENCE_DOMAIN", default="insightflow.ai")
 APP_FRONTEND_URL = env("APP_FRONTEND_URL", default="http://localhost:5173")
 APP_BACKEND_URL = env("APP_BACKEND_URL", default="http://localhost:8000")
 
-# Trigger.dev — background job infrastructure
-# TRIGGER_SECRET_KEY:     API secret from the Trigger.dev dashboard
-# TRIGGER_PROJECT_ID:     Project ID from the Trigger.dev dashboard
-# TRIGGER_API_URL:        Trigger.dev API base (default: cloud)
-# TRIGGER_INTERNAL_SECRET: Shared secret used by Trigger.dev workers to call
-#                          internal Django endpoints — keep this private
+# Trigger.dev -- background job infrastructure
 TRIGGER_SECRET_KEY = env("TRIGGER_SECRET_KEY", default="")
 TRIGGER_PROJECT_ID = env("TRIGGER_PROJECT_ID", default="")
 TRIGGER_API_URL = env("TRIGGER_API_URL", default="https://api.trigger.dev")
@@ -160,6 +156,11 @@ LOGGING = {
         "django.db.backends": {
             "handlers": ["console"],
             "level": "WARNING",
+            "propagate": False,
+        },
+        "engagement_optimization": {
+            "handlers": ["console"],
+            "level": "INFO",
             "propagate": False,
         },
     },
