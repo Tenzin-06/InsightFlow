@@ -12,6 +12,38 @@ Update this file after every meaningful implementation change.
 
 ## Completed
 
+- **Unit 28: Engagement Optimization System** ✅ implemented & verified
+  - `backend/apps/engagement_optimization/__init__.py` + `apps.py` — new Django app scaffold (`EngagementOptimizationConfig`)
+  - `backend/apps/engagement_optimization/constants.py` — trigger types (`non_response`, `dropoff_detected`), segment types (5), opt event types (3), execution statuses (5), reminder frequency defaults, Trigger.dev task ID constants
+  - `backend/apps/engagement_optimization/utils.py` — `success_response` / `error_response` helpers
+  - `backend/apps/engagement_optimization/permissions.py` — `IsCampaignOwner` object-level permission
+  - `backend/apps/engagement_optimization/validators.py` — `validate_trigger_type`, `validate_delay_days`, `validate_reminder_limit`
+  - `backend/apps/engagement_optimization/models/optimization_rule.py` — `OptimizationRule`: owner FK, campaign FK (nullable), rule_name, trigger_type, delay_days, reminder_limit, is_active; 4 DB indexes
+  - `backend/apps/engagement_optimization/models/optimization_event.py` — `OptimizationEvent`: campaign FK, optimization_rule FK (nullable), recipient_email, event_type, triggered_at, outcome; 4 DB indexes
+  - `backend/apps/engagement_optimization/models/engagement_segment.py` — `EngagementSegment`: campaign FK, recipient_email, segment_type, previous_segment, assigned_at; UniqueConstraint(campaign+recipient_email); 4 DB indexes
+  - `backend/apps/engagement_optimization/models/followup_execution.py` — `FollowupExecution`: campaign FK, optimization_rule FK (nullable), recipient_email, status, executed_at, error_message; 4 DB indexes
+  - `backend/apps/engagement_optimization/migrations/0001_initial.py` — creates all 4 tables with indexes and constraint; depends on authentication+campaigns
+  - `backend/apps/engagement_optimization/services/optimization_logger.py` — structured logger: `log_rule_evaluated`, `log_reminder_triggered`, `log_action_skipped`, `log_optimization_failure`, `log_segment_updated`
+  - `backend/apps/engagement_optimization/services/targeting_service.py` — `NonRespondent` dataclass; `get_nonrespondents()`: cross-references DeliveryLog + Response to identify non-completers
+  - `backend/apps/engagement_optimization/services/engagement_evaluator.py` — `has_opened_email`, `has_clicked_link`, `has_started_survey`, `has_completed_survey`, `has_dropped_off`; `count_reminders_sent`, `is_reminder_eligible` (returns `(bool, reason)` with limit + gap enforcement)
+  - `backend/apps/engagement_optimization/services/segmentation_service.py` — `_resolve_segment` (deterministic 5-tier logic); `assign_segment` (upsert + transition logging); `generate_segments_for_campaign` (batch)
+  - `backend/apps/engagement_optimization/services/reminder_orchestrator.py` — `orchestrate_reminder`: eligibility gate → create OptimizationEvent + FollowupExecution; returns `{status, reason}`; prevents duplicate outreach
+  - `backend/apps/engagement_optimization/services/optimization_engine.py` — `run_optimization_for_rule` (evaluates one rule per trigger type); `run_optimization_for_campaign` (refresh segments → evaluate all active rules → return full summary)
+  - `backend/apps/engagement_optimization/serializers/optimization_serializer.py` — `OptimizationRuleSerializer`, `OptimizationEventSerializer`, `EngagementSegmentSerializer`, `FollowupExecutionSerializer`, `OptimizationRunSerializer`
+  - `backend/apps/engagement_optimization/views/optimization_views.py` — `OptimizationRuleListCreateView` (`GET/POST /optimization/rules/`), `OptimizationEventListView` (`GET /optimization/events/?campaign_id&limit&offset`), `OptimizationRunView` (`POST /optimization/run/`)
+  - `backend/apps/engagement_optimization/views/internal_views.py` — `InternalProcessNonrespondentsView`, `InternalEvaluateOptRulesView`, `InternalTriggerFollowupsView`, `InternalGenerateSegmentsView`; all use `InternalSecretPermission`
+  - `backend/apps/engagement_optimization/urls.py` — 3 public routes + 4 internal routes
+  - `backend/config/settings/base.py` — added `apps.engagement_optimization` to `LOCAL_APPS`
+  - `backend/config/urls.py` — wired `apps.engagement_optimization.urls` under `/api/v1/`
+  - `backend/trigger/src/schemas/optimization.schema.ts` — Zod schemas: `ProcessNonrespondentsPayloadSchema`, `EvaluateOptRulesPayloadSchema`, `TriggerFollowupsPayloadSchema`, `GenerateSegmentsPayloadSchema`
+  - `backend/trigger/src/tasks/process_nonrespondents.ts` — `processNonrespondentsTask` (`id: process-nonrespondents`)
+  - `backend/trigger/src/tasks/evaluate_opt_rules.ts` — `evaluateOptRulesTask` (`id: evaluate-opt-rules`)
+  - `backend/trigger/src/tasks/trigger_followups.ts` — `triggerFollowupsTask` (`id: trigger-followups`)
+  - `backend/trigger/src/tasks/generate_segments.ts` — `generateSegmentsTask` (`id: generate-segments`)
+  - `backend/trigger/src/constants/index.ts` — added 4 new `TASK_IDS` entries
+  - `backend/trigger/src/index.ts` — registered all 4 new tasks
+  - `django-admin check`: 0 issues; `makemigrations --check --dry-run`: no changes; `npm run typecheck`: 0 errors
+
 - **Unit 25: Background Job Infrastructure** ✅ implemented & verified
   - `backend/trigger/package.json` — Node.js worker project; @trigger.dev/sdk, zod, dotenv, pino, pino-pretty; `dev`/`deploy`/`typecheck` scripts
   - `backend/trigger/tsconfig.json` — TypeScript config (ES2022, NodeNext, strict)
@@ -503,6 +535,9 @@ Update this file after every meaningful implementation change.
   - Production build passes, dev server runs on localhost:5173
 
 ## In Progress
+
+- **Unit 31: Gemini AI Infrastructure** — in progress
+  - Implement Gemini API integration, AI abstraction gateway, prompt builder, response parser, execution manager, retry handler, AI logger, async Trigger.dev AI workflows, AIJob/AIExecution/AIPromptTemplate/AIUsageRecord models, Pydantic output schemas, and AI configuration per `context/feature-specs/31-Gemini-AI-Infrastructure.md`.
 
 - **Unit 26: Campaign Scheduling and Automation** — in progress
   - Implement scheduled campaign execution, cancellation, reminder eligibility, reminder workflows, and automation logging per `context/feature-specs/26-Campaign-Scheduling-and-Automation.md`.
