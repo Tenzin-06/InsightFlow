@@ -1,0 +1,14 @@
+<section class="section">
+  <h2>Metrics Overview</h2>
+  <div class="metric-grid">
+    {% for key, value in analytics.metrics.items %}
+      <div class="metric">
+        <div class="metric-label">{{ key|title }}</div>
+        <div class="metric-value">{{ value }}</div>
+      </div>
+    {% empty %}
+      <p class="muted">No analytics metrics are available yet.</p>
+    {% endfor %}
+  </div>
+</section>
+

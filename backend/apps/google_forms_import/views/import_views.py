@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.authentication.permissions import IsClerkAuthenticated
+from apps.authentication.permissions import IsAuthenticated
 from apps.google_forms_import.exceptions import (
     FormParsingError,
     FormRetrievalError,
@@ -30,7 +30,7 @@ def _error(message: str, http_status=status.HTTP_400_BAD_REQUEST):
 
 
 class GoogleFormsImportView(APIView):
-    permission_classes = [IsClerkAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         serializer = GoogleFormsImportSerializer(data=request.data)

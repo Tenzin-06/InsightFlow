@@ -1,0 +1,12 @@
+<section class="section">
+  <h2>Charts and Visualizations</h2>
+  {% for key, asset in assets.items %}
+    <div class="chart">
+      <h3>{{ asset.title }}</h3>
+      <img src="{{ asset.path }}" alt="{{ asset.title }}" />
+    </div>
+  {% empty %}
+    <p class="muted">No chart assets were generated for this report.</p>
+  {% endfor %}
+</section>
+

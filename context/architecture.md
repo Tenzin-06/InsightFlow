@@ -10,7 +10,7 @@
 | Backend Framework  | Django                | Core backend application (modular monolith)                       |
 | API Layer          | Django REST Framework | REST APIs for frontend communication                              |
 | Database           | PostgreSQL            | Primary relational database for surveys, responses, and analytics |
-| Authentication     | Clerk                 | User authentication and session management                        |
+| Authentication     | Local JWT (PyJWT)     | Self-contained JWT auth; no external service required             |
 | AI Provider        | Google Gemini API     | AI-powered analysis, summarization, and simulation                |
 | Background Jobs    | Trigger.dev           | Async processing for emails, AI tasks, and scheduling             |
 | Email Service      | Resend                | Email delivery for campaigns and reminders                        |
@@ -45,6 +45,8 @@ Modular monolithic Django application.
 - `/apps/responses` → response collection and storage
 - `/apps/distribution` → email campaigns, link generation, QR codes
 - `/apps/analytics` → metrics computation and reporting logic
+- `/apps/reports` → PDF report generation, analytics/AI embedding, chart assets, export records, and authenticated downloads
+- `/apps/engagement` → email opens, link clicks, survey sessions, drop-off events, and raw engagement event persistence
 - `/apps/ai` → AI orchestration layer (Gemini API integration)
 - `/apps/simulation` → synthetic response generation (controlled mode)
 - `/apps/auth` → user/workspace access control (Clerk integration layer)
@@ -75,6 +77,7 @@ Stores structured application data:
 - Responses
 - Campaigns
 - Engagement tracking (opens, clicks, completions)
+- Engagement events, tracking tokens, response sessions, and drop-off events
 - AI analysis results
 - Simulation runs and synthetic responses metadata
 
@@ -117,19 +120,20 @@ Used for:
 
 ## 🔐 Authentication & Access Model
 
-### Provider: Clerk
+### Provider: Local JWT (PyJWT + Django password hashing)
 
 ### Core Principles:
 
-- Clerk handles authentication entirely
-- Backend never stores passwords
-- Every request is associated with a Clerk user ID
+- All auth is self-contained — no external service dependencies
+- Passwords hashed with Django's PBKDF2-SHA256 (`make_password` / `check_password`)
+- Short-lived **access tokens** (60 min, HS256) + long-lived **refresh tokens** (7 days)
+- Tokens stored in `localStorage` on the client
 
 ### Access Control Model:
 
 - Each user belongs to a **workspace (implicit MVP single workspace)**
 - All surveys, campaigns, and responses are **owned by a user**
-- Ownership is enforced via `user_id` foreign key references
+- Ownership is enforced via `owner` FK on `Survey`
 
 ### Authorization Rules:
 
@@ -142,10 +146,20 @@ Used for:
 
 ### Session Flow:
 
-1. User logs in via Clerk frontend
-2. JWT token sent with API requests
-3. Django verifies token via middleware
-4. User context injected into request lifecycle
+1. User registers/logs in via `/api/v1/auth/register/` or `/api/v1/auth/login/`
+2. Backend returns `{ access, refresh, user }` JSON
+3. Frontend stores tokens in `localStorage`, injects `Bearer <access>` on every request
+4. `JWTAuthentication` (DRF) validates the token using `SECRET_KEY` and sets `request.user`
+5. `IsAuthenticated` permission guards all protected endpoints
+
+### Auth Endpoints:
+
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/v1/auth/register/` | Create account → returns tokens |
+| POST | `/api/v1/auth/login/` | Sign in → returns tokens |
+| POST | `/api/v1/auth/token/refresh/` | Exchange refresh token for new access token |
+| GET | `/api/v1/auth/me/` | Return current user info |
 
 ---
 
@@ -197,6 +211,7 @@ Used for async and scheduled workloads:
 - **Report Generation**
   - PDF export creation
   - analytics packaging
+  - chart asset rendering and authenticated report download delivery
 
 ---
 
@@ -230,7 +245,12 @@ These are non-negotiable rules the system must never violate:
    - Every email/link click must map to a valid campaign and survey ID.
    - No orphan tracking events allowed.
 
-8. **Strict MVP Scope Enforcement**
+8. **Engagement Attribution Integrity**
+   - Public tracking tokens must map internally to campaign, survey, and recipient records.
+   - Tracking redirects must only point to approved survey destinations.
+   - Survey completion events should be deduplicated per response session.
+
+9. **Strict MVP Scope Enforcement**
    - No CRM, marketplace, or social distribution features exist in backend logic or schema.
 
 ---

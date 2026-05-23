@@ -1,4 +1,6 @@
+import uuid
 from django.db import models
+from django.utils.text import slugify
 from apps.authentication.models import AppUser
 from apps.core.models import TimeStampedModel
 
@@ -27,6 +29,13 @@ class Survey(TimeStampedModel):
         default=SURVEY_STATUS_DRAFT,
     )
     is_public = models.BooleanField(default=False)
+    slug = models.SlugField(
+        max_length=255,
+        unique=True,
+        blank=True,
+        null=True,
+        db_index=True,
+    )
 
     class Meta:
         db_table = "surveys"
@@ -39,3 +48,10 @@ class Survey(TimeStampedModel):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base = slugify(self.title)[:200]
+            suffix = str(uuid.uuid4())[:8]
+            self.slug = f"{base}-{suffix}" if base else suffix
+        super().save(*args, **kwargs)

@@ -1,6 +1,6 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from apps.authentication.permissions import IsClerkAuthenticated
+from apps.authentication.permissions import IsAuthenticated
 from apps.surveys.models.survey import Survey
 from apps.surveys.serializers.survey_serializer import SurveySerializer
 from apps.surveys.permissions import IsSurveyOwner
@@ -8,16 +8,18 @@ from apps.surveys.permissions import IsSurveyOwner
 
 class SurveyViewSet(viewsets.ModelViewSet):
     serializer_class = SurveySerializer
-    permission_classes = [IsClerkAuthenticated, IsSurveyOwner]
+    permission_classes = [IsAuthenticated, IsSurveyOwner]
     http_method_names = ["get", "post", "patch", "delete", "head", "options"]
+    # Disable DRF pagination — the frontend handles its own page slicing
+    pagination_class = None
 
     def get_queryset(self):
         return Survey.objects.filter(owner=self.request.user).prefetch_related("questions")
 
     def get_permissions(self):
         if self.action in ("list", "create"):
-            return [IsClerkAuthenticated()]
-        return [IsClerkAuthenticated(), IsSurveyOwner()]
+            return [IsAuthenticated()]
+        return [IsAuthenticated(), IsSurveyOwner()]
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)

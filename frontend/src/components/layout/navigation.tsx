@@ -1,29 +1,34 @@
 import { Link } from "react-router-dom";
-import { Show, UserButton } from "@clerk/react";
 
+import { useAuth } from "@/features/auth/context/auth-context";
 import { Button } from "@/components/ui/button";
+import { UserNav } from "@/components/layout/user-nav";
 
 export function Navigation() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  // Don't flash auth controls while hydrating from localStorage
+  if (isLoading) return null;
+
+  if (isAuthenticated) {
+    return (
+      <div className="flex items-center gap-2">
+        <Button variant="ghost" size="sm" asChild>
+          <Link to="/dashboard">Dashboard</Link>
+        </Button>
+        <UserNav />
+      </div>
+    );
+  }
+
   return (
-    <>
-      <Show when="signed-out">
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" asChild>
-            <Link to="/login">Login</Link>
-          </Button>
-          <Button size="sm" asChild>
-            <Link to="/register">Sign Up</Link>
-          </Button>
-        </div>
-      </Show>
-      <Show when="signed-in">
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" asChild>
-            <Link to="/dashboard">Dashboard</Link>
-          </Button>
-          <UserButton />
-        </div>
-      </Show>
-    </>
+    <div className="flex items-center gap-2">
+      <Button variant="ghost" size="sm" asChild>
+        <Link to="/login">Login</Link>
+      </Button>
+      <Button size="sm" asChild>
+        <Link to="/register">Sign Up</Link>
+      </Button>
+    </div>
   );
 }
