@@ -1,0 +1,33 @@
+{% extends "email_campaigns/base_email.html" %}
+
+{% block title %}Reminder — {{ campaign_name }}{% endblock %}
+
+{% block content %}
+<h1>Hi {{ first_name }},</h1>
+
+<p>
+  This is a friendly reminder that we still haven't received your response
+  to <strong>{{ campaign_name }}</strong>.
+</p>
+
+<p>
+  Your input is important. The survey takes just a few minutes and your
+  responses are greatly appreciated.
+</p>
+
+<div class="btn-wrapper">
+  <a href="{{ survey_link }}" class="btn" role="button">Complete the Survey</a>
+</div>
+
+<div class="link-fallback">
+  <p>If the button above doesn't work, copy and paste this link into your browser:</p>
+  <a href="{{ survey_link }}">{{ survey_link }}</a>
+</div>
+
+<hr class="divider" />
+
+<p style="font-size:14px; color:#71717a;">
+  If you have already completed the survey, please disregard this reminder.
+  Thank you for your time.
+</p>
+{% endblock %}

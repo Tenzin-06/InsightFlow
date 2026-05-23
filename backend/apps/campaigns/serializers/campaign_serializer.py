@@ -14,6 +14,8 @@ class CampaignSerializer(serializers.ModelSerializer):
             "id",
             "title",
             "description",
+            "subject",
+            "template_name",
             "survey",
             "status",
             "audiences",

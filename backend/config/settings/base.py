@@ -35,6 +35,7 @@ LOCAL_APPS = [
     "apps.analytics",
     "apps.campaigns",
     "apps.sharing",
+    "apps.email_campaigns",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -106,6 +107,12 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 20,
 }
+
+# Resend email delivery
+RESEND_API_KEY = env("RESEND_API_KEY", default="")
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="noreply@insightflow.ai")
+RESEND_AUDIENCE_DOMAIN = env("RESEND_AUDIENCE_DOMAIN", default="insightflow.ai")
+APP_FRONTEND_URL = env("APP_FRONTEND_URL", default="http://localhost:5173")
 
 LOGGING = {
     "version": 1,

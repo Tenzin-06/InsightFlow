@@ -1,0 +1,33 @@
+{% extends "email_campaigns/base_email.html" %}
+{% load tz %}
+
+{% block title %}You're invited — {{ campaign_name }}{% endblock %}
+
+{% block content %}
+<h1>Hi {{ first_name }},</h1>
+
+<p>
+  You have been invited to participate in <strong>{{ campaign_name }}</strong>.
+  Your feedback is valuable and the survey only takes a few minutes to complete.
+</p>
+
+<p>
+  Please click the button below to start the survey:
+</p>
+
+<div class="btn-wrapper">
+  <a href="{{ survey_link }}" class="btn" role="button">Take the Survey</a>
+</div>
+
+<div class="link-fallback">
+  <p>If the button above doesn't work, copy and paste this link into your browser:</p>
+  <a href="{{ survey_link }}">{{ survey_link }}</a>
+</div>
+
+<hr class="divider" />
+
+<p style="font-size:14px; color:#71717a;">
+  This survey is anonymous unless stated otherwise. Your responses help improve
+  research outcomes and are handled with care.
+</p>
+{% endblock %}

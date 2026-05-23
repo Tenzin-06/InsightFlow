@@ -40,6 +40,46 @@ Update this file after every meaningful implementation change.
   - `frontend/src/features/audiences/pages/audience-detail-page.tsx` — uses `useAudienceContacts` (dedicated endpoint) + `useDeleteAudience` with confirmation dialog; stat cards show live loaded-contact count
   - `npm.cmd run build`: passes (0 TS errors)
 
+- **Unit 24: Email Distribution System** ✅ implemented & verified
+  - `backend/requirements/base.txt` — added `resend>=2.0`, `html2text>=2024.2.26`
+  - `backend/.env` + `config/settings/base.py` — added `RESEND_API_KEY`, `DEFAULT_FROM_EMAIL`, `RESEND_AUDIENCE_DOMAIN`, `APP_FRONTEND_URL` settings
+  - `backend/apps/campaigns/constants.py` — added `CAMPAIGN_STATUS_SENDING`, `CAMPAIGN_STATUS_SENT`, `CAMPAIGN_STATUS_FAILED`; added email template constants `TEMPLATE_SURVEY_INVITATION`, `TEMPLATE_REMINDER`, `TEMPLATE_TEST`, `TEMPLATE_CHOICES`; extended `VALID_TRANSITIONS`
+  - `backend/apps/campaigns/models/campaign.py` — added `subject` (CharField) + `template_name` (ChoiceField) fields
+  - `backend/apps/campaigns/migrations/0003_campaign_email_fields.py` — migration applied
+  - `backend/apps/campaigns/serializers/campaign_serializer.py` — added `subject`, `template_name` to serializer fields
+  - `backend/apps/email_campaigns/__init__.py` + `apps.py` — new Django app scaffold
+  - `backend/apps/email_campaigns/constants.py` — delivery status constants (`pending`, `sent`, `failed`), re-exports template constants
+  - `backend/apps/email_campaigns/permissions.py` — `IsCampaignOwner` permission class
+  - `backend/apps/email_campaigns/validators.py` — `validate_email_format`, `validate_campaign_ready_to_send`, `validate_test_email_address`
+  - `backend/apps/email_campaigns/models/delivery_log.py` — `DeliveryLog` model: campaign FK, recipient_email, recipient_first_name, status, provider_message_id, sent_at, error_message, timestamps; 4 DB indexes
+  - `backend/apps/email_campaigns/models/__init__.py` — re-exports DeliveryLog
+  - `backend/apps/email_campaigns/migrations/0001_initial.py` — migration applied
+  - `backend/apps/email_campaigns/services/resend_service.py` — lazy Resend SDK wrapper; `SendEmailRequest`/`SendEmailResult` dataclasses; `send_email()` never raises — captures all errors in result
+  - `backend/apps/email_campaigns/services/email_renderer.py` — `render_html()`, `render_plain_text()` (html2text with tag-strip fallback), `render_email()` → (html, text) tuple
+  - `backend/apps/email_campaigns/services/delivery_service.py` — `create_pending_log`, `record_send_result`, `get_campaign_delivery_summary`
+  - `backend/apps/email_campaigns/services/campaign_processor.py` — `process_campaign()` orchestrator: load → validate → sending status → per-recipient render+send+log → sent/failed status; `process_test_send()` for QA
+  - `backend/apps/email_campaigns/services/queue_service.py` — synchronous placeholder, Celery-ready signature
+  - `backend/apps/email_campaigns/services/tracking_service.py` — `record_send_event()` stub, prepared for future analytics
+  - `backend/apps/email_campaigns/utils/template_utils.py` — `get_survey_link()` (slug-first, fallback to pk; standard + conversational), `resolve_template_name()`
+  - `backend/apps/email_campaigns/utils/personalization_utils.py` — `build_email_context()` with first_name/survey_link/campaign_name/recipient_email variables
+  - `backend/apps/email_campaigns/utils/recipient_utils.py` — `iter_valid_recipients()` with cross-audience dedup + malformed-email skipping; `collect_recipients()`
+  - `backend/apps/email_campaigns/utils/__init__.py` — re-exports all utils + `success_response`/`error_response` helpers
+  - `backend/apps/email_campaigns/templates/email_campaigns/base_email.html` — responsive table-based base layout (light/dark safe, mobile-first, screen-reader compatible)
+  - `backend/apps/email_campaigns/templates/email_campaigns/survey_invitation.html` — survey invite template with CTA button + link fallback
+  - `backend/apps/email_campaigns/templates/email_campaigns/reminder_email.html` — follow-up reminder template
+  - `backend/apps/email_campaigns/templates/email_campaigns/test_email.html` — QA preview template with variable debug panel
+  - `backend/apps/email_campaigns/serializers/campaign_serializer.py` — `EmailCampaignSerializer`
+  - `backend/apps/email_campaigns/serializers/send_serializer.py` — `SendCampaignSerializer` + `TestEmailSerializer`
+  - `backend/apps/email_campaigns/serializers/delivery_serializer.py` — `DeliveryLogSerializer`
+  - `backend/apps/email_campaigns/views/send_views.py` — `CampaignSendView` (`POST /campaigns/:pk/send/`) + `CampaignTestSendView` (`POST /campaigns/:pk/test/`); duplicate-send guard; thin orchestration only
+  - `backend/apps/email_campaigns/views/preview_views.py` — `CampaignPreviewView` (`GET /campaigns/:pk/preview/`) returns rendered html+text without sending
+  - `backend/apps/email_campaigns/views/campaign_views.py` — `CampaignDeliveryLogView` (`GET /campaigns/:pk/delivery-logs/`)
+  - `backend/apps/email_campaigns/tasks/send_campaign_task.py` — `send_campaign_task()` synchronous wrapper; Celery-ready signature
+  - `backend/apps/email_campaigns/urls.py` — 4 URL patterns wired
+  - `backend/config/settings/base.py` — added `apps.email_campaigns` to `LOCAL_APPS` + Resend settings block
+  - `backend/config/urls.py` — wired `apps.email_campaigns.urls` under `/api/v1/`
+  - `django-admin check`: 0 issues; migrations: applied OK
+
 - **Unit 23: Email Campaign UI** implemented and verified
   - `frontend/package.json` + `package-lock.json` - added `@tiptap/react` and `@tiptap/starter-kit`
   - `frontend/src/features/email-campaigns/types/index.ts` - campaign draft, status, schedule, preview, template, variable, validation, and option types
