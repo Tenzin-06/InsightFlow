@@ -12,6 +12,25 @@ Update this file after every meaningful implementation change.
 
 ## Completed
 
+- **Unit 18: Conversational Survey Logic** ✅ implemented & verified
+  - `npm install zustand` — centralized state management
+  - `src/features/conversational-surveys/utils/progression-utils.ts` — pure fns: `isAutoAdvanceType`, `isLastQuestion`, `getNextIndex`, `calculateProgressPercentage`
+  - `src/features/conversational-surveys/utils/validation-utils.ts` — pure fns: `validateRequiredAnswer`, `validateRatingBounds`, `validateCheckboxMinimum`
+  - `src/features/conversational-surveys/utils/response-utils.ts` — pure fn: `buildConversationalPayload`
+  - `src/features/conversational-surveys/services/validation-service.ts` — `validateConversationalAnswer(question, value): string | null`
+  - `src/features/conversational-surveys/services/answer-normalizer.ts` — `normalizeConversationalAnswers` (strip, coerce, dedup)
+  - `src/features/conversational-surveys/state/index.ts` — `ConversationStateSnapshot` type (future autosave/draft restoration)
+  - `src/features/conversational-surveys/stores/conversation-store.ts` — Zustand store: full state + actions (initialize, advanceTo, recordAnswer, addCompletedQuestion, addMessage, setIsTyping, setValidationError, setPhase, reset)
+  - `src/features/conversational-surveys/hooks/use-conversation-state.ts` — read-only store state slice
+  - `src/features/conversational-surveys/hooks/use-question-sequence.ts` — progression predicates (checkIsAutoAdvance, checkIsLast, nextIndex)
+  - `src/features/conversational-surveys/hooks/use-conversation-validation.ts` — validate/clear interface backed by store
+  - `src/features/conversational-surveys/hooks/use-conversation-transitions.ts` — typing indicator + TYPING_DELAY_MS timing via scheduleTransition
+  - `src/features/conversational-surveys/hooks/use-conversation-progress.ts` — completedQuestions-based progress (answeredCount, displayNumber, percentage)
+  - `src/features/conversational-surveys/hooks/use-conversation-flow.ts` — refactored: composes all specialized hooks + Zustand store; stale-closure-safe via getState() in async callbacks; same public interface
+  - `src/features/conversational-surveys/components/progress-indicator.tsx` — updated to accept explicit displayNumber/total/percentage props
+  - `src/features/conversational-surveys/pages/conversational-survey-page.tsx` — updated: uses useConversationProgress instead of useQuestionNavigation
+  - `tsc -b --noEmit`: 0 errors
+
 - **Unit 17: Conversational Survey UI** ✅ implemented & verified
   - `npm install framer-motion` — animation library
   - `src/features/conversational-surveys/types/index.ts` — re-exports shared types + `ConversationPhase`, `QuestionMessage`, `AnswerMessage`, `ConversationMessage`, `ConversationFlowResult`
@@ -258,7 +277,7 @@ Update this file after every meaningful implementation change.
 
 ## In Progress
 
-- None. Unit 17 complete.
+- None. Unit 18 complete.
 
 ## Next Up
 
