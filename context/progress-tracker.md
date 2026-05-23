@@ -8,9 +8,33 @@ Update this file after every meaningful implementation change.
 
 ## Current Goal
 
-- Unit 11: Survey Management Functionality — Complete
+- Unit 19: Campaign and Distribution Layer — Complete
 
 ## Completed
+
+- **Unit 19: Campaign and Distribution Layer** ✅ implemented & verified
+  - `backend/apps/campaigns/constants.py` — status constants + `VALID_TRANSITIONS` state machine map
+  - `backend/apps/campaigns/migrations/__init__.py` — migrations package created
+  - `backend/apps/campaigns/models/audience.py` — `Audience` model: owner FK, name, description, metadata, UniqueConstraint per owner, index on owner
+  - `backend/apps/campaigns/models/recipient.py` — `Recipient` model: audience FK (string ref), email, first_name, last_name, metadata, index on email
+  - `backend/apps/campaigns/models/campaign.py` — `Campaign` model: survey FK, owner FK, status (choices+default), M2M audiences (related_name=campaign_set), metadata, timestamps; 4 DB indexes
+  - `backend/apps/campaigns/models/__init__.py` — re-exports Campaign, Audience, Recipient
+  - `backend/apps/campaigns/permissions.py` — `IsCampaignOwner` + `IsAudienceOwner` object-level permissions
+  - `backend/apps/campaigns/validators.py` — `validate_campaign_status_transition`, `validate_email_format`
+  - `backend/apps/campaigns/utils.py` — `success_response` / `error_response` helpers
+  - `backend/apps/campaigns/serializers/campaign_serializer.py` — `CampaignSerializer`: status transition validation, survey ownership check, title strip/length
+  - `backend/apps/campaigns/serializers/audience_serializer.py` — `AudienceSerializer`: recipient_count computed field, duplicate name guard per owner
+  - `backend/apps/campaigns/serializers/recipient_serializer.py` — `RecipientSerializer`: email strip+lowercase
+  - `backend/apps/campaigns/serializers/__init__.py` — re-exports all three serializers
+  - `backend/apps/campaigns/views/campaign_views.py` — `CampaignViewSet`: owner-scoped queryset, standardized responses, pagination_class=None
+  - `backend/apps/campaigns/views/audience_views.py` — `AudienceViewSet`: owner-scoped queryset, standardized responses, pagination_class=None
+  - `backend/apps/campaigns/services/campaign_service.py` — CRUD + owner-scoped retrieval/listing functions
+  - `backend/apps/campaigns/services/audience_service.py` — CRUD + owner-scoped retrieval/listing functions
+  - `backend/apps/campaigns/services/recipient_service.py` — create, delete, list per audience
+  - `backend/apps/campaigns/urls.py` — DRF DefaultRouter: `campaigns/` + `audiences/` endpoints
+  - `backend/config/urls.py` — wired `apps.campaigns.urls` under `/api/v1/`
+  - `backend/apps/campaigns/migrations/0001_initial.py` — migration created and applied (`campaigns.0001_initial... OK`)
+  - `django-admin check`: 0 issues; `python manage.py test`: 0 failures
 
 - **Unit 18: Conversational Survey Logic** ✅ implemented & verified
   - `npm install zustand` — centralized state management
