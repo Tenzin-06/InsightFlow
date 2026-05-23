@@ -33,6 +33,10 @@ export const TASK_IDS = {
   GENERATE_SUMMARY: "generate-summary",
   CLASSIFY_RESPONSES: "classify-responses",
   PROCESS_AI_TASK: "process-ai-task",
+  // Unit 33a - Simulation Mode Foundation
+  RUN_SIMULATION: "run-simulation",
+  VALIDATE_SIMULATION: "validate-simulation",
+  CLEANUP_SIMULATION: "cleanup-simulation",
 } as const;
 
 export type TaskId = (typeof TASK_IDS)[keyof typeof TASK_IDS];

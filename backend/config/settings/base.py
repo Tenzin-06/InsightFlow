@@ -40,6 +40,7 @@ LOCAL_APPS = [
     "apps.engagement",
     "apps.engagement_optimization",
     "apps.ai",
+    "apps.simulation",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -95,7 +96,7 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# ── Analytics caching ────────────────────────────────────────────────────────
+# â”€â”€ Analytics caching â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # Uses Redis when REDIS_URL is configured; falls back to local-memory cache
 # in development environments that don't have Redis running.
 _REDIS_URL = env("REDIS_URL", default="")
@@ -161,7 +162,7 @@ RESEND_AUDIENCE_DOMAIN = env("RESEND_AUDIENCE_DOMAIN", default="insightflow.ai")
 APP_FRONTEND_URL = env("APP_FRONTEND_URL", default="http://localhost:5173")
 APP_BACKEND_URL = env("APP_BACKEND_URL", default="http://localhost:8000")
 
-# ── Gemini AI configuration ───────────────────────────────────────────────────
+# â”€â”€ Gemini AI configuration â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 GEMINI_API_KEY = env("GEMINI_API_KEY", default="")
 GEMINI_MODEL = env("GEMINI_MODEL", default="gemini-1.5-flash")
 AI_TIMEOUT_SECONDS = int(env("AI_TIMEOUT_SECONDS", default="30"))
@@ -173,6 +174,16 @@ TRIGGER_SECRET_KEY = env("TRIGGER_SECRET_KEY", default="")
 TRIGGER_PROJECT_ID = env("TRIGGER_PROJECT_ID", default="")
 TRIGGER_API_URL = env("TRIGGER_API_URL", default="https://api.trigger.dev")
 TRIGGER_INTERNAL_SECRET = env("TRIGGER_INTERNAL_SECRET", default="")
+
+# Simulation Mode Foundation (Unit 33a)
+# ---------------------------------------------------------------------------
+SIMULATION_MODE_ENABLED = env.bool("SIMULATION_MODE_ENABLED", default=True)
+SIMULATION_MAX_RESPONSES = env.int("SIMULATION_MAX_RESPONSES", default=10000)
+SIMULATION_MAX_AI_JOBS = env.int("SIMULATION_MAX_AI_JOBS", default=25)
+SIMULATION_MAX_RUNTIME_MINUTES = env.int("SIMULATION_MAX_RUNTIME_MINUTES", default=60)
+SIMULATION_MAX_CONCURRENT_RUNS = env.int("SIMULATION_MAX_CONCURRENT_RUNS", default=2)
+SIMULATION_ALLOW_EXTERNAL_API = env.bool("SIMULATION_ALLOW_EXTERNAL_API", default=False)
+SIMULATION_AI_QUEUE_NAME = env("SIMULATION_AI_QUEUE_NAME", default="simulation-ai-queue")
 
 LOGGING = {
     "version": 1,
@@ -210,6 +221,11 @@ LOGGING = {
             "propagate": False,
         },
         "apps.ai": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "apps.simulation": {
             "handlers": ["console"],
             "level": "INFO",
             "propagate": False,

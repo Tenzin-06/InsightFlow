@@ -8,9 +8,20 @@ Update this file after every meaningful implementation change.
 
 ## Current Goal
 
-- Unit 27 — Engagement Tracking System
+- Unit 33a - Simulation Mode Foundation
 
 ## Completed
+
+- **Unit 33a: Simulation Mode Foundation (33-Simulation-mode-A)** completed and verified
+  - `backend/apps/simulation/` - new Django app scaffold for simulation infrastructure.
+  - `backend/apps/simulation/models/` - added isolated `SimulationConfig`, `SimulationRun`, `SimulationEvent`, and `SyntheticDataset` models with explicit `is_simulated` tagging.
+  - `backend/apps/simulation/services/` - added simulation isolation, safeguards, constraints, validation, execution, manager, and audit logging services.
+  - `backend/apps/simulation/serializers/`, `schemas/`, `validators/`, `permissions/`, `views/`, and `urls.py` - added ownership-scoped simulation APIs plus internal Trigger endpoints.
+  - `backend/apps/simulation/migrations/0001_initial.py` - initial simulation schema migration.
+  - `backend/config/settings/base.py` - registered `apps.simulation`, simulation settings, and logger configuration.
+  - `backend/config/urls.py` - wired simulation URLs under `/api/v1/`.
+  - `backend/trigger/src/schemas/simulation.schema.ts` and simulation tasks - added Trigger.dev scaffolding for validate, run, and cleanup workflows.
+  - Verification: `.\venv\Scripts\python.exe manage.py check` passes; `.\venv\Scripts\python.exe manage.py makemigrations simulation --check --dry-run` reports no changes; `npm.cmd run typecheck` passes in `backend/trigger`.
 
 - **Unit 31: Gemini AI Infrastructure** ✅ implemented & verified
   - `backend/apps/ai/__init__.py` + `apps.py` — new Django app scaffold (`AiConfig`, label=`ai`)
@@ -602,6 +613,12 @@ Update this file after every meaningful implementation change.
   - AI-powered analytics layer: response summarization, sentiment analysis, quality scoring, question-level insights, AI-enhanced dashboard integration
   - Backend: `apps/ai` Gemini gateway is available; AI analytics app work is pending implementation before it can be registered.
   - Frontend: 5 AI analytics components in `src/components/analytics/ai/`
+
+- **Unit 35: PDF Report Frontend (35-PDF-Report-A)** — in progress
+  - Implementing full frontend reporting system: PDF export UI, report templates, layouts, configuration, preview, and export workflows per `context/feature-specs/35-PDF-Report-A.md`.
+  - Feature directory: `frontend/src/features/reports/`
+  - Route: `/dashboard/reports`
+
 - **Unit 26: Campaign Scheduling and Automation** — in progress
   - Implement scheduled campaign execution, cancellation, reminder eligibility, reminder workflows, and automation logging per `context/feature-specs/26-Campaign-Scheduling-and-Automation.md`.
 
