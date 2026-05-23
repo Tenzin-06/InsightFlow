@@ -32,6 +32,7 @@ LOCAL_APPS = [
     "apps.surveys",
     "apps.analytics",
     "apps.campaigns",
+    "apps.google_forms_import",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -133,6 +134,11 @@ LOGGING = {
         "django.db.backends": {
             "handlers": ["console"],
             "level": "WARNING",
+            "propagate": False,
+        },
+        "apps.google_forms_import": {
+            "handlers": ["console"],
+            "level": "DEBUG",
             "propagate": False,
         },
     },
