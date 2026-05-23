@@ -114,6 +114,17 @@ DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="noreply@insightflow.ai")
 RESEND_AUDIENCE_DOMAIN = env("RESEND_AUDIENCE_DOMAIN", default="insightflow.ai")
 APP_FRONTEND_URL = env("APP_FRONTEND_URL", default="http://localhost:5173")
 
+# Trigger.dev — background job infrastructure
+# TRIGGER_SECRET_KEY:     API secret from the Trigger.dev dashboard
+# TRIGGER_PROJECT_ID:     Project ID from the Trigger.dev dashboard
+# TRIGGER_API_URL:        Trigger.dev API base (default: cloud)
+# TRIGGER_INTERNAL_SECRET: Shared secret used by Trigger.dev workers to call
+#                          internal Django endpoints — keep this private
+TRIGGER_SECRET_KEY = env("TRIGGER_SECRET_KEY", default="")
+TRIGGER_PROJECT_ID = env("TRIGGER_PROJECT_ID", default="")
+TRIGGER_API_URL = env("TRIGGER_API_URL", default="https://api.trigger.dev")
+TRIGGER_INTERNAL_SECRET = env("TRIGGER_INTERNAL_SECRET", default="")
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
