@@ -34,6 +34,7 @@ LOCAL_APPS = [
     "apps.public_surveys",
     "apps.analytics",
     "apps.campaigns",
+    "apps.google_forms_import",
     "apps.sharing",
     "apps.email_campaigns",
     "apps.automation",
@@ -215,6 +216,11 @@ LOGGING = {
         "django.db.backends": {
             "handlers": ["console"],
             "level": "WARNING",
+            "propagate": False,
+        },
+        "apps.google_forms_import": {
+            "handlers": ["console"],
+            "level": "INFO",
             "propagate": False,
         },
         "engagement_optimization": {

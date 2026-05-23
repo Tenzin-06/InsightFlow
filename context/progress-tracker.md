@@ -12,6 +12,26 @@ Update this file after every meaningful implementation change.
 
 ## Completed
 
+- **Unit 13: Google Forms Import System**
+  - `backend/apps/google_forms_import/` — new isolated Django app with full import pipeline
+  - `constants.py` — SSRF whitelist, request limits (10s timeout, 5 MB cap)
+  - `exceptions.py` — `GoogleFormsImportError` hierarchy (URL, retrieval, parsing, creation)
+  - `types.py` — `RawForm`, `RawQuestion`, `NormalizedForm`, `NormalizedQuestion` TypedDicts
+  - `utils/url_utils.py` — SSRF-safe URL validation; whitelists `docs.google.com/forms/` only
+  - `utils/html_parser.py` — BeautifulSoup + `json.raw_decode` extracts `FB_PUBLIC_LOAD_DATA_` blob
+  - `utils/question_mapper.py` — GF integer type → InsightFlow string type (0→short_text, 1→multiple_choice, 2→checkbox, 4→rating, 7→long_text)
+  - `services/validation_service.py` — validates and normalizes the submitted URL
+  - `services/parser_service.py` — HTTP fetch with streaming size limit + defensive JSON navigation
+  - `services/normalization_service.py` — maps raw questions to InsightFlow schema; skips unsupported types with logging
+  - `services/survey_builder_service.py` — atomic `Survey` + `Question.bulk_create` transaction; rolls back on failure
+  - `services/import_service.py` — orchestrates full pipeline (validate → fetch → parse → normalize → persist)
+  - `serializers/import_serializer.py` — DRF serializer validating `url` field
+  - `views/import_views.py` — `POST /api/v1/import/google-forms/` (IsClerkAuthenticated); maps each exception to correct HTTP status
+  - `urls.py` — URL pattern registered
+  - `backend/config/settings/base.py` — `apps.google_forms_import` added to `LOCAL_APPS`
+  - `backend/config/urls.py` — import app URLs included under `/api/v1/`
+  - `backend/requirements/base.txt` — added `requests>=2.31`, `beautifulsoup4>=4.12`, `lxml>=5.0`
+
 - **Unit 35: PDF Report Frontend (35-PDF-Report-A)** ✅ implemented & verified
   - `frontend/src/features/reports/types/index.ts` — `ReportSectionKey`, `ReportTemplate`, `ReportConfig`, `ExportStatus`, `ExportRecord`, `ReportPreviewState`, `ReportMetric`, `ReportChartData`, `ReportInsight`
   - `frontend/src/features/reports/constants/index.ts` — 5 `REPORT_TEMPLATES`, section labels/descriptions, `OPTIONAL_SECTIONS`, `EXPORT_STATUS_LABELS`, `EXPORT_STATUS_PROGRESS`, `DEFAULT_REPORT_CONFIG`, mock exports/metrics/charts/insights, `ZOOM_LEVELS`

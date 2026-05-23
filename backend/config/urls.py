@@ -6,6 +6,7 @@ api_v1_urlpatterns = [
     path("", include("apps.core.urls")),
     path("", include("apps.authentication.urls")),
     path("", include("apps.surveys.urls")),
+    path("", include("apps.google_forms_import.urls")),
     path("", include("apps.responses.urls")),
     path("", include("apps.public_surveys.urls")),
     path("", include("apps.campaigns.urls")),

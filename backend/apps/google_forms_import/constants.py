@@ -1,0 +1,5 @@
+ALLOWED_SCHEMES = frozenset({"https"})
+ALLOWED_NETLOCS = frozenset({"docs.google.com"})
+GOOGLE_FORMS_PATH_PREFIX = "/forms/"
+REQUEST_TIMEOUT_SECONDS = 10
+MAX_RESPONSE_SIZE_BYTES = 5 * 1024 * 1024  # 5 MB
