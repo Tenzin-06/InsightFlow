@@ -11,6 +11,7 @@ api_v1_urlpatterns = [
     path("", include("apps.campaigns.urls")),
     path("", include("apps.sharing.urls")),
     path("", include("apps.email_campaigns.urls")),
+    path("analytics/", include("apps.analytics.urls")),
     path("", include("apps.automation.urls")),
     path("", include("apps.engagement.urls")),
     path("", include("apps.engagement_optimization.urls")),
