@@ -12,6 +12,35 @@ Update this file after every meaningful implementation change.
 
 ## Completed
 
+- **Unit 17: Conversational Survey UI** ✅ implemented & verified
+  - `npm install framer-motion` — animation library
+  - `src/features/conversational-surveys/types/index.ts` — re-exports shared types + `ConversationPhase`, `QuestionMessage`, `AnswerMessage`, `ConversationMessage`, `ConversationFlowResult`
+  - `src/features/conversational-surveys/constants/index.ts` — `TYPING_DELAY_MS=800`, animation durations, rating defaults
+  - `src/features/conversational-surveys/utils/index.ts` — `buildQuestionMessage`, `buildAnswerMessage`, `formatAnswerDisplay`; re-exports `isAnswered`, `buildAnswerPayload`
+  - `src/features/conversational-surveys/services/conversational-survey-api.ts` — re-exports `getPublicSurvey` + `submitSurvey` (same Unit 16 endpoints)
+  - `src/features/conversational-surveys/hooks/use-conversation-flow.ts` — core orchestrator: phase state machine (active→submitting→complete/submission_error), message stream, typing delay, per-question validation
+  - `src/features/conversational-surveys/hooks/use-question-navigation.ts` — derives currentQuestion, displayNumber, percentage, isFirst/Last from index
+  - `src/features/conversational-surveys/hooks/use-conversation-animation.ts` — centralised framer-motion variants (question/answer/fade/completion) + transition config
+  - `src/features/conversational-surveys/hooks/use-conversational-submission.ts` — `useMutation` wrapper for conversational submission
+  - `src/features/conversational-surveys/components/conversation-container.tsx` — `h-dvh` full-viewport flex-column, max-w-2xl centered
+  - `src/features/conversational-surveys/components/conversation-header.tsx` — survey title + X exit link
+  - `src/features/conversational-surveys/components/progress-indicator.tsx` — "Question N of M" + progress bar (minimal, preserves immersion)
+  - `src/features/conversational-surveys/components/transition-wrapper.tsx` — framer-motion slide-in wrapper (left for questions, right for answers)
+  - `src/features/conversational-surveys/components/question-bubble.tsx` — left-aligned assistant bubble with avatar dot + `aria-live`
+  - `src/features/conversational-surveys/components/answer-bubble.tsx` — right-aligned primary-500 bubble
+  - `src/features/conversational-surveys/components/typing-indicator.tsx` — three bouncing dots with `AnimatePresence` fade in/out
+  - `src/features/conversational-surveys/components/message-stream.tsx` — scrollable log, auto-scrolls to bottom on new messages
+  - `src/features/conversational-surveys/components/conversational-input.tsx` — sticky footer dispatcher + animated validation error
+  - `src/features/conversational-surveys/components/completion-screen.tsx` — scale+fade completion card
+  - `src/features/conversational-surveys/question-components/conversational-short-text.tsx` — Input + Send button, Enter-to-submit, auto-focus
+  - `src/features/conversational-surveys/question-components/conversational-long-text.tsx` — Textarea + Send, Ctrl+Enter-to-submit
+  - `src/features/conversational-surveys/question-components/conversational-multiple-choice.tsx` — pill buttons, auto-advance on tap
+  - `src/features/conversational-surveys/question-components/conversational-checkbox.tsx` — toggle checkboxes + Continue button, Skip if empty
+  - `src/features/conversational-surveys/question-components/conversational-rating.tsx` — large numeric buttons, auto-advance on tap
+  - `src/features/conversational-surveys/pages/conversational-survey-page.tsx` — page entry + inner `ConversationalSurvey` component; reuses `usePublicSurvey`, `SurveyLoading`, `SurveyError`; submission_error retry UI
+  - `src/app/router/index.tsx` — added `/s/:surveyId/chat` route (before `/s/:surveyId` to match first)
+  - `tsc -b --noEmit`: 0 errors
+
 - **Unit 16: Public Survey Functionality** ✅ implemented & verified
   - `backend/apps/public_surveys/__init__.py` + `apps.py` — app scaffold
   - `backend/apps/public_surveys/permissions.py` — `PublicSurveyPermission` (AllowAny, extensible for rate-limiting)
@@ -229,7 +258,7 @@ Update this file after every meaningful implementation change.
 
 ## In Progress
 
-- None. Unit 16 complete.
+- None. Unit 17 complete.
 
 ## Next Up
 
