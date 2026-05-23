@@ -31,6 +31,7 @@ const SimulationPage = lazy(() => import("@/features/simulation/pages/simulation
 const SimulationPersonasPage = lazy(() => import("@/features/simulation/pages/simulation-personas-page"));
 const SimulationRunsPage = lazy(() => import("@/features/simulation/pages/simulation-runs-page"));
 const SimulationAnalyticsPage = lazy(() => import("@/features/simulation/pages/simulation-analytics-page"));
+const GoogleFormsImportPage = lazy(() => import("@/features/google-forms-import/pages/import-page"));
 
 const PageLoader = () => (
   <div role="status" aria-live="polite" className="flex h-screen items-center justify-center">
@@ -66,6 +67,7 @@ const router = createBrowserRouter([
           { path: "/dashboard", element: <Suspense fallback={<PageLoader />}><DashboardPage /></Suspense> },
           { path: "/surveys", element: <Suspense fallback={<PageLoader />}><SurveyListPage /></Suspense> },
           { path: "/surveys/create", element: <Suspense fallback={<PageLoader />}><SurveyCreatePage /></Suspense> },
+          { path: "/surveys/import/google", element: <Suspense fallback={<PageLoader />}><GoogleFormsImportPage /></Suspense> },
           { path: "/surveys/:surveyId", element: <Suspense fallback={<PageLoader />}><SurveyDetailPage /></Suspense> },
           { path: "/surveys/:surveyId/edit", element: <Suspense fallback={<PageLoader />}><SurveyEditorPage /></Suspense> },
           { path: "/dashboard/audiences", element: <Suspense fallback={<PageLoader />}><AudiencesPage /></Suspense> },

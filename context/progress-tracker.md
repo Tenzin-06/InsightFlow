@@ -8,9 +8,30 @@ Update this file after every meaningful implementation change.
 
 ## Current Goal
 
-- Unit 34 - Simulation Mode Frontend
+- Unit 12 - Google Forms Import UI
 
 ## Completed
+
+- **Unit 12: Google Forms Import UI** ✅ implemented & verified
+  - `frontend/src/features/google-forms-import/types/index.ts` — ImportStatus, ImportErrorCode, ImportError, ImportedSurvey, ImportResult, GoogleFormImportPayload, ImportFormValues
+  - `frontend/src/features/google-forms-import/constants/index.ts` — URL pattern, status labels, loading messages, error messages, recovery hints
+  - `frontend/src/features/google-forms-import/utils/index.ts` — isGoogleFormsUrl(), classifyImportError(), sanitizeUrl()
+  - `frontend/src/features/google-forms-import/services/google-form-import-api.ts` — importGoogleForm() calling POST /api/v1/surveys/import/google/
+  - `frontend/src/features/google-forms-import/hooks/use-import-form.ts` — react-hook-form + zod URL validation hook
+  - `frontend/src/features/google-forms-import/hooks/use-google-form-import.ts` — React Query mutation hook with onSuccess/onError callbacks
+  - `frontend/src/features/google-forms-import/components/import-status.tsx` — status badge (idle/validating/importing/success/error)
+  - `frontend/src/features/google-forms-import/components/import-guide.tsx` — step-by-step Google Forms URL guide
+  - `frontend/src/features/google-forms-import/components/import-form.tsx` — URL input with inline validation, auto-focus, aria attributes
+  - `frontend/src/features/google-forms-import/components/import-loading.tsx` — animated spinner with cycling messages, aria-live
+  - `frontend/src/features/google-forms-import/components/import-error.tsx` — typed error display with recovery guidance and Retry button
+  - `frontend/src/features/google-forms-import/components/import-success.tsx` — success confirmation with survey title/question count, Open Editor + Back to Surveys actions
+  - `frontend/src/features/google-forms-import/components/import-preview.tsx` — future-ready preview shell (no backend logic required)
+  - `frontend/src/features/google-forms-import/components/import-modal.tsx` — Dialog container managing full workflow (idle → importing → success/error); blocks close during import
+  - `frontend/src/features/google-forms-import/pages/import-page.tsx` — full-page layout for mobile/direct navigation at /surveys/import/google
+  - `frontend/src/lib/api/endpoints.ts` — added googleFormsImport.import endpoint
+  - `frontend/src/app/router/index.tsx` — added /surveys/import/google route (ProtectedRoute)
+  - `frontend/src/features/surveys/pages/survey-list-page.tsx` — added "Import Google Form" button next to "Create New Survey" CTA; mounts ImportModal
+  - Verification: npm.cmd run build passes (0 TS errors)
 
 - **Unit 34: Simulation Mode Frontend (34-Simulation-Mode-B)** completed and verified
   - Added full simulation frontend feature slice under `frontend/src/features/simulation/` with dedicated pages for workspace, personas, runs, and analytics.
