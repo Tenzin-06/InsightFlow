@@ -40,7 +40,9 @@ LOCAL_APPS = [
     "apps.engagement",
     "apps.engagement_optimization",
     "apps.ai",
+    "apps.ai_analytics",
     "apps.simulation",
+    "apps.reports",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -226,6 +228,11 @@ LOGGING = {
             "propagate": False,
         },
         "apps.simulation": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "apps.reports": {
             "handlers": ["console"],
             "level": "INFO",
             "propagate": False,

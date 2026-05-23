@@ -1,0 +1,23 @@
+<section class="section">
+  <h2>AI Insights</h2>
+  <span class="ai-label">{{ ai.label }}</span>
+  {% if ai.summary.available %}
+    <h3>Response Summary</h3>
+    <p>{{ ai.summary.text }}</p>
+    {% if ai.summary.themes %}
+      <p><strong>Key themes:</strong> {{ ai.summary.themes|join:", " }}</p>
+    {% endif %}
+  {% else %}
+    <p class="muted">AI summary is not available for this survey yet.</p>
+  {% endif %}
+  {% if ai.sentiment.available %}
+    <h3>Sentiment Analysis</h3>
+    <p>Dominant sentiment: <strong>{{ ai.sentiment.dominant }}</strong></p>
+    <p>{{ ai.sentiment.reasoning }}</p>
+  {% endif %}
+  {% if ai.quality.available %}
+    <h3>Response Quality</h3>
+    <p>Average quality score: <strong>{{ ai.quality.average_score }}</strong></p>
+  {% endif %}
+</section>
+
