@@ -21,4 +21,12 @@ export const API_ENDPOINTS = {
     upload: (id: string) => `/audiences/${id}/upload/`,
     recipients: (id: string) => `/audiences/${id}/recipients/`,
   },
+  simulation: {
+    health: "/simulation/health/",
+    runs: "/simulation/runs/",
+    runDetail: (id: string) => `/simulation/runs/${id}/`,
+    results: (id: string) => `/simulation/results/${id}/`,
+    personas: "/simulation/personas/",
+    personaDetail: (id: string) => `/simulation/personas/${id}/`,
+  },
 };
