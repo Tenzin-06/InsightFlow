@@ -8,9 +8,10 @@ type Props = {
   onOpen: (id: string) => void;
   onEdit: (id: string) => void;
   onUpload: (id: string) => void;
+  onDelete: (id: string) => void;
 };
 
-export function AudienceTable({ audiences, isLoading, onOpen, onEdit, onUpload }: Props) {
+export function AudienceTable({ audiences, isLoading, onOpen, onEdit, onUpload, onDelete }: Props) {
   if (isLoading) {
     return (
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -30,6 +31,7 @@ export function AudienceTable({ audiences, isLoading, onOpen, onEdit, onUpload }
           onOpen={() => onOpen(audience.id)}
           onEdit={() => onEdit(audience.id)}
           onUpload={() => onUpload(audience.id)}
+          onDelete={() => onDelete(audience.id)}
         />
       ))}
     </div>

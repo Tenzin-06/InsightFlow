@@ -2,6 +2,14 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Plus, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { PageContainer } from "@/components/layout/page-container";
 import { AudienceFilters } from "@/features/audiences/components/audience-filters";
 import { AudienceHeader } from "@/features/audiences/components/audience-header";
@@ -10,6 +18,7 @@ import { AudienceEmptyState } from "@/features/audiences/components/empty-state"
 import { UploadModal } from "@/features/audiences/components/upload-modal";
 import { AUDIENCE_PAGE_SIZE } from "@/features/audiences/constants";
 import { useAudiences } from "@/features/audiences/hooks/use-audiences";
+import { useDeleteAudience } from "@/features/audiences/hooks/use-delete-audience";
 import type { Audience, AudienceSortKey } from "@/features/audiences/types";
 
 export default function AudiencesPage() {
@@ -19,6 +28,9 @@ export default function AudiencesPage() {
   const [sort, setSort] = useState<AudienceSortKey>("created_desc");
   const [page, setPage] = useState(1);
   const [uploadAudienceId, setUploadAudienceId] = useState<string | null>(null);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+
+  const deleteMutation = useDeleteAudience();
 
   const filteredAudiences = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -44,6 +56,13 @@ export default function AudiencesPage() {
   function handleSearchChange(value: string) {
     setSearch(value);
     setPage(1);
+  }
+
+  function handleDeleteConfirm() {
+    if (!deleteTargetId) return;
+    const id = deleteTargetId;
+    setDeleteTargetId(null);
+    deleteMutation.mutate(id);
   }
 
   return (
@@ -92,6 +111,7 @@ export default function AudiencesPage() {
               onOpen={(id) => navigate(`/dashboard/audiences/${id}`)}
               onEdit={(id) => navigate(`/dashboard/audiences/${id}/edit`)}
               onUpload={(id) => setUploadAudienceId(id)}
+              onDelete={(id) => setDeleteTargetId(id)}
             />
           )}
         </div>
@@ -99,7 +119,7 @@ export default function AudiencesPage() {
         {!isLoading && filteredAudiences.length > 0 && (
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-xs text-text-muted">
-              Showing {(page - 1) * AUDIENCE_PAGE_SIZE + 1}-
+              Showing {(page - 1) * AUDIENCE_PAGE_SIZE + 1}–
               {Math.min(page * AUDIENCE_PAGE_SIZE, filteredAudiences.length)} of{" "}
               {filteredAudiences.length}
             </p>
@@ -131,6 +151,7 @@ export default function AudiencesPage() {
         )}
       </div>
 
+      {/* Upload modal */}
       {uploadAudienceId && (
         <UploadModal
           audienceId={uploadAudienceId}
@@ -140,6 +161,34 @@ export default function AudiencesPage() {
           }}
         />
       )}
+
+      {/* Delete confirmation dialog */}
+      <Dialog open={Boolean(deleteTargetId)} onOpenChange={(open) => { if (!open) setDeleteTargetId(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete audience</DialogTitle>
+            <DialogDescription>
+              This action permanently deletes the audience and all contacts. This cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteTargetId(null)}
+              disabled={deleteMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteConfirm}
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending ? "Deleting…" : "Delete audience"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </PageContainer>
   );
 }

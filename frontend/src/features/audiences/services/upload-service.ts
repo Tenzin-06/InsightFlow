@@ -12,7 +12,6 @@
  */
 
 import { parseContactsFromCsv } from "@/features/audiences/utils/csv-parser";
-import { validateContactBatch } from "@/features/audiences/services/validation-service";
 import { uploadAudienceContacts } from "@/features/audiences/services/audience-api";
 import type { ContactUploadDraft, UploadSummary } from "@/features/audiences/types";
 
