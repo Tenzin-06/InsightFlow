@@ -44,6 +44,7 @@ Update this file after every meaningful implementation change.
   - `frontend/src/features/audiences/pages/audiences-page.tsx` - searchable/sortable audience overview with pagination and upload entry point
   - `frontend/src/features/audiences/pages/audience-detail-page.tsx` - audience metadata, stat cards, upload actions, and responsive contact table
   - `frontend/src/features/audiences/pages/audience-form-page.tsx` - create/edit audience UI
+  - `frontend/src/app/router/index.tsx` - deployment fix: restored Campaigns import to the committed Unit 23 placeholder path so Unit 21 branch does not depend on uncommitted email-campaign files
   - `npm.cmd run build`: passes
 
 - **Unit 20: Survey Sharing System** ✅ implemented (backend + frontend)
