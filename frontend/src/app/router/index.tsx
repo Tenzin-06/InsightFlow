@@ -20,6 +20,9 @@ const AudiencesPage = lazy(() => import("@/features/audiences/pages/audiences-pa
 const AudienceDetailPage = lazy(() => import("@/features/audiences/pages/audience-detail-page"));
 const AudienceFormPage = lazy(() => import("@/features/audiences/pages/audience-form-page"));
 const AnalyticsPage = lazy(() => import("@/features/analytics/pages/analytics-page"));
+const SurveyAnalyticsPage = lazy(() => import("@/features/analytics/pages/survey-analytics-page"));
+const CampaignAnalyticsPage = lazy(() => import("@/features/analytics/pages/campaign-analytics-page"));
+const EngagementAnalyticsPage = lazy(() => import("@/features/analytics/pages/engagement-analytics-page"));
 const CampaignsPage = lazy(() => import("@/features/email-campaigns/pages/campaigns-page"));
 const CreateCampaignPage = lazy(() => import("@/features/email-campaigns/pages/create-campaign-page"));
 const CampaignDetailPage = lazy(() => import("@/features/email-campaigns/pages/campaign-detail-page"));
@@ -66,6 +69,9 @@ const router = createBrowserRouter([
           { path: "/dashboard/audiences/:audienceId", element: <Suspense fallback={<PageLoader />}><AudienceDetailPage /></Suspense> },
           { path: "/dashboard/audiences/:audienceId/edit", element: <Suspense fallback={<PageLoader />}><AudienceFormPage mode="edit" /></Suspense> },
           { path: "/analytics", element: <Suspense fallback={<PageLoader />}><AnalyticsPage /></Suspense> },
+          { path: "/dashboard/analytics/surveys/:surveyId", element: <Suspense fallback={<PageLoader />}><SurveyAnalyticsPage /></Suspense> },
+          { path: "/dashboard/analytics/campaigns/:campaignId", element: <Suspense fallback={<PageLoader />}><CampaignAnalyticsPage /></Suspense> },
+          { path: "/dashboard/analytics/engagement", element: <Suspense fallback={<PageLoader />}><EngagementAnalyticsPage /></Suspense> },
           { path: "/dashboard/campaigns", element: <Suspense fallback={<PageLoader />}><CampaignsPage /></Suspense> },
           { path: "/dashboard/campaigns/new", element: <Suspense fallback={<PageLoader />}><CreateCampaignPage /></Suspense> },
           { path: "/dashboard/campaigns/:campaignId", element: <Suspense fallback={<PageLoader />}><CampaignDetailPage /></Suspense> },
