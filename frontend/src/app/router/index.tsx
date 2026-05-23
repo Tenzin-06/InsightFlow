@@ -8,6 +8,7 @@ import { ProtectedRoute } from "@/routes/protected-route";
 
 const LandingPage = lazy(() => import("@/features/marketing/pages/landing-page"));
 const PublicSurveyPage = lazy(() => import("@/features/public-surveys/pages/public-survey-page"));
+const ConversationalSurveyPage = lazy(() => import("@/features/conversational-surveys/pages/conversational-survey-page"));
 const LoginPage = lazy(() => import("@/features/auth/pages/login-page"));
 const RegisterPage = lazy(() => import("@/features/auth/pages/register-page"));
 const DashboardPage = lazy(() => import("@/features/dashboard/pages/dashboard-page"));
@@ -31,7 +32,9 @@ const router = createBrowserRouter([
     element: <PublicLayout />,
     children: [
       { path: "/", element: <Suspense fallback={<PageLoader />}><LandingPage /></Suspense> },
-      // Public survey participation — no authentication required
+      // Conversational (chat) survey — must be before /s/:surveyId to match first
+      { path: "/s/:surveyId/chat", element: <Suspense fallback={<PageLoader />}><ConversationalSurveyPage /></Suspense> },
+      // Standard public survey participation — no authentication required
       { path: "/s/:surveyId", element: <Suspense fallback={<PageLoader />}><PublicSurveyPage /></Suspense> },
     ],
   },
