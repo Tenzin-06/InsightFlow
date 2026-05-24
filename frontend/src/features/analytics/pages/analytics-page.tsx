@@ -1,4 +1,4 @@
-import { BarChart3, CheckSquare, Mail, TrendingDown, MousePointerClick } from "lucide-react";
+import { BarChart3, Mail, TrendingUp, Users } from "lucide-react";
 import { PageContainer } from "@/components/layout/page-container";
 import { AnalyticsShell } from "@/features/analytics/components/layouts/analytics-shell";
 import { AnalyticsGrid } from "@/features/analytics/components/layouts/analytics-grid";
@@ -7,52 +7,75 @@ import { StatGrid } from "@/features/analytics/components/metrics/stat-grid";
 import { AnalyticsCard } from "@/features/analytics/components/widgets/analytics-card";
 import { AnalyticsTrendChart } from "@/features/analytics/components/charts/trend-chart";
 import { AnalyticsBarChart } from "@/features/analytics/components/charts/bar-chart";
-import { MOCK_DASHBOARD_OVERVIEW } from "@/features/analytics/constants";
+import { AnalyticsSkeleton } from "@/features/analytics/components/states/analytics-skeleton";
+import { useDashboardAnalytics } from "@/features/analytics/hooks/use-analytics";
+import { Button } from "@/components/ui/button";
 import type { MetricCardData, CategoryPoint } from "@/features/analytics/types";
 
-const overview = MOCK_DASHBOARD_OVERVIEW;
-
-const kpiMetrics: MetricCardData[] = [
-  {
-    label: "Total Responses",
-    value: overview.totalResponses,
-    change: "+18%",
-    trend: "up",
-    icon: BarChart3,
-    description: "vs. last month",
-  },
-  {
-    label: "Completion Rate",
-    value: `${overview.completionRate}%`,
-    change: "+4.2%",
-    trend: "up",
-    icon: CheckSquare,
-    description: "avg. across surveys",
-  },
-  {
-    label: "Open Rate",
-    value: `${overview.openRate}%`,
-    change: "+1.8%",
-    trend: "up",
-    icon: Mail,
-    description: "email campaigns",
-  },
-  {
-    label: "Drop-Off Rate",
-    value: `${overview.dropOffRate}%`,
-    change: "−2.1%",
-    trend: "up",
-    icon: TrendingDown,
-    description: "improvement",
-  },
-];
-
-const topSurveysData: CategoryPoint[] = overview.topSurveys.map((s) => ({
-  name: s.title.length > 22 ? s.title.slice(0, 22) + "…" : s.title,
-  value: s.responses,
-}));
-
 export default function AnalyticsPage() {
+  const { data, isLoading, isError, refetch } = useDashboardAnalytics();
+
+  if (isLoading) {
+    return (
+      <PageContainer>
+        <AnalyticsShell>
+          <AnalyticsSkeleton />
+        </AnalyticsShell>
+      </PageContainer>
+    );
+  }
+
+  if (isError || !data) {
+    return (
+      <PageContainer>
+        <AnalyticsShell>
+          <AnalyticsDashboardHeader
+            title="Analytics Overview"
+            description="Survey performance, campaign engagement, and response metrics at a glance."
+          />
+          <div className="flex flex-col items-center gap-3 py-20 text-center">
+            <p className="text-sm font-semibold text-text-primary">Failed to load analytics</p>
+            <Button variant="outline" size="sm" onClick={() => void refetch()}>Retry</Button>
+          </div>
+        </AnalyticsShell>
+      </PageContainer>
+    );
+  }
+
+  const m = data.metrics;
+
+  const kpiMetrics: MetricCardData[] = [
+    {
+      label: "Total Responses",
+      value: m.total_responses,
+      icon: BarChart3,
+      description: "across all surveys",
+    },
+    {
+      label: "Total Surveys",
+      value: m.total_surveys,
+      icon: Users,
+      description: "created by you",
+    },
+    {
+      label: "Campaigns",
+      value: m.total_campaigns,
+      icon: Mail,
+      description: "email campaigns",
+    },
+    {
+      label: "Response Rate",
+      value: `${m.overall_response_rate.toFixed(1)}%`,
+      icon: TrendingUp,
+      description: "emails → responses",
+    },
+  ];
+
+  const topSurveysData: CategoryPoint[] = data.charts.top_surveys.map((s) => ({
+    name: s.title.length > 22 ? s.title.slice(0, 22) + "…" : s.title,
+    value: s.response_count,
+  }));
+
   return (
     <PageContainer>
       <AnalyticsShell>
@@ -68,14 +91,20 @@ export default function AnalyticsPage() {
         <AnalyticsGrid>
           <AnalyticsCard
             title="Response Trend"
-            description="Total responses collected over time"
-            footer="Based on all surveys in the last 8 months"
+            description="Total responses collected over the last 30 days"
+            footer="Updated from your survey responses"
           >
-            <AnalyticsTrendChart
-              data={overview.responseTrend}
-              label="Responses"
-              height={260}
-            />
+            {data.charts.response_trend.length > 0 ? (
+              <AnalyticsTrendChart
+                data={data.charts.response_trend}
+                label="Responses"
+                height={260}
+              />
+            ) : (
+              <p className="py-16 text-center text-sm text-text-muted">
+                No responses yet — share your surveys to start collecting data.
+              </p>
+            )}
           </AnalyticsCard>
 
           <AnalyticsCard
@@ -83,30 +112,36 @@ export default function AnalyticsPage() {
             description="Surveys ranked by total response count"
             footer="All-time response data"
           >
-            <AnalyticsBarChart
-              data={topSurveysData}
-              label="Responses"
-              height={260}
-            />
+            {topSurveysData.length > 0 ? (
+              <AnalyticsBarChart
+                data={topSurveysData}
+                label="Responses"
+                height={260}
+              />
+            ) : (
+              <p className="py-16 text-center text-sm text-text-muted">
+                No survey responses yet.
+              </p>
+            )}
           </AnalyticsCard>
         </AnalyticsGrid>
 
-        {/* Insight spotlight row */}
+        {/* Insight spotlight */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div className="rounded-xl border border-border-default bg-white p-5 shadow-sm dark:bg-card">
             <div className="flex items-center gap-3">
               <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-50">
-                <MousePointerClick className="h-5 w-5 text-primary-500" aria-hidden="true" />
+                <Mail className="h-5 w-5 text-primary-500" aria-hidden="true" />
               </span>
               <div>
-                <p className="text-xs font-medium text-text-secondary">Click Rate</p>
+                <p className="text-xs font-medium text-text-secondary">Emails Sent</p>
                 <p className="text-2xl font-extrabold text-text-primary">
-                  {overview.clickRate}%
+                  {m.total_emails_sent}
                 </p>
               </div>
             </div>
             <p className="mt-3 text-xs text-text-muted">
-              Across all active distribution campaigns
+              Total emails distributed across all campaigns
             </p>
           </div>
 
@@ -116,9 +151,15 @@ export default function AnalyticsPage() {
             </p>
             <ul className="mt-3 space-y-2" role="list">
               {[
-                "Completion rates have improved by 4.2% compared to last month.",
-                "Drop-off rates are declining — survey design improvements are working.",
-                "Top 5 surveys account for 83% of total responses.",
+                m.total_surveys === 0
+                  ? "Create your first survey to start collecting responses."
+                  : `You have ${m.total_surveys} survey${m.total_surveys !== 1 ? "s" : ""} collecting responses.`,
+                m.total_responses === 0
+                  ? "Share your surveys to start receiving responses."
+                  : `${m.total_responses} total response${m.total_responses !== 1 ? "s" : ""} collected across all surveys.`,
+                m.overall_response_rate > 0
+                  ? `Overall response rate: ${m.overall_response_rate.toFixed(1)}% of emails → completed surveys.`
+                  : "No email campaigns sent yet — create a campaign to track response rates.",
               ].map((insight) => (
                 <li
                   key={insight}

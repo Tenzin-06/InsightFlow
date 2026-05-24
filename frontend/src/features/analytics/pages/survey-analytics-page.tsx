@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, CheckSquare, Clock, TrendingDown, Users } from "lucide-react";
+import { ArrowLeft, CheckSquare, HelpCircle, TrendingDown, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageContainer } from "@/components/layout/page-container";
 import { AnalyticsShell } from "@/features/analytics/components/layouts/analytics-shell";
@@ -10,53 +10,93 @@ import { AnalyticsCard } from "@/features/analytics/components/widgets/analytics
 import { AnalyticsTrendChart } from "@/features/analytics/components/charts/trend-chart";
 import { AnalyticsBarChart } from "@/features/analytics/components/charts/bar-chart";
 import { AnalyticsFunnelChart } from "@/features/analytics/components/charts/funnel-chart";
-import { MOCK_SURVEY_ANALYTICS } from "@/features/analytics/constants";
+import { AnalyticsSkeleton } from "@/features/analytics/components/states/analytics-skeleton";
+import { useSurveyAnalytics } from "@/features/analytics/hooks/use-analytics";
+import { useSurveys } from "@/features/surveys/hooks/use-surveys";
+import { CHART_COLORS } from "@/features/analytics/constants";
 import type { MetricCardData } from "@/features/analytics/types";
 
 export default function SurveyAnalyticsPage() {
   const { surveyId } = useParams<{ surveyId: string }>();
+  const { data, isLoading, isError, refetch } = useSurveyAnalytics(surveyId);
+  const { data: surveys = [] } = useSurveys();
 
-  // In a real implementation this would fetch survey-specific data.
-  // For now we use mock data (Unit 29 scope: UI only).
-  const data = MOCK_SURVEY_ANALYTICS;
+  const survey = surveys.find((s) => String(s.id) === surveyId);
+  const surveyTitle = survey?.title ?? `Survey #${surveyId ?? ""}`;
+
+  if (isLoading) {
+    return (
+      <PageContainer>
+        <AnalyticsShell>
+          <AnalyticsSkeleton />
+        </AnalyticsShell>
+      </PageContainer>
+    );
+  }
+
+  if (isError || !data) {
+    return (
+      <PageContainer>
+        <AnalyticsShell>
+          <div>
+            <Button variant="ghost" size="sm" asChild className="-ml-2 gap-1.5 text-text-secondary">
+              <Link to="/analytics"><ArrowLeft className="h-4 w-4" />Back to Overview</Link>
+            </Button>
+          </div>
+          <div className="flex flex-col items-center gap-3 py-20 text-center">
+            <p className="text-sm font-semibold text-text-primary">Failed to load survey analytics</p>
+            <Button variant="outline" size="sm" onClick={() => void refetch()}>Retry</Button>
+          </div>
+        </AnalyticsShell>
+      </PageContainer>
+    );
+  }
+
+  const m = data.metrics;
 
   const kpiMetrics: MetricCardData[] = [
     {
       label: "Total Responses",
-      value: data.totalResponses,
-      change: "+22%",
-      trend: "up",
+      value: m.total_responses,
       icon: Users,
-      description: "vs. previous period",
+      description: "survey submissions",
     },
     {
       label: "Completion Rate",
-      value: `${data.completionRate}%`,
-      change: "+3.5%",
-      trend: "up",
+      value: `${m.completion_rate.toFixed(1)}%`,
       icon: CheckSquare,
-      description: "of started surveys",
+      description: m.completion_rate > 0 ? "of emails sent" : "no campaigns yet",
     },
     {
-      label: "Avg. Completion Time",
-      value: data.avgCompletionTime,
-      icon: Clock,
-      description: "per respondent",
+      label: "Questions",
+      value: m.question_count,
+      icon: HelpCircle,
+      description: "in this survey",
     },
     {
       label: "Drop-Off Rate",
-      value: `${data.dropOffRate}%`,
-      change: "−3.5%",
-      trend: "up",
+      value: `${m.drop_off_rate.toFixed(1)}%`,
       icon: TrendingDown,
-      description: "improvement",
+      description: m.drop_off_rate > 0 ? "did not respond" : "no campaign data",
     },
   ];
+
+  // Map question engagement to bar chart format
+  const questionEngagementBars = data.charts.question_engagement.map((q, i) => ({
+    name: q.question_text.length > 28 ? q.question_text.slice(0, 28) + "…" : q.question_text,
+    value: Math.round(q.engagement_rate),
+    fill: [
+      CHART_COLORS.primary,
+      CHART_COLORS.secondary,
+      CHART_COLORS.success,
+      CHART_COLORS.warning,
+      CHART_COLORS.purple,
+    ][i % 5],
+  }));
 
   return (
     <PageContainer>
       <AnalyticsShell>
-        {/* Back navigation */}
         <div>
           <Button variant="ghost" size="sm" asChild className="-ml-2 gap-1.5 text-text-secondary">
             <Link to="/analytics">
@@ -67,8 +107,8 @@ export default function SurveyAnalyticsPage() {
         </div>
 
         <AnalyticsDashboardHeader
-          title={data.title}
-          description={`Survey analytics · ID: ${surveyId ?? data.surveyId}`}
+          title={surveyTitle}
+          description={`Survey analytics · ID: ${surveyId}`}
         />
 
         {/* KPIs */}
@@ -78,37 +118,60 @@ export default function SurveyAnalyticsPage() {
         <AnalyticsGrid>
           <AnalyticsCard
             title="Response Trend"
-            description="Weekly response volume over the survey's active period"
+            description="Responses collected over the last 30 days"
           >
-            <AnalyticsTrendChart
-              data={data.responseTrend}
-              label="Responses"
-              height={250}
-            />
+            {data.charts.response_trend.length > 0 ? (
+              <AnalyticsTrendChart
+                data={data.charts.response_trend}
+                label="Responses"
+                height={250}
+              />
+            ) : (
+              <p className="py-16 text-center text-sm text-text-muted">No responses yet.</p>
+            )}
           </AnalyticsCard>
 
           <AnalyticsCard
             title="Completion Funnel"
-            description="Drop-off analysis from survey open to submission"
+            description="Journey from email send to survey submission"
           >
-            <AnalyticsFunnelChart data={data.completionFunnel} />
+            {data.funnel.length > 0 ? (
+              <AnalyticsFunnelChart data={data.funnel} />
+            ) : (
+              <p className="py-16 text-center text-sm text-text-muted">
+                No campaign data — send a campaign to see the funnel.
+              </p>
+            )}
           </AnalyticsCard>
         </AnalyticsGrid>
 
         {/* Question engagement */}
-        <AnalyticsCard
-          title="Question Engagement"
-          description="Percentage of respondents who answered each question"
-          footer="Lower values indicate drop-off at that question"
-        >
-          <AnalyticsBarChart
-            data={data.questionEngagement}
-            label="% Answered"
-            yFormatter={(v) => `${v}%`}
-            useItemColors
-            height={240}
-          />
-        </AnalyticsCard>
+        {questionEngagementBars.length > 0 && (
+          <AnalyticsCard
+            title="Question Engagement"
+            description="Percentage of respondents who answered each question"
+            footer="Lower values indicate drop-off at that question"
+          >
+            <AnalyticsBarChart
+              data={questionEngagementBars}
+              label="% Answered"
+              yFormatter={(v) => `${v}%`}
+              useItemColors
+              height={240}
+            />
+          </AnalyticsCard>
+        )}
+
+        {questionEngagementBars.length === 0 && (
+          <AnalyticsCard
+            title="Question Engagement"
+            description="Percentage of respondents who answered each question"
+          >
+            <p className="py-16 text-center text-sm text-text-muted">
+              No question response data yet — collect some responses first.
+            </p>
+          </AnalyticsCard>
+        )}
       </AnalyticsShell>
     </PageContainer>
   );
