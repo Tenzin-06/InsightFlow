@@ -21,6 +21,12 @@ export const API_ENDPOINTS = {
     upload: (id: string) => `/audiences/${id}/upload/`,
     recipients: (id: string) => `/audiences/${id}/recipients/`,
   },
+  analytics: {
+    dashboard: "/analytics/dashboard/",
+    survey: (id: string | number) => `/analytics/surveys/${id}/`,
+    campaign: (id: string | number) => `/analytics/campaigns/${id}/`,
+    engagement: "/analytics/engagement/",
+  },
   aiAnalytics: {
     summary: (surveyId: number) => `/api/v1/ai-analytics/summary/${surveyId}/`,
     sentiment: (surveyId: number) =>
