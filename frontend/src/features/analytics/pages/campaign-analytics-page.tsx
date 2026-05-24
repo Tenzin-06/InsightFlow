@@ -16,9 +16,9 @@ import type { MetricCardData } from "@/features/analytics/types";
 
 export default function CampaignAnalyticsPage() {
   const { campaignId } = useParams<{ campaignId: string }>();
-  const { data, isLoading, isError, refetch } = useCampaignAnalytics(campaignId);
+  const { data, isPending, isFetching, isError, refetch } = useCampaignAnalytics(campaignId);
 
-  if (isLoading) {
+  if (isPending && isFetching) {
     return (
       <PageContainer>
         <AnalyticsShell>

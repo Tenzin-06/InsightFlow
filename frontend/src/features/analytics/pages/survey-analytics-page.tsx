@@ -18,13 +18,14 @@ import type { MetricCardData } from "@/features/analytics/types";
 
 export default function SurveyAnalyticsPage() {
   const { surveyId } = useParams<{ surveyId: string }>();
-  const { data, isLoading, isError, refetch } = useSurveyAnalytics(surveyId);
+  const { data, isPending, isFetching, isError, error, refetch } = useSurveyAnalytics(surveyId);
   const { data: surveys = [] } = useSurveys();
 
   const survey = surveys.find((s) => String(s.id) === surveyId);
   const surveyTitle = survey?.title ?? `Survey #${surveyId ?? ""}`;
 
-  if (isLoading) {
+  // Show skeleton while actively fetching (isPending = no data yet, isFetching = request in flight)
+  if (isPending && isFetching) {
     return (
       <PageContainer>
         <AnalyticsShell>
@@ -34,7 +35,10 @@ export default function SurveyAnalyticsPage() {
     );
   }
 
-  if (isError || !data) {
+  if (isError) {
+    const apiError = error as { message?: string; status?: number } | null;
+    const msg = apiError?.message ?? "Could not load analytics for this survey.";
+    const status = apiError?.status;
     return (
       <PageContainer>
         <AnalyticsShell>
@@ -44,9 +48,23 @@ export default function SurveyAnalyticsPage() {
             </Button>
           </div>
           <div className="flex flex-col items-center gap-3 py-20 text-center">
-            <p className="text-sm font-semibold text-text-primary">Failed to load survey analytics</p>
+            <p className="text-sm font-semibold text-text-primary">
+              {status === 404 ? "Survey not found" : status === 403 ? "Access denied" : "Failed to load analytics"}
+            </p>
+            <p className="text-xs text-text-muted max-w-xs">{msg}{status ? ` (${status})` : ""}</p>
             <Button variant="outline" size="sm" onClick={() => void refetch()}>Retry</Button>
           </div>
+        </AnalyticsShell>
+      </PageContainer>
+    );
+  }
+
+  // No data yet but not errored (e.g. query disabled) — show skeleton
+  if (!data) {
+    return (
+      <PageContainer>
+        <AnalyticsShell>
+          <AnalyticsSkeleton />
         </AnalyticsShell>
       </PageContainer>
     );

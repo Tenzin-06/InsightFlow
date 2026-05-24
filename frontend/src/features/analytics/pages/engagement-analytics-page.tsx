@@ -15,9 +15,9 @@ import { useEngagementAnalytics } from "@/features/analytics/hooks/use-analytics
 import { CHART_COLORS } from "@/features/analytics/constants";
 
 export default function EngagementAnalyticsPage() {
-  const { data, isLoading, isError, refetch } = useEngagementAnalytics();
+  const { data, isPending, isFetching, isError, refetch } = useEngagementAnalytics();
 
-  if (isLoading) {
+  if (isPending && isFetching) {
     return (
       <PageContainer>
         <AnalyticsShell>

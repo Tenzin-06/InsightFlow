@@ -118,9 +118,9 @@ export function useSurveyAnalytics(surveyId: string | undefined) {
       );
       return res.data;
     },
-    enabled: Boolean(surveyId),
+    enabled: Boolean(surveyId) && surveyId !== "undefined",
     staleTime: 2 * 60 * 1000,
-    retry: 1,
+    retry: false,
   });
 }
 
