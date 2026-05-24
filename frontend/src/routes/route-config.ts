@@ -29,8 +29,8 @@ export const mainNavRoutes: RouteConfig[] = [
     icon: BarChart3,
     children: [
       { label: "Overview", path: "/analytics", icon: BarChart3 },
-      { label: "Surveys", path: "/dashboard/analytics/surveys/1", icon: LineChart },
-      { label: "Campaigns", path: "/dashboard/analytics/campaigns/1", icon: Megaphone },
+      { label: "Surveys", path: "/dashboard/analytics/surveys", icon: LineChart },
+      { label: "Campaigns", path: "/dashboard/analytics/campaigns", icon: Megaphone },
       { label: "Engagement", path: "/dashboard/analytics/engagement", icon: Activity },
     ],
   },

@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Mail, Send, TrendingUp, XCircle } from "lucide-react";
+import { ArrowLeft, Mail, Megaphone, Send, TrendingUp, XCircle } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { PageContainer } from "@/components/layout/page-container";
 import { AnalyticsShell } from "@/features/analytics/components/layouts/analytics-shell";
@@ -11,11 +12,96 @@ import { AnalyticsFunnelChart } from "@/features/analytics/components/charts/fun
 import { PercentageCard } from "@/features/analytics/components/metrics/percentage-card";
 import { AnalyticsSkeleton } from "@/features/analytics/components/states/analytics-skeleton";
 import { useCampaignAnalytics } from "@/features/analytics/hooks/use-analytics";
+import { getCampaigns } from "@/features/email-campaigns/services/campaign-api";
 import { CHART_COLORS } from "@/features/analytics/constants";
 import type { MetricCardData } from "@/features/analytics/types";
 
+// ---------------------------------------------------------------------------
+// Campaign picker — shown when navigating to /dashboard/analytics/campaigns
+// without a campaign ID in the URL.
+// ---------------------------------------------------------------------------
+
+function CampaignPicker() {
+  const { data: campaigns = [], isLoading } = useQuery({
+    queryKey: ["campaigns"],
+    queryFn: getCampaigns,
+  });
+
+  return (
+    <PageContainer>
+      <AnalyticsShell>
+        <div>
+          <Button variant="ghost" size="sm" asChild className="-ml-2 gap-1.5 text-text-secondary">
+            <Link to="/analytics">
+              <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+              Back to Overview
+            </Link>
+          </Button>
+        </div>
+
+        <AnalyticsDashboardHeader
+          title="Campaign Analytics"
+          description="Select a campaign below to explore its delivery trend, response rate, and funnel."
+        />
+
+        {isLoading ? (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-20 animate-pulse rounded-xl bg-surface-muted" />
+            ))}
+          </div>
+        ) : campaigns.length === 0 ? (
+          <div className="flex flex-col items-center gap-3 py-20 text-center">
+            <Megaphone className="h-10 w-10 text-text-muted" aria-hidden="true" />
+            <p className="text-sm font-semibold text-text-primary">No campaigns yet</p>
+            <p className="text-xs text-text-muted">
+              Create and send a campaign first to start tracking delivery and response analytics.
+            </p>
+            <Button asChild size="sm">
+              <Link to="/dashboard/campaigns/new">Create Campaign</Link>
+            </Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {campaigns.map((campaign) => (
+              <Link
+                key={campaign.id}
+                to={`/dashboard/analytics/campaigns/${campaign.id}`}
+                className="group flex flex-col gap-1.5 rounded-xl border border-border-default bg-white p-5 shadow-sm transition-shadow hover:shadow-md dark:bg-card"
+              >
+                <p className="text-sm font-semibold text-text-primary group-hover:text-primary-600 transition-colors line-clamp-2">
+                  {campaign.title}
+                </p>
+                <div className="flex items-center gap-3 text-xs text-text-muted">
+                  <span className="capitalize">{campaign.status}</span>
+                  <span>·</span>
+                  <span>{campaign.response_count ?? 0} responses</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </AnalyticsShell>
+    </PageContainer>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Campaign analytics detail view
+// ---------------------------------------------------------------------------
+
 export default function CampaignAnalyticsPage() {
   const { campaignId } = useParams<{ campaignId: string }>();
+
+  // If no campaignId in URL, show the picker
+  if (!campaignId) {
+    return <CampaignPicker />;
+  }
+
+  return <CampaignAnalyticsDetail campaignId={campaignId} />;
+}
+
+function CampaignAnalyticsDetail({ campaignId }: { campaignId: string }) {
   const { data, isPending, isFetching, isError, refetch } = useCampaignAnalytics(campaignId);
 
   if (isPending && isFetching) {
@@ -34,7 +120,7 @@ export default function CampaignAnalyticsPage() {
         <AnalyticsShell>
           <div>
             <Button variant="ghost" size="sm" asChild className="-ml-2 gap-1.5 text-text-secondary">
-              <Link to="/analytics"><ArrowLeft className="h-4 w-4" />Back to Overview</Link>
+              <Link to="/dashboard/analytics/campaigns"><ArrowLeft className="h-4 w-4" />Back to Campaigns</Link>
             </Button>
           </div>
           <div className="flex flex-col items-center gap-3 py-20 text-center">
@@ -80,15 +166,15 @@ export default function CampaignAnalyticsPage() {
       <AnalyticsShell>
         <div>
           <Button variant="ghost" size="sm" asChild className="-ml-2 gap-1.5 text-text-secondary">
-            <Link to="/analytics">
+            <Link to="/dashboard/analytics/campaigns">
               <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-              Back to Overview
+              Back to Campaigns
             </Link>
           </Button>
         </div>
 
         <AnalyticsDashboardHeader
-          title={`Campaign #${campaignId ?? ""}`}
+          title={`Campaign #${campaignId}`}
           description="Email delivery and survey response analytics for this campaign."
         />
 

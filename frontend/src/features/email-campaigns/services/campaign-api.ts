@@ -106,7 +106,7 @@ export async function sendTestEmail(
   email: string
 ): Promise<{ job_id: string; email: string }> {
   const res = await postRequest<ApiResponse<{ job_id: string; email: string }>>(
-    `/campaigns/${campaignId}/test/`,
+    API_ENDPOINTS.campaigns.test(campaignId),
     { email }
   );
   return res.data;
