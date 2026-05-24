@@ -27,10 +27,11 @@ type ConfigFormValues = z.infer<typeof configSchema>;
 type SimulationConfigFormProps = {
   personas: SimulationPersona[];
   surveys: Survey[];
+  isSubmitting?: boolean;
   onSubmit: (payload: CreateSimulationRunPayload) => Promise<void> | void;
 };
 
-export function SimulationConfigForm({ personas, surveys, onSubmit }: SimulationConfigFormProps) {
+export function SimulationConfigForm({ personas, surveys, isSubmitting = false, onSubmit }: SimulationConfigFormProps) {
   const form = useForm<ConfigFormValues>({
     resolver: zodResolver(configSchema),
     defaultValues: {
@@ -47,12 +48,17 @@ export function SimulationConfigForm({ personas, surveys, onSubmit }: Simulation
   const values = form.watch();
 
   async function submit(values: ConfigFormValues) {
+    // Include full persona objects so the backend Gemini service can build
+    // accurate persona-contextual prompts without a separate DB lookup.
+    const selectedPersonas = personas.filter((p) => selectedPersonaIds.includes(p.id));
     await onSubmit({
       ...values,
       allow_external_api: values.allow_external_api === "true",
       persona_ids: selectedPersonaIds,
       metadata: {
         execution_constraints: "sandbox",
+        personas: selectedPersonas,
+        persona_count: selectedPersonas.length,
       },
     });
   }
@@ -156,10 +162,10 @@ export function SimulationConfigForm({ personas, surveys, onSubmit }: Simulation
 
       <Button
         type="submit"
-        disabled={selectedPersonaIds.length === 0}
+        disabled={selectedPersonaIds.length === 0 || isSubmitting}
         className="bg-orange-600 hover:bg-orange-700"
       >
-        Run Synthetic Execution
+        {isSubmitting ? "Generating AI Responses…" : "Run Synthetic Execution"}
       </Button>
     </form>
   );

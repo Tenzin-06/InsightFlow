@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { FlaskConical, ShieldCheck, Users } from "lucide-react";
+import { AlertCircle, BrainCircuit, FlaskConical, ShieldCheck, Users } from "lucide-react";
 
 import { PageContainer } from "@/components/layout/page-container";
 import { SimulationShell } from "@/features/simulation/components/simulation-shell";
@@ -89,6 +89,7 @@ export default function SimulationPage() {
             <SimulationConfigForm
               personas={personas}
               surveys={surveys}
+              isSubmitting={simulation.createRunMutation.isPending || simulation.isExecuting}
               onSubmit={async (payload) => {
                 await simulation.createRun(payload);
               }}
@@ -96,10 +97,34 @@ export default function SimulationPage() {
           </div>
         </section>
 
+        {/* AI Execution banner — shown while Gemini is generating responses */}
+        {simulation.isExecuting && (
+          <div className="flex items-center gap-3 rounded-lg border border-orange-200 bg-orange-50 p-4">
+            <BrainCircuit className="h-5 w-5 shrink-0 animate-pulse text-orange-600" aria-hidden="true" />
+            <div>
+              <p className="text-sm font-semibold text-orange-900">Gemini AI is generating responses…</p>
+              <p className="mt-0.5 text-xs text-orange-700">
+                Reading survey questions and simulating each persona. This may take 20–60 seconds.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Execute error */}
+        {simulation.executeError && !simulation.isExecuting && (
+          <div className="flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 p-4">
+            <AlertCircle className="h-5 w-5 shrink-0 text-red-500" aria-hidden="true" />
+            <div>
+              <p className="text-sm font-semibold text-red-800">AI execution failed</p>
+              <p className="mt-0.5 text-xs text-red-700">{simulation.executeError}</p>
+            </div>
+          </div>
+        )}
+
         <SimulationRunner
           run={runData?.run ?? null}
           events={runData?.events ?? []}
-          isPolling={simulation.detailsQuery.isFetching}
+          isPolling={simulation.detailsQuery.isFetching || simulation.isExecuting}
         />
 
         <SimulationResults run={runData?.run ?? null} metrics={runData?.metrics ?? null} />

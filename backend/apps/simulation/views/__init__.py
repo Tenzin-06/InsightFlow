@@ -4,6 +4,8 @@ from .simulation_views import (
     SimulationHealthView,
     SimulationRunDetailView,
     SimulationRunListCreateView,
+    SimulationRunResultsView,
+    SimulationUserExecuteView,
 )
 
 __all__ = [
@@ -12,5 +14,6 @@ __all__ = [
     "SimulationHealthView",
     "SimulationRunDetailView",
     "SimulationRunListCreateView",
+    "SimulationRunResultsView",
+    "SimulationUserExecuteView",
 ]
-

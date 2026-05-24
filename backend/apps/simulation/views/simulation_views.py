@@ -143,6 +143,93 @@ class InternalSimulationExecuteView(APIView):
         )
 
 
+class SimulationUserExecuteView(APIView):
+    """
+    POST /simulation/runs/<pk>/execute/
+
+    Triggers synchronous execution of a pending simulation run for the
+    authenticated owner.  Calls SimulationExecutor (which calls Gemini) and
+    returns the updated run once complete.
+    """
+
+    def post(self, request: Request, pk: int) -> Response:
+        run = get_object_or_404(
+            SimulationRun.objects.filter(owner=request.user, is_simulated=True),
+            pk=pk,
+        )
+        if run.status != SIMULATION_RUN_STATUS_PENDING:
+            return Response(
+                error_response(
+                    "Only pending simulation runs can be executed.",
+                    code="INVALID_STATUS",
+                ),
+                status=status.HTTP_409_CONFLICT,
+            )
+        try:
+            executed_run = SimulationExecutor.execute(run)
+        except SimulationGuardError as exc:
+            run.mark_blocked(str(exc))
+            return Response(
+                error_response(str(exc), code="SAFEGUARD_BLOCKED"),
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        except Exception as exc:
+            logger.exception("simulation user-execute failed")
+            run.mark_failed(str(exc))
+            return Response(
+                error_response(str(exc), code="EXECUTION_ERROR"),
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+        return Response(
+            success_response(SimulationRunSerializer(executed_run).data),
+            status=status.HTTP_200_OK,
+        )
+
+
+class SimulationRunResultsView(APIView):
+    """
+    GET /simulation/runs/<pk>/results/
+
+    Returns AI-generated synthetic responses from the SyntheticDataset
+    associated with a completed simulation run.
+    """
+
+    def get(self, request: Request, pk: int) -> Response:
+        run = get_object_or_404(
+            SimulationRun.objects.filter(owner=request.user, is_simulated=True),
+            pk=pk,
+        )
+
+        dataset = (
+            run.synthetic_datasets.order_by("-created_at").first()
+        )
+
+        if not dataset:
+            return Response(
+                error_response(
+                    "No dataset found for this simulation run. "
+                    "Execute the run first.",
+                    code="NO_DATASET",
+                ),
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        responses = dataset.metadata.get("responses", [])
+        return Response(
+            success_response(
+                {
+                    "run_id": run.pk,
+                    "run_status": run.status,
+                    "dataset_id": dataset.pk,
+                    "generated_records": dataset.metadata.get("generated_records", 0),
+                    "persona_count": dataset.metadata.get("persona_count", 0),
+                    "responses": responses,
+                }
+            ),
+            status=status.HTTP_200_OK,
+        )
+
+
 class InternalSimulationCleanupView(APIView):
     authentication_classes = [NoAuthentication]
     permission_classes = [InternalSecretPermission]

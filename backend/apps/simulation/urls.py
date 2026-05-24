@@ -6,12 +6,24 @@ from apps.simulation.views import (
     SimulationHealthView,
     SimulationRunDetailView,
     SimulationRunListCreateView,
+    SimulationRunResultsView,
+    SimulationUserExecuteView,
 )
 
 urlpatterns = [
     path("simulation/health/", SimulationHealthView.as_view(), name="simulation-health"),
     path("simulation/runs/", SimulationRunListCreateView.as_view(), name="simulation-run-list-create"),
     path("simulation/runs/<int:pk>/", SimulationRunDetailView.as_view(), name="simulation-run-detail"),
+    path(
+        "simulation/runs/<int:pk>/execute/",
+        SimulationUserExecuteView.as_view(),
+        name="simulation-run-execute",
+    ),
+    path(
+        "simulation/runs/<int:pk>/results/",
+        SimulationRunResultsView.as_view(),
+        name="simulation-run-results",
+    ),
     path(
         "internal/simulation/runs/<int:pk>/execute/",
         InternalSimulationExecuteView.as_view(),
