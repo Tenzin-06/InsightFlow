@@ -6,6 +6,11 @@ import {
   ChevronUp,
   ChevronDown,
   X,
+  AlignLeft,
+  AlignJustify,
+  CheckSquare,
+  CircleDot,
+  Star,
 } from "lucide-react";
 import {
   Select,
@@ -17,13 +22,41 @@ import {
 import { cn } from "@/lib/utils";
 import type { Question, QuestionType, UpdateQuestionPayload } from "@/features/surveys/types";
 
-const QUESTION_TYPES: { value: QuestionType; label: string }[] = [
-  { value: "short_text", label: "Short answer" },
-  { value: "long_text", label: "Paragraph" },
-  { value: "multiple_choice", label: "Multiple choice" },
-  { value: "checkbox", label: "Checkboxes" },
-  { value: "rating", label: "Linear scale" },
+// ── Question type options ─────────────────────────────────────────────────────
+
+const QUESTION_TYPES: { value: QuestionType; label: string; icon: React.ReactNode }[] = [
+  { value: "short_text",      label: "Short answer",    icon: <AlignLeft    className="h-3.5 w-3.5" /> },
+  { value: "long_text",       label: "Paragraph",       icon: <AlignJustify className="h-3.5 w-3.5" /> },
+  { value: "multiple_choice", label: "Multiple choice", icon: <CircleDot    className="h-3.5 w-3.5" /> },
+  { value: "checkbox",        label: "Checkboxes",      icon: <CheckSquare  className="h-3.5 w-3.5" /> },
+  { value: "rating",          label: "Linear scale",    icon: <Star         className="h-3.5 w-3.5" /> },
 ];
+
+// ── Required toggle ───────────────────────────────────────────────────────────
+
+function RequiredToggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      onClick={() => onChange(!checked)}
+      className={cn(
+        "relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B82F6] focus-visible:ring-offset-1",
+        checked ? "bg-[#3B82F6]" : "bg-[#CBD5E1]"
+      )}
+    >
+      <span
+        className={cn(
+          "inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow-sm transition-transform",
+          checked ? "translate-x-[18px]" : "translate-x-0.5"
+        )}
+      />
+    </button>
+  );
+}
+
+// ── Props ─────────────────────────────────────────────────────────────────────
 
 type Props = {
   question: Question;
@@ -37,34 +70,6 @@ type Props = {
   onMoveDown: () => void;
 };
 
-function RequiredToggle({
-  checked,
-  onChange,
-}: {
-  checked: boolean;
-  onChange: (v: boolean) => void;
-}) {
-  return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      onClick={() => onChange(!checked)}
-      className={cn(
-        "relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500",
-        checked ? "bg-primary-500" : "bg-muted"
-      )}
-    >
-      <span
-        className={cn(
-          "inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform",
-          checked ? "translate-x-[18px]" : "translate-x-0.5"
-        )}
-      />
-    </button>
-  );
-}
-
 export function InlineQuestionCard({
   question,
   isFirst,
@@ -76,16 +81,16 @@ export function InlineQuestionCard({
   onMoveUp,
   onMoveDown,
 }: Props) {
-  const [localText, setLocalText] = useState(question.question_text);
-  const [localType, setLocalType] = useState<QuestionType>(question.question_type);
+  const [localText,     setLocalText]     = useState(question.question_text);
+  const [localType,     setLocalType]     = useState<QuestionType>(question.question_type);
   const [localRequired, setLocalRequired] = useState(question.is_required);
-  const [localOptions, setLocalOptions] = useState<string[]>(
+  const [localOptions,  setLocalOptions]  = useState<string[]>(
     () => (question.metadata?.choices as string[] | undefined) ?? ["Option 1"]
   );
 
   const optionsTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Sync when a different question is mounted (id change)
+  // Sync on question id change
   useEffect(() => {
     setLocalText(question.question_text);
     setLocalType(question.question_type);
@@ -95,20 +100,15 @@ export function InlineQuestionCard({
 
   // Debounced text save
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (localText !== question.question_text) {
-        onSave({ question_text: localText });
-      }
+    const t = setTimeout(() => {
+      if (localText !== question.question_text) onSave({ question_text: localText });
     }, 600);
-    return () => clearTimeout(timer);
+    return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [localText]);
 
-  // Cleanup options timer on unmount
   useEffect(() => {
-    return () => {
-      if (optionsTimerRef.current) clearTimeout(optionsTimerRef.current);
-    };
+    return () => { if (optionsTimerRef.current) clearTimeout(optionsTimerRef.current); };
   }, []);
 
   function handleTypeChange(newType: QuestionType) {
@@ -123,40 +123,33 @@ export function InlineQuestionCard({
 
   function saveOptions(opts: string[]) {
     if (optionsTimerRef.current) clearTimeout(optionsTimerRef.current);
-    optionsTimerRef.current = setTimeout(() => {
-      onSave({ metadata: { choices: opts } });
-    }, 600);
+    optionsTimerRef.current = setTimeout(() => onSave({ metadata: { choices: opts } }), 600);
   }
 
   function addOption() {
     const next = [...localOptions, `Option ${localOptions.length + 1}`];
-    setLocalOptions(next);
-    saveOptions(next);
+    setLocalOptions(next); saveOptions(next);
   }
 
   function addOther() {
     if (localOptions.includes("Other")) return;
     const next = [...localOptions, "Other"];
-    setLocalOptions(next);
-    saveOptions(next);
+    setLocalOptions(next); saveOptions(next);
   }
 
   function removeOption(i: number) {
     const next = localOptions.filter((_, idx) => idx !== i);
-    setLocalOptions(next);
-    saveOptions(next);
+    setLocalOptions(next); saveOptions(next);
   }
 
   function updateOption(i: number, val: string) {
-    const next = [...localOptions];
-    next[i] = val;
-    setLocalOptions(next);
-    saveOptions(next);
+    const next = [...localOptions]; next[i] = val;
+    setLocalOptions(next); saveOptions(next);
   }
 
   const showOptions = localType === "multiple_choice" || localType === "checkbox";
 
-  // ── Inactive preview (looks like a rendered form card) ───────────────────
+  // ── Inactive preview card ─────────────────────────────────────────────────
   if (!isActive) {
     return (
       <div
@@ -164,54 +157,48 @@ export function InlineQuestionCard({
         tabIndex={0}
         onClick={onActivate}
         onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
-            e.preventDefault();
-            onActivate();
-          }
+          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onActivate(); }
         }}
-        className="cursor-pointer rounded-xl border border-border/60 bg-white px-6 py-5 shadow-sm transition-all hover:shadow-md dark:bg-card"
+        className="cursor-pointer rounded-xl border border-[#E2E8F0] bg-white px-6 py-5 shadow-sm transition-all hover:border-[#9FC2FF] hover:shadow-md"
       >
-        {/* Question title */}
-        <p className="mb-3 text-sm font-medium text-text-primary">
-          {localText || <span className="italic text-text-muted">Untitled Question</span>}
-          {localRequired && <span className="ml-1 text-destructive">*</span>}
+        <p className="mb-3 text-sm font-medium leading-relaxed text-[#0F172A]">
+          {localText || <span className="italic text-[#94A3B8]">Untitled Question</span>}
+          {localRequired && <span className="ml-1 text-[#EF4444]">*</span>}
         </p>
 
-        {/* Answer preview — mirrors what respondents see */}
         {localType === "short_text" && (
-          <p className="w-1/2 border-b border-dotted border-text-muted/50 pb-0.5 text-sm text-text-muted">
-            Short answer text
-          </p>
+          <div className="w-56 border-b border-dashed border-[#CBD5E1] pb-1">
+            <span className="text-sm text-[#94A3B8]">Short answer text</span>
+          </div>
         )}
 
         {localType === "long_text" && (
-          <p className="w-full border-b border-dotted border-text-muted/50 pb-0.5 text-sm text-text-muted">
-            Long answer text
-          </p>
+          <div className="w-full border-b border-dashed border-[#CBD5E1] pb-1">
+            <span className="text-sm text-[#94A3B8]">Long answer text</span>
+          </div>
         )}
 
         {(localType === "multiple_choice" || localType === "checkbox") && (
           <div className="space-y-2.5">
-            {localOptions.map((opt, i) => (
+            {localOptions.slice(0, 3).map((opt, i) => (
               <div key={i} className="flex items-center gap-2.5">
-                {localType === "multiple_choice" ? (
-                  <div className="h-4 w-4 shrink-0 rounded-full border-2 border-text-secondary/50" />
-                ) : (
-                  <div className="h-4 w-4 shrink-0 rounded border-2 border-text-secondary/50" />
-                )}
-                <span className="text-sm text-text-secondary">{opt}</span>
+                {localType === "multiple_choice"
+                  ? <div className="h-4 w-4 shrink-0 rounded-full border-2 border-[#CBD5E1]" />
+                  : <div className="h-4 w-4 shrink-0 rounded border-2 border-[#CBD5E1]" />
+                }
+                <span className="text-sm text-[#475569]">{opt}</span>
               </div>
             ))}
+            {localOptions.length > 3 && (
+              <p className="pl-6 text-xs text-[#94A3B8]">+{localOptions.length - 3} more</p>
+            )}
           </div>
         )}
 
         {localType === "rating" && (
           <div className="flex gap-2">
             {[1, 2, 3, 4, 5].map((n) => (
-              <div
-                key={n}
-                className="flex h-8 w-8 items-center justify-center rounded-full border border-text-muted/40 text-sm text-text-muted"
-              >
+              <div key={n} className="flex h-8 w-8 items-center justify-center rounded-full border border-[#E2E8F0] text-sm text-[#94A3B8]">
                 {n}
               </div>
             ))}
@@ -223,19 +210,28 @@ export function InlineQuestionCard({
 
   // ── Active editing card ───────────────────────────────────────────────────
   return (
-    <div className="rounded-xl border-y border-r border-l-4 border-l-indigo-500 border-border/60 bg-white shadow-md dark:bg-card">
-      {/* Drag handle */}
-      <div className="flex cursor-grab items-center justify-center py-1.5 text-text-muted/40">
-        <GripVertical className="h-4 w-4 rotate-90" />
+    <div className="overflow-hidden rounded-xl border border-[#9FC2FF] bg-white shadow-md ring-2 ring-[#3B82F6]/10">
+
+      {/* Active header bar */}
+      <div className="flex items-center justify-between border-b border-[#EEF4FF] bg-[#EEF4FF] px-4 py-2">
+        <div className="flex items-center gap-2">
+          <div className="h-2 w-2 rounded-full bg-[#3B82F6]" />
+          <span className="text-xs font-semibold text-[#3B82F6]">Editing</span>
+        </div>
+        <div className="cursor-grab text-[#94A3B8] hover:text-[#475569]" title="Drag to reorder">
+          <GripVertical className="h-4 w-4 rotate-90" />
+        </div>
       </div>
 
-      <div className="px-5 pb-0">
-        {/* Question text + type selector */}
+      <div className="px-5 pt-4 pb-0">
+        {/* Question text + type selector row */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
-          <div className="flex flex-1 items-end gap-2 border-b border-input pb-1 transition-colors focus-within:border-indigo-500">
+
+          {/* Question text input */}
+          <div className="flex flex-1 items-end border-b-2 border-[#9FC2FF] pb-1 transition-colors focus-within:border-[#3B82F6]">
             <input
-              className="flex-1 bg-transparent text-sm outline-none placeholder:text-text-muted"
-              placeholder="Question"
+              className="flex-1 bg-transparent text-sm font-medium text-[#0F172A] outline-none placeholder:text-[#94A3B8]"
+              placeholder="Question text"
               value={localText}
               onChange={(e) => setLocalText(e.target.value)}
               autoFocus
@@ -243,18 +239,19 @@ export function InlineQuestionCard({
             />
           </div>
 
+          {/* Type selector */}
           <div className="shrink-0">
-            <Select
-              value={localType}
-              onValueChange={(v) => handleTypeChange(v as QuestionType)}
-            >
-              <SelectTrigger className="w-44 text-sm">
+            <Select value={localType} onValueChange={(v) => handleTypeChange(v as QuestionType)}>
+              <SelectTrigger className="w-44 border-[#E2E8F0] text-sm text-[#0F172A]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {QUESTION_TYPES.map((t) => (
                   <SelectItem key={t.value} value={t.value}>
-                    {t.label}
+                    <span className="flex items-center gap-2">
+                      <span className="text-[#94A3B8]">{t.icon}</span>
+                      {t.label}
+                    </span>
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -263,19 +260,19 @@ export function InlineQuestionCard({
         </div>
 
         {/* Type-specific body */}
-        <div className="mt-4">
-          {/* Multiple choice / checkbox options */}
+        <div className="mt-5">
+
+          {/* Multiple choice / checkbox */}
           {showOptions && (
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               {localOptions.map((opt, i) => (
                 <div key={i} className="flex items-center gap-2.5">
-                  {localType === "multiple_choice" ? (
-                    <div className="h-4 w-4 shrink-0 rounded-full border-2 border-text-secondary" />
-                  ) : (
-                    <div className="h-4 w-4 shrink-0 rounded border-2 border-text-secondary" />
-                  )}
+                  {localType === "multiple_choice"
+                    ? <div className="h-4 w-4 shrink-0 rounded-full border-2 border-[#6EA4FF]" />
+                    : <div className="h-4 w-4 shrink-0 rounded border-2 border-[#6EA4FF]" />
+                  }
                   <input
-                    className="flex-1 border-b border-input bg-transparent py-0.5 text-sm outline-none focus:border-indigo-500"
+                    className="flex-1 border-b border-[#E2E8F0] bg-transparent py-0.5 text-sm text-[#0F172A] outline-none transition-colors focus:border-[#3B82F6]"
                     value={opt}
                     onChange={(e) => updateOption(i, e.target.value)}
                     aria-label={`Option ${i + 1}`}
@@ -284,7 +281,7 @@ export function InlineQuestionCard({
                     <button
                       type="button"
                       onClick={() => removeOption(i)}
-                      className="text-text-muted hover:text-destructive"
+                      className="rounded p-0.5 text-[#94A3B8] transition-colors hover:bg-red-50 hover:text-[#EF4444]"
                       aria-label="Remove option"
                     >
                       <X className="h-3.5 w-3.5" />
@@ -293,26 +290,21 @@ export function InlineQuestionCard({
                 </div>
               ))}
 
-              {/* Add option row */}
-              <div className="flex items-center gap-2.5">
-                {localType === "multiple_choice" ? (
-                  <div className="h-4 w-4 shrink-0 rounded-full border-2 border-border" />
-                ) : (
-                  <div className="h-4 w-4 shrink-0 rounded border-2 border-border" />
-                )}
-                <button
-                  type="button"
-                  onClick={addOption}
-                  className="text-sm text-indigo-600 hover:underline dark:text-indigo-400"
+              {/* Add option / Other */}
+              <div className="flex items-center gap-2.5 pt-0.5">
+                {localType === "multiple_choice"
+                  ? <div className="h-4 w-4 shrink-0 rounded-full border-2 border-[#E2E8F0]" />
+                  : <div className="h-4 w-4 shrink-0 rounded border-2 border-[#E2E8F0]" />
+                }
+                <button type="button" onClick={addOption}
+                  className="text-sm font-medium text-[#3B82F6] underline-offset-2 hover:text-[#2563EB] hover:underline"
                 >
                   Add option
                 </button>
-                <span className="text-sm text-text-muted">or</span>
-                <button
-                  type="button"
-                  onClick={addOther}
+                <span className="text-sm text-[#94A3B8]">or</span>
+                <button type="button" onClick={addOther}
                   disabled={localOptions.includes("Other")}
-                  className="text-sm text-indigo-600 hover:underline disabled:opacity-40 dark:text-indigo-400"
+                  className="text-sm font-medium text-[#3B82F6] underline-offset-2 hover:text-[#2563EB] hover:underline disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   add &ldquo;Other&rdquo;
                 </button>
@@ -322,24 +314,19 @@ export function InlineQuestionCard({
 
           {/* Short / long text preview */}
           {(localType === "short_text" || localType === "long_text") && (
-            <div
-              className={cn(
-                "border-b border-dashed border-input py-2 text-sm text-text-muted",
-                localType === "long_text" && "min-h-[60px]"
-              )}
-            >
+            <div className={cn(
+              "rounded-lg border border-dashed border-[#E2E8F0] bg-[#F8FAFC] px-3 py-2.5 text-sm text-[#94A3B8]",
+              localType === "long_text" ? "min-h-[72px]" : "max-w-[55%]"
+            )}>
               {localType === "short_text" ? "Short answer text" : "Long answer text"}
             </div>
           )}
 
-          {/* Rating preview */}
+          {/* Rating scale */}
           {localType === "rating" && (
-            <div className="flex gap-2 py-2">
+            <div className="flex items-center gap-2 py-1">
               {[1, 2, 3, 4, 5].map((n) => (
-                <div
-                  key={n}
-                  className="flex h-8 w-8 items-center justify-center rounded-full border text-sm text-text-muted"
-                >
+                <div key={n} className="flex h-9 w-9 items-center justify-center rounded-full border border-[#C7DDFF] bg-[#EEF4FF] text-sm font-semibold text-[#3B82F6]">
                   {n}
                 </div>
               ))}
@@ -349,56 +336,48 @@ export function InlineQuestionCard({
       </div>
 
       {/* Footer toolbar */}
-      <div className="mt-4 flex items-center justify-end gap-2 border-t px-4 py-2.5">
-        {/* Ordering controls */}
-        <div className="flex items-center gap-0.5 mr-1">
-          <button
-            type="button"
-            onClick={onMoveUp}
-            disabled={isFirst}
-            className="rounded p-1 text-text-muted hover:bg-muted hover:text-text-secondary disabled:opacity-30"
-            aria-label="Move up"
+      <div className="mt-4 flex items-center justify-end gap-1.5 border-t border-[#EEF2F7] bg-[#F8FAFC] px-4 py-2.5">
+
+        {/* Move up/down */}
+        <div className="mr-0.5 flex items-center gap-0.5">
+          <button type="button" onClick={onMoveUp} disabled={isFirst}
+            className="rounded-md p-1.5 text-[#94A3B8] transition-colors hover:bg-[#F1F5F9] hover:text-[#475569] disabled:opacity-25"
+            aria-label="Move question up"
           >
             <ChevronUp className="h-4 w-4" />
           </button>
-          <button
-            type="button"
-            onClick={onMoveDown}
-            disabled={isLast}
-            className="rounded p-1 text-text-muted hover:bg-muted hover:text-text-secondary disabled:opacity-30"
-            aria-label="Move down"
+          <button type="button" onClick={onMoveDown} disabled={isLast}
+            className="rounded-md p-1.5 text-[#94A3B8] transition-colors hover:bg-[#F1F5F9] hover:text-[#475569] disabled:opacity-25"
+            aria-label="Move question down"
           >
             <ChevronDown className="h-4 w-4" />
           </button>
         </div>
 
-        <div className="h-4 w-px bg-border" />
+        <div className="h-4 w-px bg-[#E2E8F0]" />
 
-        {/* Duplicate (future) */}
-        <button
-          type="button"
-          className="rounded p-1.5 text-text-muted opacity-40 cursor-not-allowed"
-          aria-label="Duplicate question (coming soon)"
+        {/* Duplicate (coming soon) */}
+        <button type="button"
+          className="cursor-not-allowed rounded-md p-1.5 text-[#94A3B8]/30"
+          aria-label="Duplicate (coming soon)"
           title="Duplicate (coming soon)"
         >
           <Copy className="h-4 w-4" />
         </button>
 
         {/* Delete */}
-        <button
-          type="button"
-          onClick={onDelete}
-          className="rounded p-1.5 text-text-muted hover:bg-destructive/10 hover:text-destructive"
+        <button type="button" onClick={onDelete}
+          className="rounded-md p-1.5 text-[#94A3B8] transition-colors hover:bg-red-50 hover:text-[#EF4444]"
           aria-label="Delete question"
         >
           <Trash2 className="h-4 w-4" />
         </button>
 
-        <div className="h-4 w-px bg-border" />
+        <div className="h-4 w-px bg-[#E2E8F0]" />
 
         {/* Required toggle */}
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-text-secondary">Required</span>
+        <div className="flex items-center gap-2.5 pl-0.5">
+          <span className="text-sm font-medium text-[#475569]">Required</span>
           <RequiredToggle checked={localRequired} onChange={handleRequiredChange} />
         </div>
       </div>

@@ -18,7 +18,9 @@ def _normalize_question(raw: RawQuestion, order: int) -> NormalizedQuestion | No
 
     metadata: dict = {}
     if if_type in ("multiple_choice", "checkbox") and raw["options"]:
-        metadata["options"] = raw["options"]
+        # Key must be "choices" — that's what the survey editor (InlineQuestionCard)
+        # reads from metadata when rendering options.
+        metadata["choices"] = raw["options"]
     elif if_type == "rating":
         metadata["min_rating"] = raw["min_value"] if raw["min_value"] is not None else 1
         metadata["max_rating"] = raw["max_value"] if raw["max_value"] is not None else 5

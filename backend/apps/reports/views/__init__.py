@@ -1,6 +1,7 @@
 from .report_views import (
     ReportDownloadView,
     ReportGenerateView,
+    ReportPreviewDataView,
     ReportStatusView,
     ReportTemplatesView,
 )
@@ -8,6 +9,7 @@ from .report_views import (
 __all__ = [
     "ReportDownloadView",
     "ReportGenerateView",
+    "ReportPreviewDataView",
     "ReportStatusView",
     "ReportTemplatesView",
 ]

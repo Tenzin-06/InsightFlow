@@ -145,7 +145,7 @@ export function SurveyEditor({ surveyId, onAddRef, onSaveStateChange }: Props) {
         type="button"
         onClick={handleAddQuestion}
         disabled={createQuestion.isPending}
-        className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-border/60 bg-white/50 py-3 text-sm text-text-muted transition-colors hover:border-indigo-300 hover:bg-indigo-50/50 hover:text-indigo-600 disabled:opacity-50 dark:bg-card/50"
+        className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-[#E2E8F0] bg-white py-3.5 text-sm font-medium text-[#94A3B8] transition-all hover:border-[#9FC2FF] hover:bg-[#EEF4FF] hover:text-[#3B82F6] disabled:cursor-not-allowed disabled:opacity-50"
       >
         <Plus className="h-4 w-4" />
         {createQuestion.isPending ? "Adding…" : "Add question"}

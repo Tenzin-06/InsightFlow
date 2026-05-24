@@ -2,8 +2,10 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { FileText } from "lucide-react";
 import { ReportTemplateSelectorInline } from "./report-template-selector-inline";
 import { ReportSectionSelector } from "./report-section-selector";
+import { useSurveys } from "@/features/surveys/hooks/use-surveys";
 import type { ReportConfig, ReportSectionKey, ReportTemplate } from "../types";
 
 const schema = z.object({
@@ -26,6 +28,8 @@ type ReportConfigFormProps = {
 };
 
 export function ReportConfigForm({ defaultValues, onConfigChange }: ReportConfigFormProps) {
+  const { data: surveys = [], isLoading: surveysLoading } = useSurveys();
+
   const { register, watch, setValue, formState: { errors } } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -91,6 +95,38 @@ export function ReportConfigForm({ defaultValues, onConfigChange }: ReportConfig
             />
           </div>
         </div>
+      </fieldset>
+
+      {/* Survey selector */}
+      <fieldset>
+        <legend className="mb-3 text-sm font-semibold text-text-primary">
+          Survey <span className="text-xs font-normal text-text-muted">(select to include findings)</span>
+        </legend>
+        <div className="relative">
+          <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center">
+            <FileText className="h-4 w-4 text-text-muted" aria-hidden="true" />
+          </div>
+          <select
+            id="report-survey"
+            className="w-full appearance-none rounded-lg border border-border-default bg-white py-2.5 pl-9 pr-4 text-sm text-text-primary shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:opacity-60 dark:bg-card"
+            disabled={surveysLoading}
+            value={watch("surveyId") ?? ""}
+            onChange={(e) => setValue("surveyId", e.target.value, { shouldValidate: true })}
+          >
+            <option value="">— No specific survey (general report) —</option>
+            {surveys.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.title}
+                {s.response_count != null ? ` (${s.response_count} responses)` : ""}
+              </option>
+            ))}
+          </select>
+        </div>
+        {watch("surveyId") && (
+          <p className="mt-1.5 text-xs text-text-muted">
+            Report findings will be scoped to the selected survey's responses.
+          </p>
+        )}
       </fieldset>
 
       {/* Template */}

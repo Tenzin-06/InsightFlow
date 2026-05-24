@@ -24,7 +24,9 @@ def import_google_form(url: str, owner) -> dict:
         owner.pk,
     )
     return {
-        "survey_id": survey.pk,
-        "title": survey.title,
-        "question_count": survey.questions.count(),
+        "survey": {
+            "id": survey.pk,
+            "title": survey.title,
+            "question_count": survey.questions.count(),
+        }
     }

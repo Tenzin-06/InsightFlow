@@ -74,6 +74,7 @@ export function SidebarItem({ path, label, icon: Icon, onClick, children }: Side
   return (
     <NavLink
       to={path}
+      end
       onClick={onClick}
       className={({ isActive }) =>
         cn(

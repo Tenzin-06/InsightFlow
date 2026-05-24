@@ -13,6 +13,10 @@ Use AIGateway instead so provider logic stays isolated.
 
 Backward-compatible helpers (call_gemini, is_gemini_configured) are
 provided at module level for existing callers in apps.ai_analytics.
+
+SDK: google-genai (google.genai) — the new official SDK.
+     Install: pip install google-genai
+     The deprecated google-generativeai package is no longer used.
 """
 
 import time
@@ -22,12 +26,12 @@ from typing import Any, Optional
 logger = logging.getLogger("apps.ai")
 
 # Default model to use when GEMINI_MODEL is not configured
-_DEFAULT_MODEL = "gemini-1.5-flash"
+_DEFAULT_MODEL = "gemini-2.0-flash"
 
 
 class GeminiService:
     """
-    Thin wrapper around the google-generativeai SDK.
+    Thin wrapper around the google.genai SDK.
 
     The client is initialised lazily on the first request so that missing
     GEMINI_API_KEY does not break the application at startup — only at the
@@ -42,14 +46,14 @@ class GeminiService:
     # ------------------------------------------------------------------
 
     def _get_client(self) -> Any:
-        """Return the cached Gemini GenerativeModel, initialising it lazily."""
+        """Return the cached google.genai Client, initialising it lazily."""
         if self._client is None:
             try:
-                import google.generativeai as genai  # type: ignore[import]
+                from google import genai  # type: ignore[import]
             except ImportError as exc:
                 raise RuntimeError(
-                    "google-generativeai is not installed. "
-                    "Run: pip install google-generativeai"
+                    "google-genai is not installed. "
+                    "Run: pip install google-genai"
                 ) from exc
 
             from django.conf import settings
@@ -61,12 +65,10 @@ class GeminiService:
                     "Add it to your .env file and Django settings."
                 )
 
-            model_name: str = getattr(
-                settings, "GEMINI_MODEL", _DEFAULT_MODEL
+            self._client = genai.Client(api_key=api_key)
+            logger.debug(
+                "GeminiService: client initialised with model=%s", self.model_name
             )
-            genai.configure(api_key=api_key)
-            self._client = genai.GenerativeModel(model_name)
-            logger.debug("GeminiService: client initialised with model=%s", model_name)
 
         return self._client
 
@@ -88,19 +90,22 @@ class GeminiService:
             "tokens_used": int,   # total token count (0 if unavailable)
         }
         """
+        from google import genai  # type: ignore[import]
+        from google.genai import types  # type: ignore[import]
+
         client = self._get_client()
         from django.conf import settings
 
         timeout: int = getattr(settings, "AI_TIMEOUT_SECONDS", 30)
         start = time.time()
 
-        response = client.generate_content(
-            prompt,
-            generation_config={
-                "temperature": 0.7,
-                "max_output_tokens": 2048,
-            },
-            request_options={"timeout": timeout},
+        response = client.models.generate_content(
+            model=self.model_name,
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                temperature=0.7,
+                max_output_tokens=2048,
+            ),
         )
 
         latency_ms = (time.time() - start) * 1000
@@ -118,7 +123,12 @@ class GeminiService:
         """Safely pull total_token_count from provider metadata."""
         try:
             if hasattr(response, "usage_metadata"):
-                return int(response.usage_metadata.total_token_count or 0)
+                meta = response.usage_metadata
+                return int(
+                    getattr(meta, "total_token_count", None)
+                    or getattr(meta, "candidates_token_count", 0)
+                    or 0
+                )
         except Exception:
             pass
         return 0
@@ -219,25 +229,35 @@ def call_gemini(
         return None
 
     model_name = model or getattr(settings, "GEMINI_MODEL", _DEFAULT_MODEL)
-    request_timeout = timeout or getattr(settings, "AI_TIMEOUT_SECONDS", 30)
+    _request_timeout = timeout or getattr(settings, "AI_TIMEOUT_SECONDS", 30)
 
     try:
-        import google.generativeai as genai  # lazy import — optional dependency
+        from google import genai  # lazy import — optional dependency
+        from google.genai import types  # type: ignore[import]
 
-        genai.configure(api_key=api_key)
-        generation_config = genai.GenerationConfig(temperature=temperature)
-        ai_model = genai.GenerativeModel(model_name, generation_config=generation_config)
+        client = genai.Client(api_key=api_key)
 
-        logger.debug("Gemini request — model=%s prompt_length=%d", model_name, len(prompt))
-        response = ai_model.generate_content(prompt, request_options={"timeout": request_timeout})
+        logger.debug(
+            "Gemini request — model=%s prompt_length=%d", model_name, len(prompt)
+        )
+        response = client.models.generate_content(
+            model=model_name,
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                temperature=temperature,
+                max_output_tokens=2048,
+            ),
+        )
         text = response.text
-        logger.debug("Gemini response received — length=%d", len(text) if text else 0)
+        logger.debug(
+            "Gemini response received — length=%d", len(text) if text else 0
+        )
         return text
 
     except ImportError:
         logger.error(
-            "google-generativeai is not installed. "
-            "Run: pip install google-generativeai"
+            "google-genai is not installed. "
+            "Run: pip install google-genai"
         )
         return None
     except Exception as exc:
@@ -251,7 +271,7 @@ def is_gemini_configured() -> bool:
     if not getattr(settings, "GEMINI_API_KEY", ""):
         return False
     try:
-        import google.generativeai  # noqa: F401
+        from google import genai  # noqa: F401
         return True
     except ImportError:
         return False

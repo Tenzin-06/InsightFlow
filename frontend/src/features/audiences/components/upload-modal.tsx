@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { UploadDropzone } from "@/features/audiences/components/upload-dropzone";
@@ -11,13 +12,21 @@ type Props = {
 };
 
 export function UploadModal({ audienceId, open, onOpenChange }: Props) {
-  const { draft, isParsing, isUploading, parseFile, confirmUpload, resetUpload } =
+  const { draft, isParsing, isUploading, isSuccess, parseFile, confirmUpload, resetUpload } =
     useContactUpload(audienceId);
 
   function handleOpenChange(nextOpen: boolean) {
     onOpenChange(nextOpen);
     if (!nextOpen) resetUpload();
   }
+
+  // Auto-close and reset once the upload succeeds
+  useEffect(() => {
+    if (isSuccess) {
+      onOpenChange(false);
+      resetUpload();
+    }
+  }, [isSuccess]);
 
   const canImport = Boolean(draft?.contacts.length) && !isUploading;
 
@@ -35,7 +44,7 @@ export function UploadModal({ audienceId, open, onOpenChange }: Props) {
           <UploadDropzone onFile={parseFile} disabled={isParsing || isUploading} />
           {isParsing && (
             <p className="text-sm text-text-secondary" role="status" aria-live="polite">
-              Processing contacts...
+              Processing contacts…
             </p>
           )}
           {draft && <UploadPreview draft={draft} />}
@@ -50,7 +59,7 @@ export function UploadModal({ audienceId, open, onOpenChange }: Props) {
             disabled={!canImport}
             className="bg-primary-500 hover:bg-primary-600"
           >
-            {isUploading ? "Importing..." : "Confirm import"}
+            {isUploading ? "Importing…" : "Confirm import"}
           </Button>
         </DialogFooter>
       </DialogContent>

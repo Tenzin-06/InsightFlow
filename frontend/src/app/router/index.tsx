@@ -87,6 +87,10 @@ const router = createBrowserRouter([
           { path: "/dashboard/simulation/runs", element: <Suspense fallback={<PageLoader />}><SimulationRunsPage /></Suspense> },
           { path: "/dashboard/simulation/analytics", element: <Suspense fallback={<PageLoader />}><SimulationAnalyticsPage /></Suspense> },
           { path: "/dashboard/reports", element: <Suspense fallback={<PageLoader />}><ReportsPage /></Suspense> },
+          // Short alias — dashboard links and "Generate Report" buttons use /reports
+          { path: "/reports", element: <Suspense fallback={<PageLoader />}><ReportsPage /></Suspense> },
+          // Per-survey analytics shortcut from dashboard
+          { path: "/analytics/survey/:surveyId", element: <Suspense fallback={<PageLoader />}><SurveyAnalyticsPage /></Suspense> },
           { path: "/settings", element: <Suspense fallback={<PageLoader />}><SettingsPage /></Suspense> },
         ],
       },

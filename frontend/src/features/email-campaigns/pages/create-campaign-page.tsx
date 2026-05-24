@@ -66,6 +66,10 @@ function CreateCampaignContent() {
           onSaveDraft={form.saveDraft}
           onPrepare={() => form.markReady("ready")}
           onSchedule={() => form.markReady("scheduled")}
+          onSendTest={form.sendTest}
+          isSaving={form.isSaving}
+          isPreparing={form.isPreparing}
+          isSendingTest={form.isSendingTest}
         />
       </div>
       <aside className="hidden xl:block">

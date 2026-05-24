@@ -1,12 +1,25 @@
-# Google Forms internal question type integers → InsightFlow question types
-# GF types: 0=short answer, 1=paragraph, 2=multiple choice, 3=dropdown,
-#           4=checkboxes, 5=linear scale, 6=MC grid, 7=checkbox grid, 8=date, 9=time
+# Google Forms item[3] question type integers → InsightFlow question types
+#
+# Type source: item[3] in FB_PUBLIC_LOAD_DATA_ (item-level, NOT entry[7])
+#
+#   0 = short answer   → short_text
+#   1 = paragraph      → long_text
+#   2 = multiple choice→ multiple_choice
+#   3 = dropdown       → multiple_choice  (closest InsightFlow equivalent)
+#   4 = checkboxes     → checkbox
+#   5 = linear scale   → rating
+#   6 = MC grid        → (unsupported)
+#   7 = checkbox grid  → (unsupported)
+#   8 = date           → (unsupported)
+#   9 = time           → (unsupported)
+
 _GF_TO_IF_TYPE: dict[int, str] = {
-    0: "short_text",       # Short Answer
-    1: "long_text",        # Paragraph
-    2: "multiple_choice",  # Multiple Choice
-    4: "checkbox",         # Checkboxes
-    5: "rating",           # Linear Scale
+    0: "short_text",
+    1: "long_text",
+    2: "multiple_choice",
+    3: "multiple_choice",   # dropdown maps to multiple_choice
+    4: "checkbox",
+    5: "rating",
 }
 
 SUPPORTED_GF_TYPES: frozenset[int] = frozenset(_GF_TO_IF_TYPE.keys())

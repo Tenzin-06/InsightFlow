@@ -53,12 +53,14 @@ export function useContactUpload(audienceId: string) {
     draft,
     isParsing,
     isUploading: mutation.isPending,
+    isSuccess: mutation.isSuccess,
     lastSummary,
     parseFile,
     confirmUpload: mutation.mutate,
     resetUpload: () => {
       setDraft(null);
       setLastSummary(null);
+      mutation.reset();
     },
   };
 }

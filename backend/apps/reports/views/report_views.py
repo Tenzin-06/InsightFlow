@@ -1,4 +1,5 @@
 from pathlib import Path
+import logging
 
 from django.conf import settings
 from django.http import FileResponse
@@ -18,6 +19,9 @@ from apps.reports.serializers import (
 from apps.reports.services import create_report_export
 from apps.reports.api_response import success_response
 from apps.surveys.models.survey import Survey
+from apps.authentication.permissions import IsAuthenticated
+
+logger = logging.getLogger(__name__)
 
 
 class ReportGenerateView(APIView):
@@ -70,6 +74,51 @@ class ReportDownloadView(APIView):
 class ReportTemplatesView(APIView):
     def get(self, request):
         return Response(success_response(list(REPORT_TEMPLATES.values())))
+
+
+class ReportPreviewDataView(APIView):
+    """
+    GET /api/v1/reports/preview/<survey_id>/
+
+    Returns a complete, Gemini-generated JSON payload for the frontend
+    report preview — including real metrics, chart data, executive summary,
+    key findings, AI insights, sentiment, question breakdown, and conclusions.
+
+    Query params:
+        include_ai=true|false  (default: true)
+            When false, skips AI analytics and Gemini narrative generation
+            and returns only deterministic analytics metrics.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, survey_id: int) -> Response:
+        owner_id    = request.user.id
+        include_ai  = request.query_params.get("include_ai", "true").lower() != "false"
+
+        # Verify ownership
+        try:
+            Survey.objects.get(id=survey_id, owner_id=owner_id)
+        except Survey.DoesNotExist:
+            return Response(
+                {"error": "Survey not found or access denied."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        try:
+            from apps.reports.services.report_generation_service import (
+                generate_report_preview,
+            )
+            payload = generate_report_preview(survey_id, owner_id, include_ai=include_ai)
+            return Response(success_response(payload))
+        except Exception as exc:
+            logger.exception(
+                "ReportPreviewDataView: generation failed survey=%s — %s", survey_id, exc
+            )
+            return Response(
+                {"error": "Failed to generate report preview. Please try again."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 
 def _get_owned_survey(survey_id: int, user):
